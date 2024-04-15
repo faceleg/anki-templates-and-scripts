@@ -1,11 +1,42 @@
-<div id="char_meaning" class="meaning-card">{{Definitions}}</div>
-<br/>
+
+<script>
+    var url_hanzi = "https://cdn.jsdelivr.net/npm/hanzi-writer-data@latest/";
+
+    // change color
+    var stroke_color = "#555";
+    var outline_color = "#DDD";
+    var drawing_color = "#333";
+
+    if (document.body.classList.contains("night_mode")) {
+        stroke_color = "#ffffff";
+        outline_color = "#5B5B5B";
+        drawing_color = "#fff";
+    }
+
+    function getToneColor(char) {
+        stroke_color = "#555";
+        if (document.body.classList.contains("night_mode")) {
+            stroke_color = "#ffffff";
+        }
+        switch (char) {
+            case "char-tone1": return "#f44336";
+            case "char-tone2": return "#ff9800";
+            case "char-tone3": return "#4caf50";
+            case "char-tone4": return "#2196f3";
+            case "char-tone0": return stroke_color;
+            case "char-tone5": return stroke_color;
+        }
+    }
+</script>
+
+<div id="char_image">{{Image}}</div>
 <div id="char_zhuyin">{{Zhuyin}}</div>
 <div id="char_pinyin">{{Pinyin}}</div>
-<br/>
 <div id="char_sim" class="char-card">{{Simplified}}</div>
 <div id="char_trad" class="char-card">{{Traditional}}</div>
-<br/>
+<div id="onfinish-character-target-div" class="tappable"></div>
+<div id="character-target-div" class="tappable"></div>
+<div id="ch_load_status" style="color:#ea2322; margin-top: -36px; display: none;">&#8226;</div>
 <div id='audio' style='display:none'>{{Audio}}</div>
 
 <div class="modal-footer1">
@@ -15,12 +46,29 @@
     <a class="btn" id='btnPlayAudio'>
         <div class="icon"><i class="material-icons">play_arrow</i></div>
     </a>
+    <a class="btn" id='btnRevealChar'>
+        <div class="icon">
+            <i class="material-icons">gesture</i>
+        </div>
+    </a>
+    <a class="btn" id='btnReloadQuiz'>
+        <div class="icon"><i class="material-icons">replay</i></div>
+    </a>
+    <a class="btn" id='btnGoNextCard'>
+        <div class="icon"><i class="material-icons">navigate_next</i></div>
+    </a>
     <a class="btn" id='btnMoreOptions' onclick="openSidebar('more-info-sidebar')">
         <div class="icon"><i class="material-icons">more_vert</i></div>
     </a>
 </div>
 
+<hr>
+
+<div id="char_meaning" class="meaning-card">{{Definitions}}</div>
+
+
 <!--sidebar-->
+
 <div id="sidebar" class="sidebar">
     <section>
         <fieldset style="border:none;">
@@ -37,11 +85,19 @@
     </section>
     <section>
         <fieldset>
+            <div class="fieldset-item fs-item-3 practice fs-item-front-back">
+                <div id="text-front" class="input-stack front-back" onclick="setActive('text-front')">Front</div>
+                <div id="text-back" class="input-stack front-back" onclick="setActive('text-back')">Back</div>
+            </div>
+        </fieldset>
+    </section>
+    <section>
+        <fieldset>
             <div class="fieldset-item fs-item-1 practice">
                 <div class="input-stack">
-                    <label for="practice-select">Practice</label>
+                    <label for="reading-practice-select">Practice</label>
                 </div>
-                <select name="practice" id="practice-select" onchange=setPrefs(this)>
+                <select name="practice" id="reading-practice-select" onchange=setPrefs(this)>
                     <option>简</option>
                     <option>繁</option>
                 </select>
@@ -90,6 +146,58 @@
                 </div>
                 <input class="tappable" type="checkbox" id="text-trad" name="text-trad" onchange=setPrefs(this)>
             </div>
+            <div class="fieldset-item fs-item-1">
+                <div class="input-stack">
+                    <label for="text-grid">
+                        Grid
+                    </label>
+                </div>
+                <input class="tappable" type="checkbox" id="text-grid" name="text-grid" onchange=setPrefs(this)>
+            </div>
+            <div class="fieldset-item fs-item-1">
+                <div class="input-stack">
+                    <label for="text-outline">
+                        Outline
+                    </label>
+                </div>
+                <input class="tappable" type="checkbox" id="text-outline" name="text-outline" onchange=setPrefs(this)>
+            </div>
+            <div class="fieldset-item fs-item-1">
+                <div class="input-stack">
+                    <label for="text-stroke-color">
+                        Stroke tone color
+                    </label>
+                </div>
+                <input class="tappable" type="checkbox" id="text-stroke-color" name="text-stroke-color"
+                    onchange=setPrefs(this)>
+            </div>
+        </fieldset>
+    </section>
+    <section>
+        <fieldset>
+            <div class="fieldset-item fs-item-1">
+                <div class="input-stack">
+                    <label for="draw-size" id="text-draw-size" aria-hidden="true"><small>Grid size</small></label>
+                </div>
+                <input class="tappable" name="draw-size" id="draw-size" aria-labelledby="draw-size" type="number"
+                    value="250" min="100" max="1000" oninput=setPrefs(this)>
+            </div>
+            <div class="fieldset-item fs-item-1">
+                <div class="input-stack">
+                    <label for="stroke-size" id="text-stroke-size" aria-hidden="true"><small>Stroke
+                            width</small></label>
+                </div>
+                <input class="tappable" name="stroke-size" id="stroke-size" aria-labelledby="stroke-size" type="number"
+                    value="6" min="2" max="50" oninput=setPrefs(this)>
+            </div>
+            <div class="fieldset-item fs-item-1">
+                <div class="input-stack">
+                    <label for="hint-miss" id="text-hint-miss" aria-hidden="true"><small>Hint after
+                            misses</small></label>
+                </div>
+                <input class="tappable" name="hint-miss" id="hint-miss" aria-labelledby="hint-miss" type="number"
+                    value="3" min="1" max="10" oninput=setPrefs(this)>
+            </div>
         </fieldset>
     </section>
     <section>
@@ -137,39 +245,78 @@
 </div>
 <!-----sidebar------>
 
+<!-- Persistence -->
 <script>
     // v1.0.0 - https://github.com/SimonLammer/anki-persistence/blob/eeb2e1a9e37c941dd63e1fe6c2a257f043c40e0d/script.js
     if (void 0 === window.Persistence) { var e = "github.com/SimonLammer/anki-persistence/", t = "_default"; if (window.Persistence_localStorage = function () { var i = !1; try { null !== window.localStorage && "object" == typeof window.localStorage && (i = !0, this.clear = function () { for (var t = 0; t < localStorage.length; t++) { var i = localStorage.key(t); 0 == i.indexOf(e) && (localStorage.removeItem(i), t--) } }, this.setItem = function (i, n) { void 0 == n && (n = i, i = t), localStorage.setItem(e + i, JSON.stringify(n)) }, this.getItem = function (i) { return void 0 == i && (i = t), JSON.parse(localStorage.getItem(e + i)) }, this.removeItem = function (i) { void 0 == i && (i = t), localStorage.removeItem(e + i) }) } catch (n) { } this.isAvailable = function () { return i } }, window.Persistence_sessionStorage = function () { var i = !1; try { "object" == typeof window.sessionStorage && (i = !0, this.clear = function () { for (var t = 0; t < sessionStorage.length; t++) { var i = sessionStorage.key(t); 0 == i.indexOf(e) && (sessionStorage.removeItem(i), t--) } }, this.setItem = function (i, n) { void 0 == n && (n = i, i = t), sessionStorage.setItem(e + i, JSON.stringify(n)) }, this.getItem = function (i) { return void 0 == i && (i = t), JSON.parse(sessionStorage.getItem(e + i)) }, this.removeItem = function (i) { void 0 == i && (i = t), sessionStorage.removeItem(e + i) }) } catch (n) { } this.isAvailable = function () { return i } }, window.Persistence_windowKey = function (i) { var n = window[i], o = !1; "object" == typeof n && (o = !0, this.clear = function () { n[e] = {} }, this.setItem = function (i, o) { void 0 == o && (o = i, i = t), n[e][i] = o }, this.getItem = function (i) { return void 0 == i && (i = t), void 0 == n[e][i] ? null : n[e][i] }, this.removeItem = function (i) { void 0 == i && (i = t), delete n[e][i] }, void 0 == n[e] && this.clear()), this.isAvailable = function () { return o } }, window.Persistence = new Persistence_sessionStorage, navigator.userAgent.indexOf("Mobile") > 0 && (window.Persistence = new Persistence_localStorage, Persistence.isAvailable() || (window.Persistence = new Persistence_sessionStorage)), Persistence.isAvailable() || (window.Persistence = new Persistence_windowKey("py")), !Persistence.isAvailable()) { var i = window.location.toString().indexOf("title"), n = window.location.toString().indexOf("main", i); i > 0 && n > 0 && n - i < 10 && (window.Persistence = new Persistence_windowKey("qt")) } }
+    
+    var keyPrefix = "reading";
+    var UniqueCardPersistence = {
+        getItem: function(key) {
+            return Persistence.getItem(keyPrefix + "-" + key);
+        },
+        setItem: function(key, value) {
+            return Persistence.setItem(keyPrefix + "-" + key, value);
+        }
+    }
 </script>
 
 <script>
     var charClass = document.getElementById("char-sim-id").children;
 
-    var switchIdList = ["text-pinyin", "text-zhuyin", "text-meaning", "text-sim", "text-trad"];
+    var switchIdList = ["text-grid", "text-pinyin", "text-zhuyin", "text-meaning", "text-sim", "text-trad", "text-stroke-color", "text-outline"];
+
+    var frontBack = "front";
+    function setActive(side) {
+        if (side == "text-front") {
+            frontBack = "front";
+            document.getElementById("text-front").classList.add("btn-active")
+            document.getElementById("text-back").classList.remove("btn-active")
+        }
+        if (side == "text-back") {
+            frontBack = "back";
+            document.getElementById("text-front").classList.remove("btn-active")
+            document.getElementById("text-back").classList.add("btn-active")
+        }
+        initSwitchPrefs();
+    }
+
+    if (!document.getElementById("back")) {
+        setActive("text-front");
+    } else {
+        setActive("text-back");
+    }
 
     function initPractice() {
-        var _selectPracticeId = "practice-select";
-        var selectPracticeElem = document.getElementById("practice-select");
-        var selectPracticeStore = Persistence.getItem(_selectPracticeId);
+        var _selectPracticeId = frontBack + "reading-practice-select";
+        var selectPracticeElem = document.getElementById("reading-practice-select");
+        var selectPracticeStore = UniqueCardPersistence.getItem(_selectPracticeId);
 
         if (selectPracticeStore == undefined) {
             selectPracticeElem.selectedIndex = 0;
-            Persistence.setItem(_selectPracticeId, 0);
+            UniqueCardPersistence.setItem(_selectPracticeId, 0);
         } else {
             selectPracticeElem.selectedIndex = selectPracticeStore;
-            Persistence.setItem(_selectPracticeId, selectPracticeStore);
+            UniqueCardPersistence.setItem(_selectPracticeId, selectPracticeStore);
         }
     }
 
     function initSwitchPrefs() {
         for (var _id of switchIdList) {
-            var perId = _id;
+            var perId = frontBack + _id;
             var divId = _id.replace("text-", "char_");
-            if (Persistence.getItem(perId) == "false") {
+            var drawIds = ["text-grid", "text-stroke-color", "text-outline"];
+            if (UniqueCardPersistence.getItem(perId) == "false") {
                 document.getElementById(_id).checked = false;
+                if (!drawIds.includes(_id)) {
+                    document.getElementById(divId).style.display = "none";
+                }
             } else {
                 document.getElementById(_id).checked = true;
-                Persistence.setItem(perId, "true");
+                UniqueCardPersistence.setItem(perId, "true");
+                if (!drawIds.includes(_id)) {
+                    document.getElementById(divId).style.display = "block";
+                }
             }
 
             var isShowField = document.getElementById(_id).checked ? true : false;
@@ -196,28 +343,59 @@
         var simChar = document.getElementById("char_sim");
         var tradPer = Persistence
         if (tradChar.innerHTML != simChar.innerHTML) {
-            if (Persistence.getItem("text-trad") == "true") {
+            if (UniqueCardPersistence.getItem(frontBack + "text-trad") == "true") {
                 tradChar.style.display = "block";
             }
         } else {
-            if (Persistence.getItem("text-sim") == "true") {
+            if (UniqueCardPersistence.getItem(frontBack + "text-sim") == "true") {
                 tradChar.style.display = "none";
             }
         }
     }
 
+    function initDrawPrefs() {
+        var drawPrefsList = ["draw-size", "stroke-size", "hint-miss"];
+        for (var _id of drawPrefsList) {
+            var perId = frontBack + _id;
+            var elem = document.getElementById(_id);
+            var store = UniqueCardPersistence.getItem(perId);
+            if (store) {
+                elem.value = store;
+            } else {
+                var value = _id == "draw-size" ? 400 : _id == "stroke-size" ? 64 : 5; 2
+                
+                elem.value = value;
+                UniqueCardPersistence.setItem(perId, value);
+            }
+        }
+
+        var perIndex = UniqueCardPersistence.getItem(frontBack + "reading-practice-select");
+        if (perIndex) {
+            characters = document.getElementById('char_trad').innerHTML;
+            document.getElementById("reading-practice-select").selectedIndex = 1;
+        } else {
+            characters = document.getElementById('char_sim').innerHTML;
+            document.getElementById("reading-practice-select").selectedIndex = 0;
+        }
+    }
+
     function setPrefs(e) {
-        var perId = e.id;
-        if (e.id == "practice-select") {
-            Persistence.setItem(perId, e.selectedIndex);
-            characters = document.getElementById("practice-select").selectedIndex == 0
+        var perId = frontBack + e.id;
+        if (e.id == "reading-practice-select") {
+            UniqueCardPersistence.setItem(perId, e.selectedIndex);
+            characters = document.getElementById("reading-practice-select").selectedIndex == 0
                 ? document.getElementById('char_sim').innerHTML
                 : document.getElementById('char_trad').innerHTML;
+            doPractice();
         }
 
         if (e.type == "checkbox") {
-            Persistence.setItem(perId, e.checked.toString());
+            UniqueCardPersistence.setItem(perId, e.checked.toString());
             var divId = e.id.replace("text-", "char_");
+            if (e.id == "text-stroke-color" || e.id == "text-outline") {
+                return;
+            }
+
             if (e.checked) {
                 document.getElementById(divId).style.display = "block";
             } else {
@@ -241,7 +419,7 @@
         }
 
         if (e.type == "number") {
-            Persistence.setItem(perId, e.value);
+            UniqueCardPersistence.setItem(perId, e.value);
             var elem = document.getElementById(e.id);
             elem.value = e.value;
         }
@@ -288,9 +466,11 @@
         if (window.ankiPlatform == "desktop" || isInWebView()) {
             initPractice();
             initSwitchPrefs();
+            initDrawPrefs();
         } else {
             window.addEventListener("load", initPractice, false);
             window.addEventListener("load", initSwitchPrefs, false);
+            window.addEventListener("load", initDrawPrefs, false);
         }
     }
     // audio in Anki Web on different systems
@@ -335,8 +515,236 @@
 
     var grid_data = `<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%' class='grid-color'  id='grid-background-target'><g id="char_grid"><line x1='0' y1='0' x2='100%' y2='100%' stroke='var(--surface1)' /><line x1='100%' y1='0' x2='0' y2='100%' stroke='var(--surface1)' /><line x1='50%' y1='0' x2='50%' y2='100%' stroke='var(--surface1)' /><line x1='0' y1='50%' x2='100%' y2='50%' stroke='var(--surface1)' /></g></svg>`;
 
-    var characters = document.getElementById("practice-select").selectedIndex == "0"
+    var characters = document.getElementById("reading-practice-select").selectedIndex == "0"
         ? document.getElementById('char_sim').innerHTML
         : document.getElementById('char_trad').innerHTML;
 
+    function generateHanziOnFinishQuiz(style = "none", finish = false) {
+        var drawGrid = document.getElementById('onfinish-character-target-div');
+        drawGrid.innerHTML = "";
+        drawGrid.style = "";
+        drawGrid.style.position = "absolute";
+        drawGrid.style.display = "grid";
+        var size = 40;
+        if (finish) {
+            size = 100;
+            drawGrid.style.position = "unset";
+            drawGrid.style.display = "block";
+            drawGrid.style.whiteSpace = "nowrap";
+            drawGrid.style.overflow = "scroll";
+        }
+
+        for (i = 0; i < characters.length; i++) {
+            var hanzi = characters[i];
+            var span = document.createElement('span');
+            span.innerHTML = grid_data;
+            span.children[0].id = "onfinish-grid-background-target" + i;
+            span.children[0].style.margin = finish ? "6px" : "2px";
+            span.style.display = style;
+            drawGrid.appendChild(span);
+            setStrokeColor(i);
+            var writer = HanziWriter.create("onfinish-grid-background-target" + i, hanzi, {
+                width: size,
+                height: size,
+                padding: 5,
+                strokeColor: stroke_color
+            })
+        }
+    }
+
+    document.getElementById("btnReloadQuiz").onclick = function () {
+        doPractice(true);
+        generateHanziOnFinishQuiz("none");
+        showNextAndRevealBtn(true);
+    }
+
+    function doPractice(p = false) {
+        if (document.getElementById("back")) {
+            generateHanziOnFinishQuiz("unset", true);
+            if (!p) {
+                showNextAndRevealBtn(false);
+                return;
+            };
+        } else {
+            generateHanziOnFinishQuiz("none");
+        }
+
+        document.getElementById("ch_load_status").innerHTML = "&#8226;";
+        document.getElementById("ch_load_status").style.marginBottom = "0px";
+        document.getElementById("ch_load_status").style.display = "block";
+
+        var hanziWriterList = [];
+        var drawGrid = document.getElementById('character-target-div');
+        drawGrid.innerHTML = "";
+
+        for (i = 0; i < characters.length; i++) {
+            var div = document.createElement('div');
+            div.id = "div" + i;
+            div.innerHTML = grid_data;
+            div.children[0].id = "grid-background-target" + i;
+            drawGrid.appendChild(div);
+            setStrokeColor(i);
+            var hanzi = characters[i];
+            var writer = HanziWriter.create('grid-background-target' + i, hanzi, {
+                onLoadCharDataSuccess: function (data) {
+                    document.getElementById("ch_load_status").style.color = "#4caf50";
+                },
+                onLoadCharDataError: function (reason) {
+                    document.getElementById("ch_load_status").style.color = "#ea2322";
+                },
+
+                width: charWidth,
+                height: charHeight,
+                showCharacter: false,
+                showOutline: UniqueCardPersistence.getItem(frontBack + "text-outline") == "true" ? true : false,
+                highlightOnComplete: true,
+                highlightCompleteColor: stroke_color,
+                drawingWidth: strokeWidth,
+                strokeColor: stroke_color,
+                outlineColor: outline_color,
+                drawingColor: drawing_color,
+                showHintAfterMisses: strokeAfterMisses,
+                padding: 5
+            });
+
+            writerQuiz(writer);
+            hanziWriterList.push(writer);
+
+            var revealClickCount = 0;
+            document.getElementById("btnGoNextCard").onclick = function () {
+                revealClickCount = 0;
+                btnTapAudio();
+                writer = hanziWriterList[getCurrentHanziNum()];
+                writer.showOutline();
+                writer.showCharacter();
+
+                setTimeout(function () {
+                    onFinishQuizDrawHanzi();
+                }, 800);
+
+                setTimeout(function () {
+                    showNextHanzi();
+                }, 1000);
+            };
+
+            document.getElementById("text-outline").onclick = function () {
+                btnTapAudio();
+                document.getElementById("text-outline").checked ?
+                    writer.showOutline() : writer.hideOutline();
+            };
+
+            document.getElementById("btnRevealChar").onclick = function () {
+                btnTapAudio();
+                writer = hanziWriterList[getCurrentHanziNum()];
+                writer.showOutline();
+                if (revealClickCount == 0) {
+                    writer.animateCharacter();
+                } else if (revealClickCount == 1) {
+                    writer.showCharacter();
+                } else if (revealClickCount == 2) {
+                    writer.hideCharacter();
+                    writer.hideOutline();
+                    writerQuiz(writer);
+                } else {
+                    revealClickCount = -1;
+                    writerQuiz(writer);
+                }
+                revealClickCount++;
+            };
+
+            function writerQuiz(writer) {
+                writer.quiz({
+                    onComplete: function (summaryData) {
+                        onFinishQuizDrawHanzi();
+
+                        setTimeout(function () {
+                            showNextHanzi();
+                        }, 1000)
+                    }
+                });
+            }
+
+            function getCurrentHanziNum() {
+                var characterDiv = document.querySelector('#character-target-div');
+                var characterElements = characterDiv.children;
+                var len = characterElements.length;
+                for (i = 0; i < len; i++) {
+                    var style = characterElements[i].style.display;
+                    if (style === 'block' || style === "") {
+                        return i;
+                    }
+                }
+            }
+
+            function onFinishQuizDrawHanzi() {
+                var finishCharacterDiv = document.getElementById('onfinish-character-target-div');
+                var characterElements = finishCharacterDiv.children;
+                var len = characterElements.length;
+                for (i = 0; i < len; i++) {
+                    var style = characterElements[i].style.display;
+                    if (style === 'none' || style === "") {
+                        characterElements[i].style.display = "unset";
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    function setStrokeColor(i) {
+        if (UniqueCardPersistence.getItem(frontBack + "text-stroke-color") == "true") {
+            var toneColor = getToneColor(charClass[i].className);
+            drawing_color = toneColor;
+            stroke_color = toneColor;
+        }
+    }
+
+    function showNextHanzi() {
+        var characterDiv = document.querySelector('#character-target-div');
+        var characterElements = characterDiv.children;
+        var len = characterElements.length;
+
+        for (i = 0; i < len; i++) {
+            var style = characterElements[i].style.display;
+            if (style === 'block' || style === "") {
+                characterElements[i].style.display = 'none';
+                characterElements[(i + 1) % characterElements.length].style.display = 'block';
+                onFinishQuiz(i, len);
+                break;
+            }
+        }
+    }
+
+    function onFinishQuiz(i, len) {
+        if (i != len - 1) {
+            return;
+        }
+
+        if (i + 1 == len) {
+            document.querySelector('#character-target-div').innerHTML = "";
+            document.getElementById("ch_load_status").style.display = "none";
+            generateHanziOnFinishQuiz("unset", true);
+        }
+
+        playAudio();
+        showHide("#char_sim", true);
+        showTraditionalChar();
+        showHide("#char_meaning", true, "block");
+        if (document.getElementById("text-pinyin").checked) {
+            showHide(".pinyin", true);
+        }
+        if (document.getElementById("text-zhuyin").checked) {
+            showHide(".zhuyin", true);
+        }
+        showNextAndRevealBtn(false);
+    }
+
+    function showNextAndRevealBtn(show) {
+        showHide("#btnGoNextCard", show);
+        showHide("#btnRevealChar", show);
+    }
+
+    if (Persistence.isAvailable()) {
+        doPractice();
+    }
 </script>
