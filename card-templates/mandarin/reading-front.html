@@ -2,11 +2,12 @@
 <div id="char_pinyin">{{Pinyin}}</div>
 <div id="char_sim" class="char-card">{{Simplified}}</div>
 <div id="char_trad" class="char-card">{{Traditional}}</div>
+<div id="char_examples">{{Examples}}</div>
 <div id='audio' style='display:none'>{{Audio}}</div>
 
 <div id="char_meaning" class="meaning-card">
-    <hr>
-    {{Definitions}}
+  <hr>
+  {{Definitions}}
 </div>
 
 <div class="modal-footer1">
@@ -75,6 +76,14 @@
                     </label>
                 </div>
                 <input class="tappable" type="checkbox" id="text-zhuyin" name="text-zhuyin" onchange=setPrefs(this)>
+            </div>
+            <div class="fieldset-item fs-item-1">
+                <div class="input-stack">
+                    <label for="text-examples">
+                        Examples
+                    </label>
+                </div>
+                <input class="tappable" type="checkbox" id="text-examples" name="text-examples" onchange=setPrefs(this)>
             </div>
             <div class="fieldset-item fs-item-1">
                 <div class="input-stack">
@@ -218,7 +227,14 @@
 <script>
     var charClass = document.getElementById("char-sim-id").children;
 
-    var switchIdList = [ "text-pinyin", "text-zhuyin", "text-meaning", "text-sim", "text-trad"];
+    var switchIdList = [ 
+        "text-pinyin", 
+        "text-zhuyin", 
+        "text-meaning", 
+        "text-sim", 
+        "text-trad", 
+        "text-examples"
+    ];
 
     var frontBack = "front";
     function setActive(side) {
