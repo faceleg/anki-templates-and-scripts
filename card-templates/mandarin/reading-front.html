@@ -1,43 +1,13 @@
-
-<script>
-    var url_hanzi = "https://cdn.jsdelivr.net/npm/hanzi-writer-data@latest/";
-
-    // change color
-    var stroke_color = "#555";
-    var outline_color = "#DDD";
-    var drawing_color = "#333";
-
-    if (document.body.classList.contains("night_mode")) {
-        stroke_color = "#ffffff";
-        outline_color = "#5B5B5B";
-        drawing_color = "#fff";
-    }
-
-    function getToneColor(char) {
-        stroke_color = "#555";
-        if (document.body.classList.contains("night_mode")) {
-            stroke_color = "#ffffff";
-        }
-        switch (char) {
-            case "char-tone1": return "#f44336";
-            case "char-tone2": return "#ff9800";
-            case "char-tone3": return "#4caf50";
-            case "char-tone4": return "#2196f3";
-            case "char-tone0": return stroke_color;
-            case "char-tone5": return stroke_color;
-        }
-    }
-</script>
-
-<div id="char_image">{{Image}}</div>
 <div id="char_zhuyin">{{Zhuyin}}</div>
 <div id="char_pinyin">{{Pinyin}}</div>
 <div id="char_sim" class="char-card">{{Simplified}}</div>
 <div id="char_trad" class="char-card">{{Traditional}}</div>
-<div id="onfinish-character-target-div" class="tappable"></div>
-<div id="character-target-div" class="tappable"></div>
-<div id="ch_load_status" style="color:#ea2322; margin-top: -36px; display: none;">&#8226;</div>
 <div id='audio' style='display:none'>{{Audio}}</div>
+
+<div id="char_meaning" class="meaning-card">
+    <hr>
+    {{Definitions}}
+</div>
 
 <div class="modal-footer1">
     <a class="btn" id="btnShowMenu" onclick="openSidebar('sidebar')">
@@ -46,26 +16,10 @@
     <a class="btn" id='btnPlayAudio'>
         <div class="icon"><i class="material-icons">play_arrow</i></div>
     </a>
-    <a class="btn" id='btnRevealChar'>
-        <div class="icon">
-            <i class="material-icons">gesture</i>
-        </div>
-    </a>
-    <a class="btn" id='btnReloadQuiz'>
-        <div class="icon"><i class="material-icons">replay</i></div>
-    </a>
-    <a class="btn" id='btnGoNextCard'>
-        <div class="icon"><i class="material-icons">navigate_next</i></div>
-    </a>
     <a class="btn" id='btnMoreOptions' onclick="openSidebar('more-info-sidebar')">
         <div class="icon"><i class="material-icons">more_vert</i></div>
     </a>
 </div>
-
-<hr>
-
-<div id="char_meaning" class="meaning-card">{{Definitions}}</div>
-
 
 <!--sidebar-->
 
@@ -264,7 +218,7 @@
 <script>
     var charClass = document.getElementById("char-sim-id").children;
 
-    var switchIdList = ["text-grid", "text-pinyin", "text-zhuyin", "text-meaning", "text-sim", "text-trad", "text-stroke-color", "text-outline"];
+    var switchIdList = [ "text-pinyin", "text-zhuyin", "text-meaning", "text-sim", "text-trad"];
 
     var frontBack = "front";
     function setActive(side) {
@@ -519,224 +473,13 @@
         ? document.getElementById('char_sim').innerHTML
         : document.getElementById('char_trad').innerHTML;
 
-    function generateHanziOnFinishQuiz(style = "none", finish = false) {
-        var drawGrid = document.getElementById('onfinish-character-target-div');
-        drawGrid.innerHTML = "";
-        drawGrid.style = "";
-        drawGrid.style.position = "absolute";
-        drawGrid.style.display = "grid";
-        var size = 40;
-        if (finish) {
-            size = 100;
-            drawGrid.style.position = "unset";
-            drawGrid.style.display = "block";
-            drawGrid.style.whiteSpace = "nowrap";
-            drawGrid.style.overflow = "scroll";
-        }
-
-        for (i = 0; i < characters.length; i++) {
-            var hanzi = characters[i];
-            var span = document.createElement('span');
-            span.innerHTML = grid_data;
-            span.children[0].id = "onfinish-grid-background-target" + i;
-            span.children[0].style.margin = finish ? "6px" : "2px";
-            span.style.display = style;
-            drawGrid.appendChild(span);
-            setStrokeColor(i);
-            var writer = HanziWriter.create("onfinish-grid-background-target" + i, hanzi, {
-                width: size,
-                height: size,
-                padding: 5,
-                strokeColor: stroke_color
-            })
-        }
-    }
-
-    document.getElementById("btnReloadQuiz").onclick = function () {
-        doPractice(true);
-        generateHanziOnFinishQuiz("none");
-        showNextAndRevealBtn(true);
-    }
-
     function doPractice(p = false) {
         if (document.getElementById("back")) {
-            generateHanziOnFinishQuiz("unset", true);
             if (!p) {
                 showNextAndRevealBtn(false);
                 return;
             };
-        } else {
-            generateHanziOnFinishQuiz("none");
         }
-
-        document.getElementById("ch_load_status").innerHTML = "&#8226;";
-        document.getElementById("ch_load_status").style.marginBottom = "0px";
-        document.getElementById("ch_load_status").style.display = "block";
-
-        var hanziWriterList = [];
-        var drawGrid = document.getElementById('character-target-div');
-        drawGrid.innerHTML = "";
-
-        for (i = 0; i < characters.length; i++) {
-            var div = document.createElement('div');
-            div.id = "div" + i;
-            div.innerHTML = grid_data;
-            div.children[0].id = "grid-background-target" + i;
-            drawGrid.appendChild(div);
-            setStrokeColor(i);
-            var hanzi = characters[i];
-            var writer = HanziWriter.create('grid-background-target' + i, hanzi, {
-                onLoadCharDataSuccess: function (data) {
-                    document.getElementById("ch_load_status").style.color = "#4caf50";
-                },
-                onLoadCharDataError: function (reason) {
-                    document.getElementById("ch_load_status").style.color = "#ea2322";
-                },
-
-                width: charWidth,
-                height: charHeight,
-                showCharacter: false,
-                showOutline: UniqueCardPersistence.getItem(frontBack + "text-outline") == "true" ? true : false,
-                highlightOnComplete: true,
-                highlightCompleteColor: stroke_color,
-                drawingWidth: strokeWidth,
-                strokeColor: stroke_color,
-                outlineColor: outline_color,
-                drawingColor: drawing_color,
-                showHintAfterMisses: strokeAfterMisses,
-                padding: 5
-            });
-
-            writerQuiz(writer);
-            hanziWriterList.push(writer);
-
-            var revealClickCount = 0;
-            document.getElementById("btnGoNextCard").onclick = function () {
-                revealClickCount = 0;
-                btnTapAudio();
-                writer = hanziWriterList[getCurrentHanziNum()];
-                writer.showOutline();
-                writer.showCharacter();
-
-                setTimeout(function () {
-                    onFinishQuizDrawHanzi();
-                }, 800);
-
-                setTimeout(function () {
-                    showNextHanzi();
-                }, 1000);
-            };
-
-            document.getElementById("text-outline").onclick = function () {
-                btnTapAudio();
-                document.getElementById("text-outline").checked ?
-                    writer.showOutline() : writer.hideOutline();
-            };
-
-            document.getElementById("btnRevealChar").onclick = function () {
-                btnTapAudio();
-                writer = hanziWriterList[getCurrentHanziNum()];
-                writer.showOutline();
-                if (revealClickCount == 0) {
-                    writer.animateCharacter();
-                } else if (revealClickCount == 1) {
-                    writer.showCharacter();
-                } else if (revealClickCount == 2) {
-                    writer.hideCharacter();
-                    writer.hideOutline();
-                    writerQuiz(writer);
-                } else {
-                    revealClickCount = -1;
-                    writerQuiz(writer);
-                }
-                revealClickCount++;
-            };
-
-            function writerQuiz(writer) {
-                writer.quiz({
-                    onComplete: function (summaryData) {
-                        onFinishQuizDrawHanzi();
-
-                        setTimeout(function () {
-                            showNextHanzi();
-                        }, 1000)
-                    }
-                });
-            }
-
-            function getCurrentHanziNum() {
-                var characterDiv = document.querySelector('#character-target-div');
-                var characterElements = characterDiv.children;
-                var len = characterElements.length;
-                for (i = 0; i < len; i++) {
-                    var style = characterElements[i].style.display;
-                    if (style === 'block' || style === "") {
-                        return i;
-                    }
-                }
-            }
-
-            function onFinishQuizDrawHanzi() {
-                var finishCharacterDiv = document.getElementById('onfinish-character-target-div');
-                var characterElements = finishCharacterDiv.children;
-                var len = characterElements.length;
-                for (i = 0; i < len; i++) {
-                    var style = characterElements[i].style.display;
-                    if (style === 'none' || style === "") {
-                        characterElements[i].style.display = "unset";
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    function setStrokeColor(i) {
-        if (UniqueCardPersistence.getItem(frontBack + "text-stroke-color") == "true") {
-            var toneColor = getToneColor(charClass[i].className);
-            drawing_color = toneColor;
-            stroke_color = toneColor;
-        }
-    }
-
-    function showNextHanzi() {
-        var characterDiv = document.querySelector('#character-target-div');
-        var characterElements = characterDiv.children;
-        var len = characterElements.length;
-
-        for (i = 0; i < len; i++) {
-            var style = characterElements[i].style.display;
-            if (style === 'block' || style === "") {
-                characterElements[i].style.display = 'none';
-                characterElements[(i + 1) % characterElements.length].style.display = 'block';
-                onFinishQuiz(i, len);
-                break;
-            }
-        }
-    }
-
-    function onFinishQuiz(i, len) {
-        if (i != len - 1) {
-            return;
-        }
-
-        if (i + 1 == len) {
-            document.querySelector('#character-target-div').innerHTML = "";
-            document.getElementById("ch_load_status").style.display = "none";
-            generateHanziOnFinishQuiz("unset", true);
-        }
-
-        playAudio();
-        showHide("#char_sim", true);
-        showTraditionalChar();
-        showHide("#char_meaning", true, "block");
-        if (document.getElementById("text-pinyin").checked) {
-            showHide(".pinyin", true);
-        }
-        if (document.getElementById("text-zhuyin").checked) {
-            showHide(".zhuyin", true);
-        }
-        showNextAndRevealBtn(false);
     }
 
     function showNextAndRevealBtn(show) {
