@@ -29,17 +29,17 @@
     }
 </script>
 
-<div id="char_image">{{Image}}</div>
 <div id="char_zhuyin">{{Zhuyin}}</div>
 <div id="char_pinyin">{{Pinyin}}</div>
 <div id="char_sim" class="char-card">{{Simplified}}</div>
 <div id="char_trad" class="char-card">{{Traditional}}</div>
-<div id="char_examples">{{Examples}}</div>
 
 <div id="onfinish-character-target-div" class="tappable"></div>
 <div id="character-target-div" class="tappable"></div>
 <div id="ch_load_status" style="color:#ea2322; margin-top: -36px; display: none;">&#8226;</div>
 <div id='audio' style='display:none'>{{Audio}}</div>
+
+<div id="char_examples-parts-of-speech"></div>
 
 <div class="modal-footer1">
     <a class="btn" id="btnShowMenu" onclick="openSidebar('sidebar')">
@@ -64,13 +64,13 @@
     </a>
 </div>
 
-
-
 <div id="char_meaning" class="meaning-card">
-  <hr>
-  {{Definitions}}
+    <hr/>
+    {{Definitions}}
+    <hr/>
 </div>
 
+<div id="char_examples">{{Examples}}</div>
 
 <!--sidebar-->
 
@@ -134,6 +134,14 @@
                     </label>
                 </div>
                 <input class="tappable" type="checkbox" id="text-examples" name="text-examples" onchange=setPrefs(this)>
+            </div>
+            <div class="fieldset-item fs-item-1">
+                <div class="input-stack">
+                    <label for="text-examples-parts-of-speech">
+                        Examples - Parts of Speech Headings
+                    </label>
+                </div>
+                <input class="tappable" type="checkbox" id="text-examples-parts-of-speech" name="text-examples-parts-of-speech" onchange=setPrefs(this)>
             </div>
             <div class="fieldset-item fs-item-1">
                 <div class="input-stack">
@@ -286,7 +294,8 @@
         "text-sim", 
         "text-trad", 
         "text-stroke-color", 
-        "text-outline"
+        "text-outline",
+        "text-examples-parts-of-speech"
     ];
 
     var frontBack = "front";
@@ -328,6 +337,7 @@
         for (var _id of switchIdList) {
             var perId = frontBack + _id;
             var divId = _id.replace("text-", "char_");
+
             var drawIds = ["text-grid", "text-stroke-color", "text-outline"];
             if (UniqueCardPersistence.getItem(perId) == "false") {
                 document.getElementById(_id).checked = false;
@@ -341,23 +351,17 @@
                     document.getElementById(divId).style.display = "block";
                 }
             }
+            
+            if (UniqueCardPersistence.getItem(perId) == "false") {
+                document.getElementById(_id).checked = false;
+            } else {
+                document.getElementById(_id).checked = true;
+                UniqueCardPersistence.setItem(perId, "true");
+            }
 
-            var isShowField = document.getElementById(_id).checked ? true : false;
-            if (_id == "text-pinyin") {
-                showHide(".pinyin", isShowField);
-            }
-            if (_id == "text-zhuyin") {
-                showHide(".zhuyin", isShowField);
-            }
-            if (_id == "text-sim") {
-                showHide("#char-sim-id", isShowField);
-            }
-            if (_id == "text-trad") {
-                showHide("#char-trad-id", isShowField);
-                showHide(".sep", isShowField);
-            }
+            showHideFieldByCheckboxId(_id)
         }
-
+        
         showTraditionalChar();
     }
 
@@ -401,6 +405,42 @@
             document.getElementById("reading-practice-select").selectedIndex = 0;
         }
     }
+    
+    function showHideFieldByCheckboxId(_id) {
+        var isShowField = document.getElementById(_id).checked ? true : false;
+        var divId = _id.replace("text-", "char_");
+
+        // Use the generic showhide on the element first
+        showHide("#" + divId, isShowField, "block");
+        
+        // Perform additional show/hide on special elements
+        switch (_id) {
+            case "text-pinyin":
+                showHide(".pinyin", isShowField);
+                break;
+
+            case "text-zhuyin":
+                showHide(".zhuyin", isShowField);
+                break;
+
+            case "text-examples-parts-of-speech":
+                showHide('.char_examples-parts-of-speech', isShowField);
+                break;
+
+            case "text-sim":
+                showHide("#char-sim-id", isShowField);
+                break;
+
+            case "text-trad":
+                showHide("#char-trad-id", isShowField);
+                showHide(".sep", isShowField);
+                break;                
+
+            default:
+                console.error(_id + " not in switch list")
+                break;
+        }
+    }
 
     function setPrefs(e) {
         var perId = frontBack + e.id;
@@ -419,26 +459,7 @@
                 return;
             }
 
-            if (e.checked) {
-                document.getElementById(divId).style.display = "block";
-            } else {
-                document.getElementById(divId).style.display = "none";
-            }
-
-            var isShowField = document.getElementById(divId).style.display == "none" ? false : true;
-            if (e.id == "text-pinyin") {
-                showHide(".pinyin", isShowField);
-            }
-            if (e.id == "text-zhuyin") {
-                showHide(".zhuyin", isShowField);
-            }
-            if (e.id == "text-sim") {
-                showHide("#char-sim-id", isShowField);
-            }
-            if (e.id == "text-trad") {
-                showHide("#char-trad-id", isShowField);
-                showHide(".sep", isShowField);
-            }
+            showHideFieldByCheckboxId(e.id);
         }
 
         if (e.type == "number") {
