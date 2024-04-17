@@ -5,7 +5,14 @@
 <script>
     
 (function() {
-	var color_codes = {1:"#080", 2:"#5af", 3:"#fa0", 4:"#f00", 5:"#ddd"}
+
+	var color_codes = {
+		1:"#f44336", 
+		2:"#ff9800", 
+		3:"#4caf50", 
+		4:"#2196f3", 
+		5: document.body.classList.contains("night_mode") ? "#fff" : "555"
+	}
     
 	decode_pinyin = function(pinyin) {
 	var core = ["a", "e", "i", "o", "u", "ü", "v"]

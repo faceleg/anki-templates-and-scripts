@@ -7,7 +7,7 @@
     {{Meaning}}
     <hr/>
 </div>
-<div class="char_examples">{{Examples}}</div>
+<div id="char_examples">{{Examples}}</div>
 <div id="char_examples-parts-of-speech"></div>
 
 <div class="modal-footer1">
@@ -66,16 +66,17 @@ if(void 0===window.Persistence){var e="github.com/SimonLammer/anki-persistence/"
         setActive("text-back");
     }
 
-    var switchIdList = [
-        "text-pinyin", 
-        "text-zhuyin", 
-        "text-meaning", 
-        "text-sim", 
-        "text-trad", 
-        "text-examples", 
-        "text-examples-parts-of-speech"
-    ];
     function initSwitchPrefs() {
+        var switchIdList = [
+            "text-pinyin", 
+            "text-zhuyin", 
+            "text-meaning", 
+            "text-sim", 
+            "text-trad", 
+            "text-examples", 
+            "text-examples-parts-of-speech"
+        ];
+
         for (var _id of switchIdList) {
             var perId = frontBack + _id;
             var divId = _id.replace("text-", "char_");
@@ -99,10 +100,10 @@ if(void 0===window.Persistence){var e="github.com/SimonLammer/anki-persistence/"
         }
     }
 
-    function showHide(type, isShow) {
+    function showHide(type, isShow, style = "inline") {
         if (isShow) {
             document.querySelectorAll(type).forEach(function (val) {
-                val.style.display = 'inline';
+                val.style.display = style;
             });
         } else {
             document.querySelectorAll(type).forEach(function (val) {
@@ -142,7 +143,7 @@ if(void 0===window.Persistence){var e="github.com/SimonLammer/anki-persistence/"
                 break;                
 
             default:
-                console.error(_id + " not in switch list")
+                console.warn(_id + " not in switch list")
                 break;
         }
     }
