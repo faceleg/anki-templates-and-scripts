@@ -11,7 +11,6 @@
 </div>
 <div id="char_examples">{{Examples}}</div>
 <div id='audio' style='display:none'>{{Audio}}</div>
-<div id="char-sim-id"></div>
 
 <div class="modal-footer1">
     <a class="btn" id="btnShowMenu" onclick="openSidebar('sidebar')">
@@ -197,7 +196,7 @@
         "text-examples-parts-of-speech"
     ];
 
-    var frontBack = "front";
+    var frontBack = "back";
     function setActive(side) {
         if (side == "text-front") {
             frontBack = "front";
@@ -251,11 +250,15 @@
 
     function showHideFieldByCheckboxId(_id) {
         var isShowField = document.getElementById(_id).checked ? true : false;
+        showHideFieldByCheckboxIdWithIsShowField(_id, isShowField);
+    }
+
+    function showHideFieldByCheckboxIdWithIsShowField(_id, isShowField) {
         var divId = _id.replace("text-", "char_");
 
         // Use the generic showhide on the element first
         showHide("#" + divId, isShowField, "block");
-        
+
         // Perform additional show/hide on special elements
         switch (_id) {
             case "text-pinyin":
@@ -423,9 +426,12 @@
     if (Persistence.isAvailable()) {
         doPractice();
     }
-</script>
 
-<!-- STOP -->
+    // Hack for iOS which isn't working properly (not respecting checkbox values)
+    // TODO figure out why this is happening
+    showHideFieldByCheckboxIdWithIsShowField("text-trad", false);
+    showHideFieldByCheckboxIdWithIsShowField("text-zhuyin", false);
+</script>
 
 <script>
 (function() {
@@ -527,11 +533,9 @@
 
 	let pinyin_element = document.getElementById("char_pinyin")
 	let hanzi_element = document.getElementById("char_sim")
-	let pinyin_sentence_element = document.getElementById("pinyin_sentence")
-	let hanzi_sentence_element =document.getElementById("char_sim_examples")
 
 	//just check if you did everything correctly :)
-	if((pinyin_element == null && hanzi_element != null) || (pinyin_element == null && hanzi_element == null && pinyin_sentence_element == null && hanzi_sentence_element == null)) {
+	if((pinyin_element == null && hanzi_element != null) || (pinyin_element == null && hanzi_element == null)) {
 		throw "<br><br>It looks like you did not put the <span style=\"color: red;\">id=\"pinyin\"</span> into the pinyin element<br>Example:<br>\
 		&ltdiv class=\"pinyin\" <span style=\"color: red;\">id=\"pinyin\"</span>&gt{ {Pinyin.1} }&lt/div&gt"
 	}
@@ -539,22 +543,11 @@
 		throw "<br><br>It looks like you did not put the <span style=\"color: red;\">id=\"hanzi\"</span> into the hanzi element<br>Example:<br>\
 		&ltdiv class=\"hanzi\" <span style=\"color: red;\">id=\"hanzi\"</span>&gt{ {Simplified} }&lt/div&gt"
 	}
-	else if(pinyin_sentence_element == null && hanzi_sentence_element != null) {
-		throw "<br><br>It looks like you did not put the <span style=\"color: red;\">id=\"pinyin_sentence\"</span> into the pinyin sentence element<br>Example:<br>\
-		&ltdiv class=\"pinyinSen\" <span style=\"color: red;\">id=\"pinyin_sentence\"</span>&gt{ {SentencePinyin.1} }&lt/div&gt"
-	}
-	else if(pinyin_sentence_element != null && hanzi_sentence_element == null) {
-		throw "<br><br>It looks like you did not put the <span style=\"color: red;\">id=\"hanzi_sentence\"</span> into the hanzi sentence element<br>Example:<br>\
-		&ltdiv class=\"sentence\" <span style=\"color: red;\">id=\"hanzi_sentence\"</span>&gt{ {SentenceSimplified} }&lt/div&gt"
-	}
+
 	//just check if you did everything correctly :)
 
 	if(pinyin_element != null && hanzi_element != null) {
 		recolor_pinyin(pinyin_element, hanzi_element)
 	}
-	if(pinyin_sentence_element != null && hanzi_sentence_element != null) {
-		recolor_pinyin(pinyin_sentence_element, hanzi_sentence_element)
-	}
-
 })()
 </script>
