@@ -2,14 +2,14 @@
 <div id="char_pinyin">{{Pinyin}}</div>
 <div id="char_sim" class="char-card">{{Simplified}}</div>
 <div id="char_trad" class="char-card">{{Traditional}}</div>
+<div id="char_meaning" class="meaning-card">
+    <hr/>
+    {{Definitions}}
+    <hr/>
+</div>
 <div id="char_examples">{{Examples}}</div>
 <div id='audio' style='display:none'>{{Audio}}</div>
 <div id="char-sim-id"></div>
-
-<div id="char_meaning" class="meaning-card">
-  <hr>
-  {{Definitions}}
-</div>
 
 <div class="modal-footer1">
     <a class="btn" id="btnShowMenu" onclick="openSidebar('sidebar')">
@@ -22,6 +22,9 @@
         <div class="icon"><i class="material-icons">more_vert</i></div>
     </a>
 </div>
+
+<!-- Empty div to allow the setPrefs function to work (it expects a div with an id, and will then show/hide based on classes) -->
+<div id="char_examples-parts-of-speech"></div>
 
 <!--sidebar-->
 
@@ -88,6 +91,14 @@
             </div>
             <div class="fieldset-item fs-item-1">
                 <div class="input-stack">
+                    <label for="text-examples-parts-of-speech">
+                        Examples - Parts of Speech Headings
+                    </label>
+                </div>
+                <input class="tappable" type="checkbox" id="text-examples-parts-of-speech" name="text-examples-parts-of-speech" onchange=setPrefs(this)>
+            </div>
+            <div class="fieldset-item fs-item-1">
+                <div class="input-stack">
                     <label for="text-meaning">
                         Meaning
                     </label>
@@ -109,58 +120,6 @@
                     </label>
                 </div>
                 <input class="tappable" type="checkbox" id="text-trad" name="text-trad" onchange=setPrefs(this)>
-            </div>
-            <div class="fieldset-item fs-item-1">
-                <div class="input-stack">
-                    <label for="text-grid">
-                        Grid
-                    </label>
-                </div>
-                <input class="tappable" type="checkbox" id="text-grid" name="text-grid" onchange=setPrefs(this)>
-            </div>
-            <div class="fieldset-item fs-item-1">
-                <div class="input-stack">
-                    <label for="text-outline">
-                        Outline
-                    </label>
-                </div>
-                <input class="tappable" type="checkbox" id="text-outline" name="text-outline" onchange=setPrefs(this)>
-            </div>
-            <div class="fieldset-item fs-item-1">
-                <div class="input-stack">
-                    <label for="text-stroke-color">
-                        Stroke tone color
-                    </label>
-                </div>
-                <input class="tappable" type="checkbox" id="text-stroke-color" name="text-stroke-color"
-                    onchange=setPrefs(this)>
-            </div>
-        </fieldset>
-    </section>
-    <section>
-        <fieldset>
-            <div class="fieldset-item fs-item-1">
-                <div class="input-stack">
-                    <label for="draw-size" id="text-draw-size" aria-hidden="true"><small>Grid size</small></label>
-                </div>
-                <input class="tappable" name="draw-size" id="draw-size" aria-labelledby="draw-size" type="number"
-                    value="250" min="100" max="1000" oninput=setPrefs(this)>
-            </div>
-            <div class="fieldset-item fs-item-1">
-                <div class="input-stack">
-                    <label for="stroke-size" id="text-stroke-size" aria-hidden="true"><small>Stroke
-                            width</small></label>
-                </div>
-                <input class="tappable" name="stroke-size" id="stroke-size" aria-labelledby="stroke-size" type="number"
-                    value="6" min="2" max="50" oninput=setPrefs(this)>
-            </div>
-            <div class="fieldset-item fs-item-1">
-                <div class="input-stack">
-                    <label for="hint-miss" id="text-hint-miss" aria-hidden="true"><small>Hint after
-                            misses</small></label>
-                </div>
-                <input class="tappable" name="hint-miss" id="hint-miss" aria-labelledby="hint-miss" type="number"
-                    value="3" min="1" max="10" oninput=setPrefs(this)>
             </div>
         </fieldset>
     </section>
@@ -232,7 +191,8 @@
         "text-meaning", 
         "text-sim", 
         "text-trad", 
-        "text-examples"
+        "text-examples",
+        "text-examples-parts-of-speech"
     ];
 
     var frontBack = "front";
@@ -273,44 +233,59 @@
     function initSwitchPrefs() {
         for (var _id of switchIdList) {
             var perId = frontBack + _id;
-            var divId = _id.replace("text-", "char_");
-            var drawIds = ["text-grid", "text-stroke-color", "text-outline"];
+            
             if (UniqueCardPersistence.getItem(perId) == "false") {
                 document.getElementById(_id).checked = false;
-                if (!drawIds.includes(_id)) {
-                    document.getElementById(divId).style.display = "none";
-                }
             } else {
                 document.getElementById(_id).checked = true;
                 UniqueCardPersistence.setItem(perId, "true");
-                if (!drawIds.includes(_id)) {
-                    document.getElementById(divId).style.display = "block";
-                }
             }
 
-            var isShowField = document.getElementById(_id).checked ? true : false;
-            if (_id == "text-pinyin") {
+            showHideFieldByCheckboxId(_id)
+        }
+        
+        showTraditionalChar();
+    }
+
+    function showHideFieldByCheckboxId(_id) {
+        var isShowField = document.getElementById(_id).checked ? true : false;
+        var divId = _id.replace("text-", "char_");
+
+        // Use the generic showhide on the element first
+        showHide("#" + divId, isShowField, "block");
+        
+        // Perform additional show/hide on special elements
+        switch (_id) {
+            case "text-pinyin":
                 showHide(".pinyin", isShowField);
-            }
-            if (_id == "text-zhuyin") {
+                break;
+
+            case "text-zhuyin":
                 showHide(".zhuyin", isShowField);
-            }
-            if (_id == "text-sim") {
+                break;
+
+            case "text-examples-parts-of-speech":
+                showHide('.char_examples-parts-of-speech', isShowField);
+                break;
+
+            case "text-sim":
                 showHide("#char-sim-id", isShowField);
-            }
-            if (_id == "text-trad") {
+                break;
+
+            case "text-trad":
                 showHide("#char-trad-id", isShowField);
                 showHide(".sep", isShowField);
-            }
-        }
+                break;                
 
-        showTraditionalChar();
+            default:
+                console.error(_id + " not in switch list")
+                break;
+        }
     }
 
     function showTraditionalChar() {
         var tradChar = document.getElementById("char_trad");
         var simChar = document.getElementById("char_sim");
-        var tradPer = Persistence
         if (tradChar.innerHTML != simChar.innerHTML) {
             if (UniqueCardPersistence.getItem(frontBack + "text-trad") == "true") {
                 tradChar.style.display = "block";
@@ -319,32 +294,6 @@
             if (UniqueCardPersistence.getItem(frontBack + "text-sim") == "true") {
                 tradChar.style.display = "none";
             }
-        }
-    }
-
-    function initDrawPrefs() {
-        var drawPrefsList = ["draw-size", "stroke-size", "hint-miss"];
-        for (var _id of drawPrefsList) {
-            var perId = frontBack + _id;
-            var elem = document.getElementById(_id);
-            var store = UniqueCardPersistence.getItem(perId);
-            if (store) {
-                elem.value = store;
-            } else {
-                var value = _id == "draw-size" ? 400 : _id == "stroke-size" ? 64 : 5; 2
-                
-                elem.value = value;
-                UniqueCardPersistence.setItem(perId, value);
-            }
-        }
-
-        var perIndex = UniqueCardPersistence.getItem(frontBack + "reading-practice-select");
-        if (perIndex) {
-            characters = document.getElementById('char_trad').innerHTML;
-            document.getElementById("reading-practice-select").selectedIndex = 1;
-        } else {
-            characters = document.getElementById('char_sim').innerHTML;
-            document.getElementById("reading-practice-select").selectedIndex = 0;
         }
     }
 
@@ -361,30 +310,8 @@
         if (e.type == "checkbox") {
             UniqueCardPersistence.setItem(perId, e.checked.toString());
             var divId = e.id.replace("text-", "char_");
-            if (e.id == "text-stroke-color" || e.id == "text-outline") {
-                return;
-            }
 
-            if (e.checked) {
-                document.getElementById(divId).style.display = "block";
-            } else {
-                document.getElementById(divId).style.display = "none";
-            }
-
-            var isShowField = document.getElementById(divId).style.display == "none" ? false : true;
-            if (e.id == "text-pinyin") {
-                showHide(".pinyin", isShowField);
-            }
-            if (e.id == "text-zhuyin") {
-                showHide(".zhuyin", isShowField);
-            }
-            if (e.id == "text-sim") {
-                showHide("#char-sim-id", isShowField);
-            }
-            if (e.id == "text-trad") {
-                showHide("#char-trad-id", isShowField);
-                showHide(".sep", isShowField);
-            }
+            showHideFieldByCheckboxId(e.id);
         }
 
         if (e.type == "number") {
@@ -435,11 +362,9 @@
         if (window.ankiPlatform == "desktop" || isInWebView()) {
             initPractice();
             initSwitchPrefs();
-            initDrawPrefs();
         } else {
             window.addEventListener("load", initPractice, false);
             window.addEventListener("load", initSwitchPrefs, false);
-            window.addEventListener("load", initDrawPrefs, false);
         }
     }
     // audio in Anki Web on different systems
@@ -457,14 +382,7 @@
         return false;
     }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script>
-    var charHW = document.getElementById("draw-size").value;
-    var charHeight = charHW;
-    var charWidth = charHW;
-    var strokeWidth = document.getElementById("stroke-size").value;
-    var strokeAfterMisses = document.getElementById("hint-miss").value;
-
     function btnTapAudio() {
         var audio = new Audio();
         audio.src = "_press.mp3";
@@ -481,8 +399,6 @@
     document.getElementById("btnPlayAudio").onclick = function () {
         playAudio();
     };
-
-    var grid_data = `<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%' class='grid-color'  id='grid-background-target'><g id="char_grid"><line x1='0' y1='0' x2='100%' y2='100%' stroke='var(--surface1)' /><line x1='100%' y1='0' x2='0' y2='100%' stroke='var(--surface1)' /><line x1='50%' y1='0' x2='50%' y2='100%' stroke='var(--surface1)' /><line x1='0' y1='50%' x2='100%' y2='50%' stroke='var(--surface1)' /></g></svg>`;
 
     var characters = document.getElementById("reading-practice-select").selectedIndex == "0"
         ? document.getElementById('char_sim').innerHTML
