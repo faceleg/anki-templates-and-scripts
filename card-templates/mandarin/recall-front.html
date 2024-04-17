@@ -1,0 +1,48 @@
+<div id="char_meaning" class="meaning-card">
+    {{Definitions}}
+</div>
+
+<script>
+    function showHide(selectors) {
+        for (const selector of selectors) {
+            const elements = document.querySelectorAll(selector);
+            if (elements.length === 0) {
+                return;
+            }
+
+            for (const element of elements) {
+                element.style.display = "none";
+            }
+        }
+    }
+
+    showHide([
+        '.char',
+        '.pinyin',
+        '.zhuyin',
+    ])
+
+    function stripNonASCII(selectors) {
+        for (const selector of selectors) {
+            const elements = document.querySelectorAll(selector);
+            if (elements.length === 0) {
+                return;
+            }
+
+            for (const element of elements) {
+                //  Remove non ASCII
+                element.innerHTML = element.innerHTML.replace(/[^\x00-\x7F]/g, "");
+                // Remove [...] content and the []
+                element.innerHTML = element.innerHTML.replace(/\[[^\]]*\]/g, "");
+                // Remove CL:
+                element.innerHTML = element.innerHTML.replace(/CL:/g, "");
+                // Remove CL:
+                element.innerHTML = element.innerHTML.replace(/\|/g, "");
+            }
+        }
+    }
+
+    stripNonASCII([
+        '#char_meaning'
+    ])
+</script>
