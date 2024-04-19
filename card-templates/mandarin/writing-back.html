@@ -81,7 +81,7 @@
   }
 
   function recolorPinyin(pinyinElement, decodedTones) {
-    var pinyinText = pinyinElement.innerHTML;
+    var pinyinText = pinyinElement.textContent.trim();
     var coloredPinyin = "";
     var wordIndex = 0;
 
@@ -95,7 +95,6 @@
       coloredPinyin +=
         '<span style="color:' + color + ';">' + pinyinText[i] + "</span>";
     }
-
     pinyinElement.innerHTML = coloredPinyin;
   }
 
@@ -122,10 +121,6 @@
     characterElement.innerHTML = coloredCharacters;
   }
 
-  function recolorTraditional(traditionalElement, decodedTones) {
-    console.log(traditionalElement.innerHTML);
-  }
-
   function applyColorization() {
     var pinyinElement = document.getElementById("char_pinyin");
     if (!pinyinElement) {
@@ -134,7 +129,7 @@
       );
       return;
     }
-    var decodedTones = decodePinyin(pinyinElement.innerHTML);
+    var decodedTones = decodePinyin(pinyinElement.textContent);
     recolorPinyin(pinyinElement, decodedTones);
 
     var hanziElement = document.getElementById("char_sim");
@@ -157,5 +152,5 @@
     }
   }
 
-  applyColorization(); // Call the function to apply the color when the script is executed
+  applyColorization(); 
 </script>

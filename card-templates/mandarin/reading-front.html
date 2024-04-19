@@ -7,7 +7,9 @@
   {{Definitions}}
   <hr />
 </div>
-<div id="char_examples">{{Examples}}</div>
+<div id="char_examples">
+  {{Examples}}
+</div>
 <div id="audio" style="display: none">{{Audio}}</div>
 
 <div class="modal-footer1">
@@ -21,6 +23,7 @@
     <div class="icon"><i class="material-icons">more_vert</i></div>
   </a>
 </div>
+<div id="char_deck">{{Deck}}</div>
 
 <!-- Empty div to allow the setPrefs function to work (it expects a div with an id, and will then show/hide based on classes) -->
 <div id="char_examples-parts-of-speech"></div>
@@ -452,7 +455,7 @@
         break;
 
       default:
-        console.warn(_id + " not in switch list");
+        // console.warn(_id + " not in switch list");
         break;
     }
   }

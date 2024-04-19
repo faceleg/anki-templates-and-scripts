@@ -119,6 +119,12 @@
   font-size: 3em;
 }
 
+#char_deck {
+  margin-top: 10px;
+  font-size: 10px;
+  font-style: italic;
+}
+
 /* Windows */
 .win .char-card {
   font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
