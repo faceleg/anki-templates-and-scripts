@@ -3,127 +3,159 @@
 <div id="back">{{FrontSide}}</div>
 
 <script>
-    
-(function() {
-	var color_codes = {1:"#080", 2:"#5af", 3:"#fa0", 4:"#f00", 5:"#ddd"}
-    
-	decode_pinyin = function(pinyin) {
-	var core = ["a", "e", "i", "o", "u", "ü", "v"]
-	let arr = pinyin.replace(/<b>|<\/b>|<div>|<\/div>/g, "").split("")
+  var colorCodes = {
+    1: "#f44336",
+    2: "#ff9800",
+    3: "#4caf50",
+    4: "#2196f3",
+    5: document.body.classList.contains("night_mode") ? "#fff" : "#555",
+  };
 
-	is_core = function(c, c_previous_two = "", c_next = "") {
-		//pre conditions
-		if(c == "r" && (c_next == " " || c_next == "") && (c_previous_two != " " && c_previous_two != "")) {
-			return [true, true]
-		}
-		//pre conditions
+  function decodePinyin(pinyin) {
+    var coreVowels = ["a", "e", "i", "o", "u", "ü", "v"];
+    var tonesArr = [];
+    var buffer = [];
 
-		c=c.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
-		for(let i = 0; i < core.length; i++) {
-			if (c === core[i]) {
-				return [true, false]
-			}
-		}
-		return [false, false]
-	}
-
-	get_tone = function(str) {
-		let pure = str.replace(/a|e|i|o|u|ü|r/g, '')
-		if(pure == "") {
-			return  5
-		}
-		else if(['ā','ē','ī','ō','ū','ǖ', 'v̄'].includes(pure)) {
-			return 1
-		}
-		else if(['á','é','í','ó','ú','ǘ', 'v́'].includes(pure)) {
-			return 2
-		}
-		else if(['ǎ','ě','ǐ','ǒ','ǔ','ǚ', 'v̌'].includes(pure)) {
-			return 3
-		}
-		else if(['à','è','ì','ò','ù','ǜ', 'v̀'].includes(pure)) {
-			return 4
-		} else {
-            return 4; // probably 绿 with v̀
+    function isCore(char, charPrevTwo, charNext) {
+      if (
+        char === "r" &&
+        (charNext === " " || charNext === "") &&
+        charPrevTwo !== " " &&
+        charPrevTwo !== ""
+      ) {
+        return [true, true];
+      }
+      char = char
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+      for (var i = 0; i < coreVowels.length; i++) {
+        if (char === coreVowels[i]) {
+          return [true, false];
         }
+      }
+      return [false, false];
+    }
 
-		return pure
-	}
+    function getTone(str) {
+      var pure = str.replace(/a|e|i|o|u|ü|r/g, "");
+      if (pure === "") {
+        return 5;
+      } else if (["ā", "ē", "ī", "ō", "ū", "ǖ", "v̄"].indexOf(pure) !== -1) {
+        return 1;
+      } else if (["á", "é", "í", "ó", "ú", "ǘ", "v́"].indexOf(pure) !== -1) {
+        return 2;
+      } else if (["ǎ", "ě", "ǐ", "ǒ", "ǔ", "ǚ", "v̌"].indexOf(pure) !== -1) {
+        return 3;
+      } else if (["à", "è", "ì", "ò", "ù", "ǜ", "v̀"].indexOf(pure) !== -1) {
+        return 4;
+      } else {
+        return 4; // Probably 绿 with v̀
+      }
+    }
 
-	let tones_arr = []
-	let buff = []
-	
-	flush = function() {
-		if(buff.length > 0) {
-			tones_arr.push(get_tone(buff.join("")))				
-			buff = []
-		}
-	}
-	for(let i = 0; i < arr.length;i++) {
-		let res = is_core(arr[i], arr[i - 2], arr[i + 1])
-		if(res[1]) {
-			flush()
-		}
-		if(res[0]) {
-			buff.push(arr[i])
-		}
-		else {
-			flush()
-		}
-	}
-	if(buff.length > 0) {
-		tones_arr.push(get_tone(buff.join("")))	
-		buff = []
-	}
-	return tones_arr
-	}
+    function flush() {
+      if (buffer.length > 0) {
+        tonesArr.push(getTone(buffer.join("")));
+        buffer = [];
+      }
+    }
 
-	recolor_pinyin = function(pinyin_element, hanzi_element) {
-		let hanzi_sentence = hanzi_element.innerHTML
-		let decoded = decode_pinyin(pinyin_element.innerHTML)
-		let hanzi_sentence_strip = hanzi_sentence.replace(/ |<b>|<\/b>|\.|。|\?|？|!|！|<div>|<\/div>|，|，/g, '')
-		if(hanzi_sentence_strip.length == decoded.length) {
-			let start = 0
-			for(i in hanzi_sentence_strip) {
-				let index = hanzi_sentence.indexOf(hanzi_sentence_strip[i], start)
-				let insertion = "<span style=\"color:"+color_codes[decoded[i]]+";\">" + hanzi_sentence_strip[i] + "</span>"
-				hanzi_sentence = hanzi_sentence.substring(0, index) + insertion + hanzi_sentence.substring(index + 1)
-				start = index + insertion.length
-			}
-			hanzi_element.innerHTML = hanzi_sentence
-		}
-	}
+    for (var i = 0; i < pinyin.length; i++) {
+      var result = isCore(pinyin[i], pinyin[i - 2], pinyin[i + 1]);
+      if (result[1]) {
+        flush();
+      }
+      if (result[0]) {
+        buffer.push(pinyin[i]);
+      } else {
+        flush();
+      }
+    }
 
-	let pinyin_element = document.getElementById("char_pinyin")
-	let hanzi_element = document.getElementById("char_sim")
-	let pinyin_sentence_element = document.getElementById("pinyin_sentence")
-	let hanzi_sentence_element =document.getElementById("char_sim_examples")
+    if (buffer.length > 0) {
+      tonesArr.push(getTone(buffer.join("")));
+    }
 
-	//just check if you did everything correctly :)
-	if((pinyin_element == null && hanzi_element != null) || (pinyin_element == null && hanzi_element == null && pinyin_sentence_element == null && hanzi_sentence_element == null)) {
-		throw "<br><br>It looks like you did not put the <span style=\"color: red;\">id=\"pinyin\"</span> into the pinyin element<br>Example:<br>\
-		&ltdiv class=\"pinyin\" <span style=\"color: red;\">id=\"pinyin\"</span>&gt{ {Pinyin.1} }&lt/div&gt"
-	}
-	else if(pinyin_element != null && hanzi_element == null) {
-		throw "<br><br>It looks like you did not put the <span style=\"color: red;\">id=\"hanzi\"</span> into the hanzi element<br>Example:<br>\
-		&ltdiv class=\"hanzi\" <span style=\"color: red;\">id=\"hanzi\"</span>&gt{ {Simplified} }&lt/div&gt"
-	}
-	else if(pinyin_sentence_element == null && hanzi_sentence_element != null) {
-		throw "<br><br>It looks like you did not put the <span style=\"color: red;\">id=\"pinyin_sentence\"</span> into the pinyin sentence element<br>Example:<br>\
-		&ltdiv class=\"pinyinSen\" <span style=\"color: red;\">id=\"pinyin_sentence\"</span>&gt{ {SentencePinyin.1} }&lt/div&gt"
-	}
-	else if(pinyin_sentence_element != null && hanzi_sentence_element == null) {
-		throw "<br><br>It looks like you did not put the <span style=\"color: red;\">id=\"hanzi_sentence\"</span> into the hanzi sentence element<br>Example:<br>\
-		&ltdiv class=\"sentence\" <span style=\"color: red;\">id=\"hanzi_sentence\"</span>&gt{ {SentenceSimplified} }&lt/div&gt"
-	}
-	//just check if you did everything correctly :)
+    return tonesArr;
+  }
 
-	if(pinyin_element != null && hanzi_element != null) {
-		recolor_pinyin(pinyin_element, hanzi_element)
-	}
-	if(pinyin_sentence_element != null && hanzi_sentence_element != null) {
-		recolor_pinyin(pinyin_sentence_element, hanzi_sentence_element)
-	}
+  function recolorPinyin(pinyinElement, decodedTones) {
+    var pinyinText = pinyinElement.innerHTML;
+    var coloredPinyin = "";
+    var wordIndex = 0;
 
-})()
+    for (var i = 0; i < pinyinText.length; i++) {
+      if (pinyinText[i] === " ") {
+        coloredPinyin += " ";
+        wordIndex++;
+        continue;
+      }
+      var color = colorCodes[decodedTones[wordIndex]] || "#000"; // Default color to black if tone is not found
+      coloredPinyin +=
+        '<span style="color:' + color + ';">' + pinyinText[i] + "</span>";
+    }
+
+    pinyinElement.innerHTML = coloredPinyin;
+  }
+
+  function isChineseCharacter(char) {
+    return /^[\u4e00-\u9fff]$/.test(char);
+  }
+
+  function recolorCharacters(characterElement, decodedTones) {
+    var characterText = characterElement.innerHTML;
+    var coloredCharacters = "";
+    var wordIndex = 0;
+
+    for (var i = 0; i < characterText.length; i++) {
+      if (!isChineseCharacter([characterText[i]])) {
+        coloredCharacters += characterText[i];
+      } else {
+        var color = colorCodes[decodedTones[wordIndex]] || "#555"; // Default color to grey if tone is not found
+        coloredCharacters +=
+          '<span style="color:' + color + ';">' + characterText[i] + "</span>";
+        wordIndex++;
+      }
+    }
+
+    characterElement.innerHTML = coloredCharacters;
+  }
+
+  function recolorTraditional(traditionalElement, decodedTones) {
+    console.log(traditionalElement.innerHTML);
+  }
+
+  function applyColorization() {
+    var pinyinElement = document.getElementById("char_pinyin");
+    if (!pinyinElement) {
+      console.warn(
+        'Pinyin element not found with "#char_pinyin", will not attempt to recolour pinyin, simplified or traditional',
+      );
+      return;
+    }
+    var decodedTones = decodePinyin(pinyinElement.innerHTML);
+    recolorPinyin(pinyinElement, decodedTones);
+
+    var hanziElement = document.getElementById("char_sim");
+    if (hanziElement) {
+      recolorCharacters(hanziElement, decodedTones);
+    } else {
+      console.warn(
+        'Simpliifed element not found with "#char_sim", will not attempt to recolour simplified',
+      );
+    }
+
+    var traditionalElement = document.getElementById("char_trad");
+    var hanziElement = document.getElementById("char_sim");
+    if (hanziElement) {
+      recolorCharacters(traditionalElement, decodedTones);
+    } else {
+      console.warn(
+        'Traditional element not found with "#char_trad", will not attempt to recolour traditional',
+      );
+    }
+  }
+
+  applyColorization(); // Call the function to apply the color when the script is executed
 </script>

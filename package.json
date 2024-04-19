@@ -1,9 +1,15 @@
 {
-  "scripts":{
-    "build:css:mandarin": "purgecss --config purgecss.mandarin.config.js --out ./card-templates/mandarin/dist"
-
+  "scripts": {
+    "build:css:mandarin": "purgecss --config purgecss.mandarin.config.js --output ./card-templates/mandarin/dist",
+    "lint": "eslint .",
+    "format": "prettier --write ."
   },
   "devDependencies": {
+    "@html-eslint/eslint-plugin": "^0.24.1",
+    "@html-eslint/parser": "^0.24.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "prettier": "3.2.5",
     "purgecss": "^6.0.0"
   }
 }
