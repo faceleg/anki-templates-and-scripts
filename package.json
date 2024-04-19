@@ -1,0 +1,9 @@
+{
+  "scripts":{
+    "build:css:mandarin": "purgecss --config purgecss.mandarin.config.js --out ./card-templates/mandarin/dist"
+
+  },
+  "devDependencies": {
+    "purgecss": "^6.0.0"
+  }
+}
