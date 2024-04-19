@@ -16,25 +16,86 @@
 
   showHide([".char", ".pinyin", ".zhuyin"]);
 
-  function stripNonASCII(selectors) {
-    for (const selector of selectors) {
-      const elements = document.querySelectorAll(selector);
-      if (elements.length === 0) {
-        return;
-      }
-
-      for (const element of elements) {
-        //  Remove non ASCII
-        element.innerHTML = element.innerHTML.replace(/[^\x00-\x7F]/g, "");
-        // Remove [...] content and the []
-        element.innerHTML = element.innerHTML.replace(/\[[^\]]*\]/g, "");
-        // Remove CL:
-        element.innerHTML = element.innerHTML.replace(/CL:/g, "");
-        // Remove CL:
-        element.innerHTML = element.innerHTML.replace(/\|/g, "");
-      }
+  function removeCLStringSegments(inputString) {
+    // Find the position of "CL" in the string
+    const clIndex = inputString.lastIndexOf("CL:");
+    if (clIndex === -1) {
+        // "CL" not found, return the original string
+        return inputString;
     }
-  }
 
-  stripNonASCII(["#char_meaning"]);
+    // Find the position of "◆" before "CL" (if it exists)
+    const markerIndex = inputString.lastIndexOf("◆", clIndex);
+
+    // Define the end position for removal
+    let endIndex = clIndex;
+    if (markerIndex !== -1) {
+        // If "◆" exists before "CL", set endIndex to the position before "◆"
+        endIndex = markerIndex - 1;
+    }
+
+    // Find the position of "]" after "CL"
+    const closingBracketIndex = inputString.indexOf("]", clIndex);
+
+    // If closing bracket found, remove the substring from endIndex to closingBracketIndex
+    if (closingBracketIndex !== -1) {
+        const removedString = inputString.substring(0, endIndex) + inputString.substring(closingBracketIndex + 1);
+        return removedString;
+    }
+
+    // If no closing bracket found, remove from "CL" to end of string
+    return inputString.substring(0, endIndex);
+}
+
+function clearNonEnglishContent(selector) {
+    const elements = document.querySelectorAll(selector);
+
+    elements.forEach(element => {
+        clearNonEnglishContentRecursive(element);
+    });
+}
+
+function clearNonEnglishContentRecursive(element) {
+    const childNodes = element.childNodes;
+
+    // Iterate backwards to safely remove nodes while iterating
+    for (let i = childNodes.length - 1; i >= 0; i--) {
+        const childNode = childNodes[i];
+
+        if (childNode.nodeType === Node.ELEMENT_NODE) {
+            // Recursively call clearCLContentRecursive on the child element
+            clearNonEnglishContentRecursive(childNode);
+
+            // Remove the element if it has no child nodes or text content
+            if (!childNode.firstChild && !childNode.textContent.trim()) {
+                childNode.remove();
+            }
+        } else if (childNode.nodeType === Node.TEXT_NODE) {
+            // Remove any characters and surrounding parentheses or brackets containing Chinese characters
+            let textContent = childNode.textContent.trim()
+            // Replace chinese wrapped in []
+              .replace(/\[([\u4E00-\u9FFF]+)\]/g, "[X]")
+              // REplace chinese wrapped in ()
+              .replace(/\(([\u4E00-\u9FFF]+)\)/g, "(X)")
+              // Replace any remaining chinese
+              
+            .replace(/[\u4E00-\u9FFF]/g, "")	;
+						
+            if (/CL/.test(textContent)) {
+            	textContent = removeCLStringSegments(textContent)
+            }
+
+            // Clear the content of the text node
+            childNode.textContent = textContent.trim();
+
+            // Remove the text node if it's empty after clearing content
+            if (!childNode.textContent.trim()) {
+                childNode.remove();
+            }
+        }
+    }
+}
+
+clearNonEnglishContent("#char_meaning .meaning");
+
 </script>
