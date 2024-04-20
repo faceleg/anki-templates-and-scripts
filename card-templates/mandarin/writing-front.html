@@ -912,8 +912,17 @@
           : writer.hideOutline();
       };
 
+      function isVisible(selector) {
+          var element = document.querySelector(selector);
+          if (element) {
+              var style = window.getComputedStyle(element);
+              return style.display !== 'none';
+          }
+          return false; // If selector doesn't match any element
+      }
+
       document.getElementById("btnShowCharacters").onclick = function() {
-        showHide("#char_sim", true);
+        showHide("#char_sim", !isVisible("#char_sim"));
       }
 
       document.getElementById("btnRevealChar").onclick = function () {
