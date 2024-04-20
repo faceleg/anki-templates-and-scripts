@@ -92,6 +92,15 @@
   background-color: #1f1f1f;
 }
 
+.char-card {
+  font-size: 3em;
+}
+
+#char_deck {
+  margin-top: 10px;
+  font-size: 10px;
+  font-style: italic;
+}
 
 @font-face {
   font-family: "KaiTi";
