@@ -123,12 +123,7 @@
   font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
 } 
 
-.char-card {
-  font-size: 3em;
-}
-
 /* Material Icon Font */
-
 @font-face {
   font-family: "Material Icons";
   font-style: normal;
