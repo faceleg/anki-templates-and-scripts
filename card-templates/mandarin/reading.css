@@ -102,33 +102,33 @@
   font-style: italic;
 }
 
+@font-face {
+  font-family: "KaiTi";
+  font-style: normal;
+  font-weight: 300;
+  src: url(_KaiTi.ttf);
+}
+
 /* Windows */
 .win .char-card {
   font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
 }
 /* macOS */
-.mac .char-card {
-  font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
-}
+.mac .char-card,
+.iphone .char-card {
+  font-family: "KaiTi";
+} 
 /* Linux desktops */
 .linux:not(.android) .char-card {
   font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
-}
+} 
 
 /* Material Icon Font */
-
 @font-face {
   font-family: "Material Icons";
   font-style: normal;
   font-weight: 300;
-  src: url(MaterialIcons-Regular.eot);
-  /* For IE6-8 */
-  src:
-    local("Material Icons"),
-    local("MaterialIcons-Regular"),
-    url(_MaterialIcons-Regular.woff2) format("woff2"),
-    url(_MaterialIcons-Regular.woff) format("woff"),
-    url(_MaterialIcons-Regular.ttf) format("truetype");
+  src: url(_MaterialIcons-Regular.woff2);
 }
 
 .material-icons {

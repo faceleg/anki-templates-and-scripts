@@ -1,3 +1,4 @@
+<div id="ios-messenger" style="display:none;color:red;border: 1px solid black;font-size: 8px;position: absolute; top: 0px;left: 0px; padding: 2px;max-width:100%;"></div>
 <div id="char_zhuyin">{{Zhuyin}}</div>
 <div id="char_pinyin">{{Pinyin}}</div>
 <div id="char_sim" class="char-card">{{Simplified}}</div>
@@ -363,6 +364,34 @@
   </a>
 </div>
 <!-----sidebar------>
+
+<script type="text/javascript">
+  function millisecondsSinceTimestamp(previousTimestamp) {
+    // Get the current timestamp in milliseconds
+    const currentTimestamp = Date.now();
+
+    // Calculate the difference between current and previous timestamps
+    const differenceMilliseconds = currentTimestamp - previousTimestamp;
+
+    return differenceMilliseconds;
+  }
+
+  var loadStartedTimestamp = Date.now();
+  
+  // Set this to true to make the messenger appear with your messages
+  var DEBUG = false;
+  function sendMessage(message) {
+    var messageDiv = document.getElementById("ios-messenger");
+    
+    messageDiv.style.display = DEBUG ? "block" : "none";
+    
+    messageDiv.innerHTML +=
+      message +
+      " (" +
+      millisecondsSinceTimestamp(loadStartedTimestamp) +
+      ")<br/>";
+  }  
+</script>
 
 <script>
   // prettier-ignore
