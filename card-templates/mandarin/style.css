@@ -690,6 +690,11 @@ hr {
   width: 0px;
 }
 
+#writing-feedback {
+  margin-top: 10px;
+  font-size: 10px;
+}
+
 .close-button {
   position: absolute;
   right: 16px;

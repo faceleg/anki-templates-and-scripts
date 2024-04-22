@@ -25,6 +25,10 @@
 >
   &#8226;
 </div>
+<div id="writing-feedback" style="display:none;">
+  <span id="writing-feedback-mistakes"></span>
+  <span id="writing-feedback-total-strokes"></span>
+</div>
 <div id="audio" style="display: none">{{Audio}}</div>
 
 <div id="char_examples-parts-of-speech"></div>
@@ -1019,7 +1023,38 @@
         revealClickCount++;
       };
 
+      /**
+       * Toggles the visibility of the writing feedback.
+       * 
+       * @param {boolean} showOrHide - Indicates whether to show or hide the feedback.
+       * @returns {void}
+       */
+      function showHideFeedback(showOrHide) {
+        return showHide('#writing-feedback', showOrHide, "block")
+      }
+
+      /**
+       * Updates the writing feedback based on the provided feedback data.
+       * 
+       * @param {object} feedback - Feedback data object.
+       * @param {number} feedback.totalMistakes - Total number of mistakes.
+       * @returns {void}
+       */
+      function updateWritingFeedback (feedback) {
+        var totalMistakes = feedback.totalMistakes;
+        if (!totalMistakes) {
+          showHideFeedback(false)
+          return;
+        }
+        
+        showHideFeedback(true)
+        if (totalMistakes > 0) {
+          document.getElementById('writing-feedback-mistakes').innerHTML = totalMistakes === 1 ? "1 mistake" : totalMistakes + " mistakes"
+        }
+      }
+
       function writerQuiz(writer) {
+        showHideFeedback(false);
         writer.quiz({
           onComplete: function (summaryData) {
             onFinishQuizDrawHanzi();
@@ -1027,7 +1062,13 @@
             setTimeout(function () {
               showNextHanzi();
             }, 1000);
-          },
+          },  
+          onMistake: updateWritingFeedback,
+          onCorrectStroke: updateWritingFeedback,
+          onComplete: function(summaryData) {
+            console.log('You did it! You finished drawing ' + summaryData.character);
+            console.log('You made ' + summaryData.totalMistakes + ' total mistakes on this quiz');
+          }
         });
       }
 
