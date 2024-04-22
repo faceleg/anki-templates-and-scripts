@@ -25,7 +25,7 @@
 >
   &#8226;
 </div>
-<div id="writing-feedback" style="display:none;">
+<div id="writing-feedback" style="display: none">
   <span id="writing-feedback-mistakes"></span>
   <span id="writing-feedback-total-strokes"></span>
 </div>
@@ -411,14 +411,13 @@
 </script>
 
 <script>
-
   // *** Side management ***
 
   /**
    * Manages the active side.
    * @returns {Object} An object containing functions to get and set the active side.
    */
-  var activeSideManager = (function () {
+  var ActiveSideManager = (function () {
     let frontBack = "front";
 
     /**
@@ -461,7 +460,7 @@
    * @returns {void}
    */
   function setActive(side) {
-    activeSideManager.setActive(side);
+    ActiveSideManager.setActive(side);
   }
 
   // *** Side management end
@@ -576,13 +575,13 @@
     "text-pinyin": true,
     "text-zhuyin": false,
     "text-meaning": true,
-    "text-examples": true,
+    "text-examples": false,
     "text-examples-parts-of-speech": false,
     "text-sim": false,
     "text-trad": false,
     "text-grid": true,
     "text-outline": false,
-    "text-stroke-color": true
+    "text-stroke-color": true,
   };
 
   function getSwitchIds() {
@@ -595,7 +594,7 @@
   var keyPrefix = "writing";
   var UniqueCardPersistence = {
     getKey: function (key) {
-      return keyPrefix + activeSideManager.getActiveSide() + key;
+      return keyPrefix + ActiveSideManager.getActiveSide() + key;
     },
     getItem: function (key) {
       var item = Persistence.getItem(UniqueCardPersistence.getKey(key));
@@ -613,15 +612,87 @@
 
   // *** Persistence wrapper end ***
 
+  // *** Mistake feedback wrapper ***
+
+  /**
+   * WritingFeedbackManager - Manages the writing feedback and the total mistakes for a quiz.
+   */
+  var WritingFeedbackManager = {
+    /**
+     * Total number of mistakes for the entire quiz.
+     * @type {number}
+     * @private
+     */
+    _totalMistakesForQuiz: 0,
+
+    addToTotalMistakes: function (mistakes) {
+      WritingFeedbackManager._totalMistakesForQuiz += mistakes;
+    },
+
+    /**
+     * Updates the writing feedback based on the provided feedback data.
+     *
+     * @param {object} feedback - Feedback data object.
+     * @param {number} feedback.totalMistakes - Total number of mistakes for this character.
+     * @returns {void}
+     */
+    updateWritingFeedback: function (feedback) {
+      WritingFeedbackManager._updateFeedbackText(feedback.totalMistakes);
+    },
+
+    _updateFeedbackText(currentMistakes) {
+      var writingFeedback = [];
+
+      if (currentMistakes > 0) {
+        WritingFeedbackManager.showHideFeedback(true);
+        writingFeedback.push(
+          currentMistakes === 1
+            ? "1 mistake for this character"
+            : currentMistakes + " mistakes for this character",
+        );
+      }
+
+      if (WritingFeedbackManager._totalMistakesForQuiz > 0) {
+        WritingFeedbackManager.showHideFeedback(true);
+
+        writingFeedback.push(
+          WritingFeedbackManager._totalMistakesForQuiz === 1
+            ? "1 mistake for the quiz"
+            : WritingFeedbackManager._totalMistakesForQuiz +
+                " mistakes for the quiz",
+        );
+      }
+
+      document.getElementById("writing-feedback-mistakes").innerHTML =
+        writingFeedback.join("<br/>");
+    },
+
+    showFinalFeedback: function () {
+      WritingFeedbackManager._updateFeedbackText(0);
+    },
+
+    /**
+     * Toggles the visibility of the writing feedback.
+     *
+     * @param {boolean} showOrHide - Indicates whether to show or hide the feedback.
+     * @returns {void}
+     */
+    showHideFeedback: function (showOrHide) {
+      return showHide("#writing-feedback", showOrHide, "block");
+    },
+  };
+
+  // *** Mistake feedback wrapper end ***
+
   if (!document.getElementById("back")) {
-    activeSideManager.setActive("text-front");
+    ActiveSideManager.setActive("text-front");
   } else {
-    activeSideManager.setActive("text-back");
+    ActiveSideManager.setActive("text-back");
   }
 
   function initPractice() {
     var _selectPracticeId =
-      activeSideManager.getActiveSide() + "reading-practice-select";
+      ActiveSideManager.getActiveSide() + "reading-practice-select";
     var selectPracticeElem = document.getElementById("reading-practice-select");
     var selectPracticeStore = UniqueCardPersistence.getItem(_selectPracticeId);
 
@@ -843,14 +914,15 @@
    * @returns {string} The string with ASCII characters removed.
    */
   function stripAscii(str) {
-    return str.replace(/[A-Za-z0-9]/g, '');
+    return str.replace(/[A-Za-z0-9]/g, "");
   }
 
   function getCharactersToDraw() {
-    const charactersText = document.getElementById("reading-practice-select").selectedIndex === 0
-      ? document.getElementById("char_sim").innerText
-      : document.getElementById("char_trad").innerText;
-      return stripAscii(charactersText)
+    const charactersText =
+      document.getElementById("reading-practice-select").selectedIndex === 0
+        ? document.getElementById("char_sim").innerText
+        : document.getElementById("char_trad").innerText;
+    return stripAscii(charactersText);
   }
 
   var charHW = document.getElementById("draw-size").value;
@@ -930,10 +1002,12 @@
     document.getElementById("ch_load_status").style.marginBottom = "0px";
     document.getElementById("ch_load_status").style.display = "block";
 
+    WritingFeedbackManager.showHideFeedback(false);
+
     var hanziWriterList = [];
     var drawGrid = document.getElementById("character-target-div");
     drawGrid.innerHTML = "";
-    
+
     var characters = getCharactersToDraw();
     for (i = 0; i < characters.length; i++) {
       var div = document.createElement("div");
@@ -1023,52 +1097,20 @@
         revealClickCount++;
       };
 
-      /**
-       * Toggles the visibility of the writing feedback.
-       * 
-       * @param {boolean} showOrHide - Indicates whether to show or hide the feedback.
-       * @returns {void}
-       */
-      function showHideFeedback(showOrHide) {
-        return showHide('#writing-feedback', showOrHide, "block")
-      }
-
-      /**
-       * Updates the writing feedback based on the provided feedback data.
-       * 
-       * @param {object} feedback - Feedback data object.
-       * @param {number} feedback.totalMistakes - Total number of mistakes.
-       * @returns {void}
-       */
-      function updateWritingFeedback (feedback) {
-        var totalMistakes = feedback.totalMistakes;
-        if (!totalMistakes) {
-          showHideFeedback(false)
-          return;
-        }
-        
-        showHideFeedback(true)
-        if (totalMistakes > 0) {
-          document.getElementById('writing-feedback-mistakes').innerHTML = totalMistakes === 1 ? "1 mistake" : totalMistakes + " mistakes"
-        }
-      }
-
       function writerQuiz(writer) {
-        showHideFeedback(false);
         writer.quiz({
           onComplete: function (summaryData) {
+            WritingFeedbackManager.addToTotalMistakes(
+              summaryData.totalMistakes,
+            );
             onFinishQuizDrawHanzi();
 
             setTimeout(function () {
               showNextHanzi();
             }, 1000);
-          },  
-          onMistake: updateWritingFeedback,
-          onCorrectStroke: updateWritingFeedback,
-          onComplete: function(summaryData) {
-            console.log('You did it! You finished drawing ' + summaryData.character);
-            console.log('You made ' + summaryData.totalMistakes + ' total mistakes on this quiz');
-          }
+          },
+          onMistake: WritingFeedbackManager.updateWritingFeedback,
+          onCorrectStroke: WritingFeedbackManager.updateWritingFeedback,
         });
       }
 
@@ -1127,6 +1169,8 @@
   }
 
   function onFinishQuiz(i, len) {
+    WritingFeedbackManager.showFinalFeedback();
+
     if (i != len - 1) {
       return;
     }
@@ -1140,6 +1184,7 @@
     playAudio();
     showHide("#char_sim", true);
     showTraditionalChar();
+
     showHide("#char_meaning", true, "block");
     if (document.getElementById("text-pinyin").checked) {
       showHide(".pinyin", true);
