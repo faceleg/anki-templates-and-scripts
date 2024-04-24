@@ -1,0 +1,253 @@
+:root {
+  --tone-1: #f44336;
+  --tone-2: #ff9800;
+  --tone-3: #4caf50;
+  --tone-4: #2196f3;
+  --tone-5: #607d8b;
+  --brand-bg1: rgb(255, 117, 195);
+  --brand-bg2: rgb(157, 119, 255);
+  --brand-bg-gradient: linear-gradient(
+    to bottom,
+    var(--brand-bg2),
+    var(--brand-bg2)
+  );
+  --thumb-highlight-color: rgba(255, 255, 254, 0.2);
+  --space-xxs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --space-xxl: 6rem;
+  --isLTR: 1;
+  --isRTL: -1;
+}
+
+#char_image {
+  text-align: center;
+}
+
+#char_image img {
+  max-height: 200px;
+}
+
+.char_example {
+  line-height: 1.8;
+}
+
+.card {
+  --title-color: grey;
+  --time-left-color: teal;
+  --hanzi-grid: #fafafa;
+  --stroke: #555;
+  --outline: #ddd;
+  --drawing: #333;
+  --pinyin-color: #ef6c00;
+  --simplified-color: #6495ed;
+  --traditional-color: #00796b;
+  --meaning-color: #607d8b;
+  --icon-button-background: #63759d;
+  --icon-button-background-focus: #7d92c2;
+  --sidebar-color: white;
+  --sidebar-background-color: #52575d;
+  --header-color: #455a64;
+  --surface1: rgb(226, 226, 226);
+  --surface2: rgb(255, 255, 254);
+  --surface3: rgb(249, 249, 249);
+  --surface4: rgb(212, 212, 212);
+  --text1: rgb(48, 48, 48);
+  --text2: rgb(94, 94, 94);
+  --brand: rgb(47, 167, 214);
+  --thumb-highlight-color: rgba(0, 0, 0, 0.2);
+  font-size: 20px;
+  text-align: center;
+  color: black;
+  background-color: white;
+}
+
+.card.night_mode {
+  --header-color: white;
+  --title-color: #00bcd4;
+  --time-left-color: #fff;
+  --hanzi-grid: #262626;
+  --stroke: #ffffff;
+  --outline: #5b5b5b;
+  --drawing: #fff;
+  --pinyin-color: #27b46e;
+  --simplified-color: #6495ed;
+  --traditional-color: #fba910;
+  --meaning-color: #00bfa5;
+  --icon-button-background: #63759d;
+  --icon-button-background-focus: #7d92c2;
+  --sidebar-color: white;
+  --sidebar-background-color: #52575d;
+  --surface1: rgb(27, 27, 27);
+  --surface2: rgb(37, 37, 37);
+  --surface3: rgb(48, 48, 48);
+  --surface4: rgb(59, 59, 59);
+  --text1: rgb(240, 240, 240);
+  --text2: rgb(184, 184, 184);
+  --brand: rgb(118, 161, 184);
+  color: white;
+  background-color: #1f1f1f;
+}
+
+#char_deck {
+  margin-top: 10px;
+  font-size: 10px;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "KaiTi";
+  font-style: normal;
+  font-weight: 300;
+  src: url(_KaiTi.ttf);
+}
+
+/* Windows */
+.win .char-card {
+  font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
+}
+/* macOS */
+.mac .char-card,
+.iphone .char-card {
+  font-family: "KaiTi";
+}
+/* Linux desktops */
+.linux:not(.android) .char-card {
+  font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
+}
+
+.text-color1 {
+  font-size: 16px;
+  color: var(--pinyin-color);
+}
+
+.text-color2 {
+  color: var(--traditional-color);
+}
+
+.text-color3 {
+  color: var(--meaning-color);
+}
+
+.text-color4 {
+  font-size: 30px;
+  font-weight: bold;
+  color: var(--simplified-color);
+}
+
+img {
+  border-radius: 10%;
+}
+
+.meaning {
+  text-align: center;
+}
+
+.tone1 {
+  color: #f44336;
+}
+
+.tone2 {
+  color: #fbc02d;
+}
+
+.tone3 {
+  color: #4caf50;
+}
+
+.tone4 {
+  color: #03a9f4;
+}
+
+.tone5 {
+  color: #858585;
+}
+
+.meaning-card {
+  text-align: center;
+  padding: 10px;
+}
+
+.meaning {
+  display: block;
+}
+
+.char {
+  font-size: 30px;
+}
+
+.pinyin {
+  font-size: 16px;
+}
+
+.zhuyin {
+  font-size: 16px;
+}
+
+.py {
+  font-size: 14px;
+  color: gray;
+}
+
+.zy {
+  font-size: 14px;
+  color: gray;
+}
+
+.header {
+  color: var(--header-color);
+}
+
+.question-sub-text {
+  color: #f44336;
+  font-weight: bold;
+}
+
+.char-tone1 {
+  color: var(--tone-1);
+}
+
+.char-tone2 {
+  color: var(--tone-2);
+}
+
+.char-tone3 {
+  color: var(--tone-3);
+}
+
+.char-tone4 {
+  color: var(--tone-4);
+}
+
+.char-sim-1 {
+  margin: 2px;
+  font-size: 30px;
+}
+
+.char-trad-1 {
+  margin: 2px;
+  font-size: 30px;
+}
+
+.char-pin-1 {
+  margin: 2px;
+  line-height: 32px;
+}
+
+.char-zhy-1 {
+  margin: 2px;
+  line-height: 32px;
+}
+
+small {
+  line-height: 1.5;
+}
+
+hr {
+  border: 0;
+  height: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
