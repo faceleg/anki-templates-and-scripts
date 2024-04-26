@@ -612,6 +612,27 @@
 
   // *** Persistence wrapper end ***
 
+  // *** Show next stroke wrapper ***
+
+  var ShowNextStrokeManager = {
+    
+    _nextStrokeIndex: 0,
+
+    setNextStroke: function (nextStrokeIndex) {
+      ShowNextStrokeManager._nextStrokeIndex = nextStrokeIndex;
+    },
+
+    incrementStroke: function() {
+      ShowNextStrokeManager._nextStrokeIndex = ShowNextStrokeManager._nextStrokeIndex + 1;
+    },
+
+    showNextStroke: function (writer) {
+      writer.highlightStroke(ShowNextStrokeManager._nextStrokeIndex)
+    }
+  }
+
+  // *** Show next stroke wrapper end ***
+
   // *** Mistake feedback wrapper ***
 
   /**
@@ -1080,21 +1101,25 @@
       };
 
       document.getElementById("btnRevealChar").onclick = function () {
-        writer = hanziWriterList[getCurrentHanziNum()];
-        writer.showOutline();
-        if (revealClickCount == 0) {
-          writer.animateCharacter();
-        } else if (revealClickCount == 1) {
-          writer.showCharacter();
-        } else if (revealClickCount == 2) {
-          writer.hideCharacter();
-          writer.hideOutline();
-          writerQuiz(writer);
-        } else {
-          revealClickCount = -1;
-          writerQuiz(writer);
-        }
-        revealClickCount++;
+        // Comment this out and uncomment block below to return to standard animation & show behaviour
+        ShowNextStrokeManager.showNextStroke(writer = hanziWriterList[getCurrentHanziNum()]);
+        
+        // Uncomment this for standard animation & show behaviour
+        // writer = hanziWriterList[getCurrentHanziNum()];
+        // writer.showOutline();
+        // if (revealClickCount == 0) {
+        //   writer.animateCharacter();
+        // } else if (revealClickCount == 1) {
+        //   writer.showCharacter();
+        // } else if (revealClickCount == 2) {
+        //   writer.hideCharacter();
+        //   writer.hideOutline();
+        //   writerQuiz(writer);
+        // } else {
+        //   revealClickCount = -1;
+        //   writerQuiz(writer);
+        // }
+        // revealClickCount++;
       };
 
       function writerQuiz(writer) {
@@ -1103,6 +1128,7 @@
             WritingFeedbackManager.addToTotalMistakes(
               summaryData.totalMistakes,
             );
+            ShowNextStrokeManager.setNextStroke(0);
             onFinishQuizDrawHanzi();
 
             setTimeout(function () {
@@ -1110,7 +1136,10 @@
             }, 1000);
           },
           onMistake: WritingFeedbackManager.updateWritingFeedback,
-          onCorrectStroke: WritingFeedbackManager.updateWritingFeedback,
+          onCorrectStroke: function(feedback) {
+            WritingFeedbackManager.updateWritingFeedback(feedback);
+            ShowNextStrokeManager.incrementStroke()
+          },
         });
       }
 
