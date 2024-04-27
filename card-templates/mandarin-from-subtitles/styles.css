@@ -166,6 +166,8 @@ img {
   color: #858585;
 }
 
+/* Text block styling */
+
 .meaning-card {
   text-align: center;
   padding: 10px;
@@ -175,8 +177,17 @@ img {
   display: block;
 }
 
-#char_sim {
-  font-size: 30px;
+/* Character styling */
+
+.char, #char_sim {
+  font-size: 35px;
+}
+
+#char_sim.kaiti {
+  font-family: KaiTi;
+}
+#char_sim.arial {
+  font-family: Arial;
 }
 
 .pinyin {
