@@ -1,5 +1,5 @@
 <div
-  id="ios-messenger"
+  id="debug-message-console"
   style="
     display: none;
     color: red;
@@ -398,8 +398,8 @@
 
   // Set this to true to make the messenger appear with your messages
   var DEBUG = true;
-  function sendMessage(message) {
-    var messageDiv = document.getElementById("ios-messenger");
+  function printDebugMessage(message) {
+    var messageDiv = document.getElementById("debug-message-console");
 
     messageDiv.style.display = DEBUG ? "block" : "none";
 
@@ -560,14 +560,14 @@
   );
 
   function getToneColor(characterIndex) {
-    return colorCodes[decodedPinyin[i]];
+    return colorCodes[decodedPinyin[characterElementsIndex]];
   }
 
   // *** Colour mananagement end ***
 
   // prettier-ignore
   // v1.1.8 - https://github.com/SimonLammer/anki-persistence/blob/584396fea9dea0921011671a47a0fdda19265e62/script.js
-  if(void 0===window.Persistence){var e="github.com/SimonLammer/anki-persistence/",t="_default";if(window.Persistence_sessionStorage=function(){var i=!1;try{"object"==typeof window.sessionStorage&&(i=!0,this.clear=function(){for(var t=0;t<sessionStorage.length;t++){var i=sessionStorage.key(t);0==i.indexOf(e)&&(sessionStorage.removeItem(i),t--)}},this.setItem=function(i,n){void 0==n&&(n=i,i=t),sessionStorage.setItem(e+i,JSON.stringify(n))},this.getItem=function(i){return void 0==i&&(i=t),JSON.parse(sessionStorage.getItem(e+i))},this.removeItem=function(i){void 0==i&&(i=t),sessionStorage.removeItem(e+i)},this.getAllKeys=function(){for(var t=[],i=Object.keys(sessionStorage),n=0;n<i.length;n++){var s=i[n];0==s.indexOf(e)&&t.push(s.substring(e.length,s.length))}return t.sort()})}catch(n){}this.isAvailable=function(){return i}},window.Persistence_windowKey=function(i){var n=window[i],s=!1;"object"==typeof n&&(s=!0,this.clear=function(){n[e]={}},this.setItem=function(i,s){void 0==s&&(s=i,i=t),n[e][i]=s},this.getItem=function(i){return void 0==i&&(i=t),void 0==n[e][i]?null:n[e][i]},this.removeItem=function(i){void 0==i&&(i=t),delete n[e][i]},this.getAllKeys=function(){return Object.keys(n[e])},void 0==n[e]&&this.clear()),this.isAvailable=function(){return s}},window.Persistence=new Persistence_sessionStorage,Persistence.isAvailable()||(window.Persistence=new Persistence_windowKey("py")),!Persistence.isAvailable()){var i=window.location.toString().indexOf("title"),n=window.location.toString().indexOf("main",i);i>0&&n>0&&n-i<10&&(window.Persistence=new Persistence_windowKey("qt"))}}
+  if(void 0===window.Persistence){var e="github.com/SimonLammer/anki-persistence/",t="_default";if(window.Persistence_sessionStorage=function(){var i=!1;try{"object"==typeof window.sessionStorage&&(i=!0,this.clear=function(){for(var t=0;t<sessionStorage.length;t++){var i=sessionStorage.key(t);0==i.indexOf(e)&&(sessionStorage.removeItem(i),t--)}},this.setItem=function(i,n){void 0==n&&(n=i,i=t),sessionStorage.setItem(e+i,JSON.stringify(n))},this.getItem=function(i){return void 0==i&&(i=t),JSON.parse(sessionStorage.getItem(e+i))},this.removeItem=function(i){void 0==i&&(i=t),sessionStorage.removeItem(e+i)},this.getAllKeys=function(){for(var t=[],i=Object.keys(sessionStorage),n=0;n<i.length;n++){var s=i[n];0==s.indexOf(e)&&t.push(s.substring(e.length,s.length))}return t.sort()})}catch(n){}this.isAvailable=function(){return i}},window.Persistence_windowKey=function(i){var n=window[i],s=!1;"object"==typeof n&&(s=!0,this.clear=function(){n[e]={}},this.setItem=function(i,s){void 0==s&&(s=i,i=t),n[e][i]=s},this.getItem=function(i){return void 0==i&&(i=t),void 0==n[e][i]?null:n[e][i]},this.removeItem=function(i){void 0==i&&(i=t),delete n[e][i]},this.getAllKeys=function(){return Object.keys(n[e])},void 0==n[e]&&this.clear()),this.isAvailable=function(){return s}},window.Persistence=new Persistence_sessionStorage,Persistence.isAvailable()||(window.Persistence=new Persistence_windowKey("py")),!Persistence.isAvailable()){var characterElementsIndex=window.location.toString().indexOf("title"),n=window.location.toString().indexOf("main",characterElementsIndex);characterElementsIndex>0&&n>0&&n-characterElementsIndex<10&&(window.Persistence=new Persistence_windowKey("qt"))}}
 
   // *** Default preferences ***
 
@@ -616,21 +616,21 @@
   // *** Show next stroke wrapper ***
 
   var ShowNextStrokeManager = {
-    
     _nextStrokeIndex: 0,
 
     setNextStroke: function (nextStrokeIndex) {
       ShowNextStrokeManager._nextStrokeIndex = nextStrokeIndex;
     },
 
-    incrementStroke: function() {
-      ShowNextStrokeManager._nextStrokeIndex = ShowNextStrokeManager._nextStrokeIndex + 1;
+    incrementStroke: function () {
+      ShowNextStrokeManager._nextStrokeIndex =
+        ShowNextStrokeManager._nextStrokeIndex + 1;
     },
 
     showNextStroke: function (writer) {
-      writer.highlightStroke(ShowNextStrokeManager._nextStrokeIndex)
-    }
-  }
+      writer.highlightStroke(ShowNextStrokeManager._nextStrokeIndex);
+    },
+  };
 
   // *** Show next stroke wrapper end ***
 
@@ -689,7 +689,7 @@
         writingFeedback.join("<br/>");
     },
 
-    showFinalFeedback: function () {
+    showFinalFeedbackForCharacter: function () {
       WritingFeedbackManager._updateFeedbackText(0);
     },
 
@@ -705,6 +705,25 @@
   };
 
   // *** Mistake feedback wrapper end ***
+
+  // *** setTimeout wrapper that cancels the callback if visibility change happens
+  window.renderTimestamp = Date.now(); // Used to identify functions generated in this card showing
+
+  function delayedCallback(callback, delay) {
+    const calltimeRenderTimestamp = window.renderTimestamp; // Get the current value of renderTimestamp
+
+    const timer = setTimeout(() => {
+      // Check if renderTimestamp has changed since the setTimeout was called
+      if (window.renderTimestamp !== calltimeRenderTimestamp) {
+        clearTimeout(timer); // Cancel the timeout
+        // printDebugMessage("Callback canceled due to renderTimestamp change.");
+      } else {
+        callback(); // Execute the callback if renderTimestamp hasn't changed
+      }
+    }, delay);
+  }
+
+  // *** setTimeout wrapper that cancels the callback if visibility change happens
 
   if (!document.getElementById("back")) {
     ActiveSideManager.setActive("text-front");
@@ -981,17 +1000,22 @@
       drawGrid.style.overflow = "scroll";
     }
 
-    for (i = 0; i < characters.length; i++) {
-      var hanzi = characters[i];
+    for (
+      characterElementsIndex = 0;
+      characterElementsIndex < characters.length;
+      characterElementsIndex++
+    ) {
+      var hanzi = characters[characterElementsIndex];
       var span = document.createElement("span");
       span.innerHTML = grid_data;
-      span.children[0].id = "onfinish-grid-background-target" + i;
+      span.children[0].id =
+        "onfinish-grid-background-target" + characterElementsIndex;
       span.children[0].style.margin = finish ? "6px" : "2px";
       span.style.display = style;
       drawGrid.appendChild(span);
-      setStrokeColor(i);
+      setStrokeColor(characterElementsIndex);
       var writer = HanziWriter.create(
-        "onfinish-grid-background-target" + i,
+        "onfinish-grid-background-target" + characterElementsIndex,
         hanzi,
         {
           width: size,
@@ -1011,28 +1035,29 @@
 
   // Function to load character data from a given URL
   function loadCharacterData(url, onComplete) {
-      var xhr = new XMLHttpRequest();
-      
-      xhr.open('GET', url, true);
-      
-      // Set up a callback function to handle the response
-      xhr.onreadystatechange = function() {
-          if (xhr.readyState === XMLHttpRequest.DONE) {
-              if (xhr.status === 200) {
-                  // Parse the JSON response
-                  var charData = JSON.parse(xhr.responseText);
-                  onComplete(charData);
-              } else {
-                  // Log an error message if the request fails
-                  sendMessage('Request failed with status: ' + xhr.status + ' for URL: ' + url);
-              }
-          }
-      };
-      
-      // Send the request
-      xhr.send();
-  }
+    var xhr = new XMLHttpRequest();
 
+    xhr.open("GET", url, true);
+
+    // Set up a callback function to handle the response
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        if (xhr.status === 200) {
+          // Parse the JSON response
+          var charData = JSON.parse(xhr.responseText);
+          onComplete(charData);
+        } else {
+          // Log an error message if the request fails
+          printDebugMessage(
+            "Request failed with status: " + xhr.status + " for URL: " + url,
+          );
+        }
+      }
+    };
+
+    // Send the request
+    xhr.send();
+  }
 
   function doPractice(p = false) {
     if (document.getElementById("back")) {
@@ -1056,52 +1081,68 @@
     drawGrid.innerHTML = "";
 
     var characters = getCharactersToDraw();
-    for (i = 0; i < characters.length; i++) {
+    for (
+      characterElementsIndex = 0;
+      characterElementsIndex < characters.length;
+      characterElementsIndex++
+    ) {
       var div = document.createElement("div");
-      div.id = "div" + i;
+      div.id = "div" + characterElementsIndex;
       div.innerHTML = grid_data;
-      div.children[0].id = "grid-background-target" + i;
+      div.children[0].id = "grid-background-target" + characterElementsIndex;
       drawGrid.appendChild(div);
-      setStrokeColor(i);
-      var hanzi = characters[i];
-      var writer = HanziWriter.create("grid-background-target" + i, hanzi, {
-        onLoadCharDataSuccess: function (data) {
-          document.getElementById("ch_load_status").style.color = "#4caf50";
-        },
-        onLoadCharDataError: function (reason) {
-          document.getElementById("ch_load_status").style.color = "#ea2322";
-        },
-        charDataLoader: function(character, onComplete) {
-          var initialUrl = "/_" + character + ".json";
-          
-          // Attempt to load character data from the initial URL
-          loadCharacterData(initialUrl, function(charData) {
-              onComplete(charData);
-          }, function() {
-              // If the initial load fails, fallback to loading from another URL
-              var fallbackUrl = "https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0/" + character + ".json";
-              
-              loadCharacterData(fallbackUrl, function(charData) {
+      setStrokeColor(characterElementsIndex);
+      var hanzi = characters[characterElementsIndex];
+      var writer = HanziWriter.create(
+        "grid-background-target" + characterElementsIndex,
+        hanzi,
+        {
+          onLoadCharDataSuccess: function (data) {
+            document.getElementById("ch_load_status").style.color = "#4caf50";
+          },
+          onLoadCharDataError: function (reason) {
+            document.getElementById("ch_load_status").style.color = "#ea2322";
+          },
+          charDataLoader: function (character, onComplete) {
+            var initialUrl = "/_" + character + ".json";
+
+            // Attempt to load character data from the initial URL
+            loadCharacterData(
+              initialUrl,
+              function (charData) {
+                onComplete(charData);
+              },
+              function () {
+                // If the initial load fails, fallback to loading from another URL
+                var fallbackUrl =
+                  "https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0/" +
+                  character +
+                  ".json";
+                loadCharacterData(fallbackUrl, function (charData) {
                   onComplete(charData);
-              });
-          });
+                });
+              },
+            );
+          },
+          strokeAnimationSpeed: 2,
+          delayBetweenStrokes: 125, // milliseconds
+          width: charWidth,
+          height: charHeight,
+          showCharacter: false,
+          showOutline:
+            UniqueCardPersistence.getItem("text-outline") == true
+              ? true
+              : false,
+          highlightOnComplete: true,
+          highlightCompleteColor: stroke_color,
+          drawingWidth: strokeWidth,
+          strokeColor: stroke_color,
+          outlineColor: outline_color,
+          drawingColor: drawing_color,
+          showHintAfterMisses: strokeAfterMisses,
+          padding: 5,
         },
-        strokeAnimationSpeed: 2,
-        delayBetweenStrokes: 125, // milliseconds
-        width: charWidth,
-        height: charHeight,
-        showCharacter: false,
-        showOutline:
-          UniqueCardPersistence.getItem("text-outline") == true ? true : false,
-        highlightOnComplete: true,
-        highlightCompleteColor: stroke_color,
-        drawingWidth: strokeWidth,
-        strokeColor: stroke_color,
-        outlineColor: outline_color,
-        drawingColor: drawing_color,
-        showHintAfterMisses: strokeAfterMisses,
-        padding: 5,
-      });
+      );
 
       writerQuiz(writer);
       hanziWriterList.push(writer);
@@ -1113,11 +1154,11 @@
         writer.showOutline();
         writer.showCharacter();
 
-        setTimeout(function () {
+        delayedCallback(function () {
           onFinishQuizDrawHanzi();
         }, 800);
 
-        setTimeout(function () {
+        delayedCallback(function () {
           showNextHanzi();
         }, 1000);
       };
@@ -1143,8 +1184,10 @@
 
       document.getElementById("btnRevealChar").onclick = function () {
         // Comment this out and uncomment block below to return to standard animation & show behaviour
-        ShowNextStrokeManager.showNextStroke(writer = hanziWriterList[getCurrentHanziNum()]);
-        
+        ShowNextStrokeManager.showNextStroke(
+          (writer = hanziWriterList[getCurrentHanziNum()]),
+        );
+
         // Uncomment this for standard animation & show behaviour
         // writer = hanziWriterList[getCurrentHanziNum()];
         // writer.showOutline();
@@ -1172,14 +1215,14 @@
             ShowNextStrokeManager.setNextStroke(0);
             onFinishQuizDrawHanzi();
 
-            setTimeout(function () {
+            delayedCallback(function () {
               showNextHanzi();
             }, 1000);
           },
           onMistake: WritingFeedbackManager.updateWritingFeedback,
-          onCorrectStroke: function(feedback) {
+          onCorrectStroke: function (feedback) {
             WritingFeedbackManager.updateWritingFeedback(feedback);
-            ShowNextStrokeManager.incrementStroke()
+            ShowNextStrokeManager.incrementStroke();
           },
         });
       }
@@ -1188,24 +1231,35 @@
         var characterDiv = document.querySelector("#character-target-div");
         var characterElements = characterDiv.children;
         var len = characterElements.length;
-        for (i = 0; i < len; i++) {
-          var style = characterElements[i].style.display;
+        for (
+          characterElementsIndex = 0;
+          characterElementsIndex < len;
+          characterElementsIndex++
+        ) {
+          var style = characterElements[characterElementsIndex].style.display;
           if (style === "block" || style === "") {
-            return i;
+            return characterElementsIndex;
           }
         }
       }
 
+      /**
+       * Show the finished characters
+       */
       function onFinishQuizDrawHanzi() {
         var finishCharacterDiv = document.getElementById(
           "onfinish-character-target-div",
         );
         var characterElements = finishCharacterDiv.children;
-        var len = characterElements.length;
-        for (i = 0; i < len; i++) {
-          var style = characterElements[i].style.display;
+        var characterElementsLength = characterElements.length;
+        for (
+          characterElementsIndex = 0;
+          characterElementsIndex < characterElementsLength;
+          characterElementsIndex++
+        ) {
+          var style = characterElements[characterElementsIndex].style.display;
           if (style === "none" || style === "") {
-            characterElements[i].style.display = "unset";
+            characterElements[characterElementsIndex].style.display = "unset";
             break;
           }
         }
@@ -1224,28 +1278,38 @@
   function showNextHanzi() {
     var characterDiv = document.querySelector("#character-target-div");
     var characterElements = characterDiv.children;
-    var len = characterElements.length;
+    var characterElementsLength = characterElements.length;
 
-    for (i = 0; i < len; i++) {
-      var style = characterElements[i].style.display;
+    for (
+      characterElementsIndex = 0;
+      characterElementsIndex < characterElementsLength;
+      characterElementsIndex++
+    ) {
+      var style = characterElements[characterElementsIndex].style.display;
       if (style === "block" || style === "") {
-        characterElements[i].style.display = "none";
-        characterElements[(i + 1) % characterElements.length].style.display =
-          "block";
-        onFinishQuiz(i, len);
+        characterElements[characterElementsIndex].style.display = "none";
+        characterElements[
+          (characterElementsIndex + 1) % characterElements.length
+        ].style.display = "block";
+        onFinishQuiz(characterElementsIndex, characterElementsLength);
         break;
       }
     }
   }
 
-  function onFinishQuiz(i, len) {
-    WritingFeedbackManager.showFinalFeedback();
+  /**
+   * Finish the quiz if this is the last character.
+   */
+  function onFinishQuiz(characterElementsIndex, characterElementsLength) {
+    WritingFeedbackManager.showFinalFeedbackForCharacter();
 
-    if (i != len - 1) {
+    if (characterElementsIndex != characterElementsLength - 1) {
       return;
     }
 
-    if (i + 1 == len) {
+    // If the last character element is reached:
+    if (characterElementsIndex + 1 == characterElementsLength) {
+      // Clear character target div and hide loading status.
       document.querySelector("#character-target-div").innerHTML = "";
       document.getElementById("ch_load_status").style.display = "none";
       generateHanziOnFinishQuiz("unset", true);
