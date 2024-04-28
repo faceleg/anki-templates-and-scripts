@@ -380,6 +380,7 @@
     <small>Tatoeba</small>
   </a>
 </div>
+
 <!-----sidebar------>
 
 <script type="text/javascript">
@@ -411,6 +412,11 @@
 </script>
 
 <script>
+
+  // *** Offline character data for Hanziwriter ****
+  // var url_hanzi = "https://cdn.jsdelivr.net/npm/hanzi-writer-data@latest/";
+  var url_hanzi = "_";
+
   // *** Side management ***
 
   /**
@@ -1044,6 +1050,31 @@
         },
         onLoadCharDataError: function (reason) {
           document.getElementById("ch_load_status").style.color = "#ea2322";
+        },
+        charDataLoader: function(character, onComplete) {
+          var xhr = new XMLHttpRequest();
+          var url = "_hanzi-writer-data/_" + character + ".json";
+
+          xhr.open('GET', url, true);
+
+          // Set up a callback function to handle the response
+          xhr.onreadystatechange = function() {
+            // Check if the request is complete and successful
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+              if (xhr.status === 200) {
+                // Parse the JSON response
+                var charData = JSON.parse(xhr.responseText);
+                onComplete(charData);
+              } else {
+                // Log an error message if the request fails
+                sendMessage('Request failed with status: ' + xhr.status + ' for character: ' + character);
+                sendMessage('Url: ' + url);
+              }
+            }
+          };
+
+          // Send the request
+          xhr.send();
         },
         strokeAnimationSpeed: 2,
         delayBetweenStrokes: 125, // milliseconds
