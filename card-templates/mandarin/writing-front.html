@@ -707,21 +707,21 @@
   // *** Mistake feedback wrapper end ***
 
   // *** setTimeout wrapper that cancels the callback if visibility change happens
-  window.renderTimestamp = Date.now(); // Used to identify functions generated in this card showing
+  window.currentCharacter = document.getElementById('char_sim').textContent.trim(); // Get the content of the element with id "char_sim"
 
-  function delayedCallback(callback, delay) {
-    const calltimeRenderTimestamp = window.renderTimestamp; // Get the current value of renderTimestamp
+function delayedCallback(callback, delay) {
+  const currentCharacter = document.getElementById('char_sim').textContent.trim(); // Get the content of the element with id "char_sim"
 
-    const timer = setTimeout(() => {
-      // Check if renderTimestamp has changed since the setTimeout was called
-      if (window.renderTimestamp !== calltimeRenderTimestamp) {
-        clearTimeout(timer); // Cancel the timeout
-        // printDebugMessage("Callback canceled due to renderTimestamp change.");
-      } else {
-        callback(); // Execute the callback if renderTimestamp hasn't changed
-      }
-    }, delay);
-  }
+  const timer = setTimeout(() => {
+	// Check if the currentCharacter has changed since the setTimeout was called
+	if (window.currentCharacter !== currentCharacter) {
+	  clearTimeout(timer); // Cancel the timeout
+	  // printDebugMessage("Callback canceled due to character change.");
+	} else {
+	  callback(); // Execute the callback if currentCharacter hasn't changed
+	}
+  }, delay);
+}
 
   // *** setTimeout wrapper that cancels the callback if visibility change happens
 
