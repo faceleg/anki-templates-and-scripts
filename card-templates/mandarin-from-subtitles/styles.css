@@ -221,7 +221,7 @@ rt > span {
 
 rt > span,
 ruby > span {
-  min-width: 35px;
+  min-width: 25px;
   display: inline-block;
   text-align: center;
 }
