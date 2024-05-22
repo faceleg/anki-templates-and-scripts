@@ -74,14 +74,16 @@
 /**
  * Stop skipping to next card on misclicks around buttons or interactive components
  */ 
-(() => {
+ (() => {
     const noTouchWrapper = document.getElementById('no-touch-wrapper');
 
     if (noTouchWrapper) {
         const allowedSelectors = ['button', '#container > div', '#dash > div'];
 
         function isAllowedTarget(target) {
-            return allowedSelectors.some(selector => target.matches(selector));
+            return allowedSelectors.some(selector => {
+                return target.matches(selector) || target.closest(selector);
+            });
         }
 
         function handleEvent(e) {
@@ -90,7 +92,7 @@
             }
             e.preventDefault();
             e.stopImmediatePropagation();
-            printDebugMessage(`${e.type} event intercepted!`);
+            console.log(`${e.type} event intercepted!`);
         }
 
         const events = ['click', 'touchstart', 'touchmove', 'touchend', 'touchcancel'];
