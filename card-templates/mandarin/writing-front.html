@@ -966,6 +966,56 @@ function delayedCallback(callback, delay) {
     return stripAscii(charactersText);
   }
 
+  // Function to load character data from a given URL
+  function loadCharacterData(url, onComplete) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+
+    // Set up a callback function to handle the response
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        if (xhr.status === 200) {
+          // Parse the JSON response
+          var charData = JSON.parse(xhr.responseText);
+          onComplete(charData);
+        } else {
+          // Log an error message if the request fails
+          printDebugMessage(
+            "Request failed with status: " + xhr.status + " for URL: " + url,
+          );
+        }
+      }
+    };
+
+    // Send the request
+    xhr.send();
+  }
+
+  /**
+   * Load character data from file or fallback to URL
+   */
+  function charDataLoader(character, onComplete) {
+    var initialUrl = "/_" + character + ".json";
+
+    // Attempt to load character data from the initial URL
+    loadCharacterData(
+      initialUrl,
+      function (charData) {
+        onComplete(charData);
+      },
+      function () {
+        // If the initial load fails, fallback to loading from another URL
+        var fallbackUrl =
+          "https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0/" +
+          character +
+          ".json";
+        loadCharacterData(fallbackUrl, function (charData) {
+          onComplete(charData);
+        });
+      },
+    );
+  }
+
   var charHW = document.getElementById("draw-size").value;
   var charHeight = charHW;
   var charWidth = charHW;
@@ -1018,6 +1068,7 @@ function delayedCallback(callback, delay) {
         "onfinish-grid-background-target" + characterElementsIndex,
         hanzi,
         {
+          charDataLoader,
           width: size,
           height: size,
           padding: 5,
@@ -1032,32 +1083,6 @@ function delayedCallback(callback, delay) {
     generateHanziOnFinishQuiz("none");
     showNextAndRevealBtn(true);
   };
-
-  // Function to load character data from a given URL
-  function loadCharacterData(url, onComplete) {
-    var xhr = new XMLHttpRequest();
-
-    xhr.open("GET", url, true);
-
-    // Set up a callback function to handle the response
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState === XMLHttpRequest.DONE) {
-        if (xhr.status === 200) {
-          // Parse the JSON response
-          var charData = JSON.parse(xhr.responseText);
-          onComplete(charData);
-        } else {
-          // Log an error message if the request fails
-          printDebugMessage(
-            "Request failed with status: " + xhr.status + " for URL: " + url,
-          );
-        }
-      }
-    };
-
-    // Send the request
-    xhr.send();
-  }
 
   function doPractice(p = false) {
     if (document.getElementById("back")) {
@@ -1103,27 +1128,7 @@ function delayedCallback(callback, delay) {
           onLoadCharDataError: function (reason) {
             document.getElementById("ch_load_status").style.color = "#ea2322";
           },
-          charDataLoader: function (character, onComplete) {
-            var initialUrl = "/_" + character + ".json";
-
-            // Attempt to load character data from the initial URL
-            loadCharacterData(
-              initialUrl,
-              function (charData) {
-                onComplete(charData);
-              },
-              function () {
-                // If the initial load fails, fallback to loading from another URL
-                var fallbackUrl =
-                  "https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0/" +
-                  character +
-                  ".json";
-                loadCharacterData(fallbackUrl, function (charData) {
-                  onComplete(charData);
-                });
-              },
-            );
-          },
+          charDataLoader,
           strokeAnimationSpeed: 2,
           delayBetweenStrokes: 125, // milliseconds
           width: charWidth,
