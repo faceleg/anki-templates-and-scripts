@@ -410,7 +410,27 @@
       ")<br/>";
   }
 </script>
+<script type="text/javascript">
+  // Browser based text to speech for use with multi character words
+  var utterance = new SpeechSynthesisUtterance();
+  function speak(phrase) {
+    
+    utterance.lang = 'zh'
+    utterance.text = phrase
 
+    // Select a voice that speaks Mandarin or Taiwanese Mandarin
+    const voices = speechSynthesis.getVoices().filter((voice) => {
+      if (voice.lang.indexOf('zh-TW') === 0) return true
+      else if (voice.lang.indexOf('zh-CN') === 0) return true
+      else return false
+    });
+    
+    // Randomly choose one of these voices
+    const voiceIndex = (Math.floor(Math.random() * voices.length))    
+    utterance.voice = voices[voiceIndex];
+    speechSynthesis.speak(utterance);
+  }
+</script>
 <script>
   // *** Side management ***
 
@@ -1149,7 +1169,7 @@ function delayedCallback(callback, delay) {
         },
       );
 
-      writerQuiz(writer);
+      writerQuiz(writer, characterElementsIndex + 1, characters.length);
       hanziWriterList.push(writer);
 
       var revealClickCount = 0;
@@ -1211,15 +1231,20 @@ function delayedCallback(callback, delay) {
         // revealClickCount++;
       };
 
-      function writerQuiz(writer) {
+      function writerQuiz(writer, currentCharacter, totalCharacters) {
         writer.quiz({
           onComplete: function (summaryData) {
+            
+            // Only read the character if this is a multi character word
+            if (totalCharacters > 1) {
+              speak(summaryData.character)
+            }
             WritingFeedbackManager.addToTotalMistakes(
               summaryData.totalMistakes,
             );
             ShowNextStrokeManager.setNextStroke(0);
             onFinishQuizDrawHanzi();
-
+            
             delayedCallback(function () {
               showNextHanzi();
             }, 1000);
