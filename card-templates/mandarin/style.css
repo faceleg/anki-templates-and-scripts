@@ -154,6 +154,13 @@
   font-feature-settings: "liga";
 }
 
+/* Character meaning display for individual characters */
+.character-meaning-div-populated {
+  max-width: 400px;
+  font-size: 12px;
+  line-height: 1.44;
+}
+
 /* grid color for character */
 
 .grid-color {
@@ -182,6 +189,12 @@
 .modal-footer1 {
   padding-top: 15px;
   text-align: center;
+}
+
+#ch_load_status {
+  padding-right: 10px;
+  font-size: 16px;
+  vertical-align: middle;
 }
 
 .modal-footer1 a {
@@ -691,8 +704,8 @@ hr {
 }
 
 #writing-feedback {
-  margin-top: 10px;
-  font-size: 16px;
+  margin-top: 5px;
+  font-size: 12px;
   line-height: 1.44;
 }
 

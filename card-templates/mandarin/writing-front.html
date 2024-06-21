@@ -19,19 +19,17 @@
 
 <div id="onfinish-character-target-div" class="tappable"></div>
 <div id="character-target-div" class="tappable"></div>
-<div
-  id="ch_load_status"
-  style="color: #ea2322; margin-top: -36px; display: none"
->
-  &#8226;
-</div>
 <div id="writing-feedback" style="display: none">
   <span id="writing-feedback-mistakes"></span>
   <span id="writing-feedback-total-strokes"></span>
 </div>
 <div id="audio" style="display: none">{{Audio}}</div>
 
-<div id="char_examples-parts-of-speech"></div>
+<div id="char_meaning" class="meaning-card">
+  <hr />
+  {{Definitions}}
+  <hr />
+</div>
 
 <div class="modal-footer1">
   <a class="btn" id="btnShowMenu" onclick="openSidebar('sidebar')">
@@ -61,15 +59,15 @@
     <div class="icon"><i class="material-icons">more_vert</i></div>
   </a>
 </div>
-
-<div id="char_meaning" class="meaning-card">
-  <hr />
-  {{Definitions}}
-  <hr />
-</div>
-
+<!-- Placeholder to stop crashing because I can't be bothered sorting out the show/hide JS for this section -->
+<div id="char_examples-parts-of-speech"></div>
 <div id="char_examples">{{Examples}}</div>
-<div id="char_deck">{{Deck}}</div>
+<div id="char_deck"><span
+  id="ch_load_status"
+  style="color: #ea2322; display: none"
+>
+  &#8226;
+</span>{{Deck}}</div>
 
 <!--sidebar-->
 
@@ -576,8 +574,16 @@
     return tonesArr;
   }
   var decodedPinyin = decodePinyin(
-    document.getElementById("char_pinyin").innerText,
+    getPinyinString()
   );
+
+  function getPinyinString() {
+    return document.getElementById("char_pinyin").innerText
+  }
+
+  function getPinyinAtIndex(index) {
+    return getPinyinString().split(' ')[index];
+  }
 
   function getToneColor(characterIndex) {
     return colorCodes[decodedPinyin[characterElementsIndex]];
@@ -987,7 +993,7 @@ function delayedCallback(callback, delay) {
   }
 
   // Function to load character data from a given URL
-  function loadCharacterData(url, onComplete) {
+  function loadDataFromUrl(url, onComplete) {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
 
@@ -1018,7 +1024,7 @@ function delayedCallback(callback, delay) {
     var initialUrl = "/_" + character + ".json";
 
     // Attempt to load character data from the initial URL
-    loadCharacterData(
+    loadDataFromUrl(
       initialUrl,
       function (charData) {
         onComplete(charData);
@@ -1029,7 +1035,7 @@ function delayedCallback(callback, delay) {
           "https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0/" +
           character +
           ".json";
-        loadCharacterData(fallbackUrl, function (charData) {
+        loadDataFromUrl(fallbackUrl, function (charData) {
           onComplete(charData);
         });
       },
@@ -1104,6 +1110,18 @@ function delayedCallback(callback, delay) {
     showNextAndRevealBtn(true);
   };
 
+  function getAndSetCharacterMeaning(id, character, index) {
+    const pinyin = getPinyinAtIndex(index)
+    var characterDefinitionDiv = document.getElementById(id)
+    loadDataFromUrl("/_" + character + "_meaning.json", function(characterData) {
+      characterDefinitionDiv.className = "character-meaning-div-populated"
+      characterDefinitionDiv.innerHTML = pinyin + ': ' + characterData.definitions.join('; ');
+    }, function() {
+      characterDefinitionDiv.display = "none";
+      printDebugMessage('Failed to load meaning data for ' + "/_" + character + "_meaning.json")
+    })
+  }
+
   function doPractice(p = false) {
     if (document.getElementById("back")) {
       generateHanziOnFinishQuiz("unset", true);
@@ -1116,8 +1134,7 @@ function delayedCallback(callback, delay) {
     }
 
     document.getElementById("ch_load_status").innerHTML = "&#8226;";
-    document.getElementById("ch_load_status").style.marginBottom = "0px";
-    document.getElementById("ch_load_status").style.display = "block";
+    document.getElementById("ch_load_status").style.display = "inline";
 
     WritingFeedbackManager.showHideFeedback(false);
 
@@ -1135,12 +1152,25 @@ function delayedCallback(callback, delay) {
       div.id = "div" + characterElementsIndex;
       div.innerHTML = grid_data;
       div.children[0].id = "grid-background-target" + characterElementsIndex;
+      
       drawGrid.appendChild(div);
+
+      // Only show special individual character meaning section if this word is multi-character
+      if (characters.length > 1) {
+        var character = characters[characterElementsIndex];
+        var characterMeandingDiv = document.createElement("div");
+        var characterMeaningDivId = "div-characterMeaning" + characterElementsIndex
+        characterMeandingDiv.id = characterMeaningDivId;
+        div.appendChild(characterMeandingDiv);
+
+        getAndSetCharacterMeaning(characterMeaningDivId, character, characterElementsIndex)
+      }
+      
       setStrokeColor(characterElementsIndex);
-      var hanzi = characters[characterElementsIndex];
+      
       var writer = HanziWriter.create(
         "grid-background-target" + characterElementsIndex,
-        hanzi,
+        character,
         {
           onLoadCharDataSuccess: function (data) {
             document.getElementById("ch_load_status").style.color = "#4caf50";
@@ -1334,6 +1364,8 @@ function delayedCallback(callback, delay) {
     WritingFeedbackManager.showFinalFeedbackForCharacter();
 
     if (characterElementsIndex != characterElementsLength - 1) {
+      // Speak the next character to draw
+      speak(getCharactersToDraw()[characterElementsIndex + 1])
       return;
     }
 
