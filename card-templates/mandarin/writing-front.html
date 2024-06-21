@@ -993,7 +993,7 @@ function delayedCallback(callback, delay) {
   }
 
   // Function to load character data from a given URL
-  function loadDataFromUrl(url, onComplete) {
+  function loadDataFromUrl(url, onComplete, onFailure) {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
 
@@ -1009,6 +1009,9 @@ function delayedCallback(callback, delay) {
           printDebugMessage(
             "Request failed with status: " + xhr.status + " for URL: " + url,
           );
+          if (onFailuer) {
+            onFailure()
+          }
         }
       }
     };
@@ -1081,7 +1084,7 @@ function delayedCallback(callback, delay) {
       characterElementsIndex < characters.length;
       characterElementsIndex++
     ) {
-      var hanzi = characters[characterElementsIndex];
+      var character = characters[characterElementsIndex];
       var span = document.createElement("span");
       span.innerHTML = grid_data;
       span.children[0].id =
@@ -1092,7 +1095,7 @@ function delayedCallback(callback, delay) {
       setStrokeColor(characterElementsIndex);
       var writer = HanziWriter.create(
         "onfinish-grid-background-target" + characterElementsIndex,
-        hanzi,
+        character,
         {
           charDataLoader,
           width: size,
@@ -1155,9 +1158,10 @@ function delayedCallback(callback, delay) {
       
       drawGrid.appendChild(div);
 
+      var character = characters[characterElementsIndex];
+
       // Only show special individual character meaning section if this word is multi-character
       if (characters.length > 1) {
-        var character = characters[characterElementsIndex];
         var characterMeandingDiv = document.createElement("div");
         var characterMeaningDivId = "div-characterMeaning" + characterElementsIndex
         characterMeandingDiv.id = characterMeaningDivId;
