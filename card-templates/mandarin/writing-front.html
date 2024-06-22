@@ -38,6 +38,11 @@
                 <i class="material-icons">translate</i>
             </div>
         </a>
+        <a class="btn" id="btnShowCharactersPlaceholder" style="display:none; visibility: hidden;">
+          <div class="icon">
+              <i class="material-icons">translate</i>
+          </div>
+      </a>
         <a class="btn" id="btnReloadQuiz">
             <div class="icon">
                 <i class="material-icons">replay</i>
@@ -1408,6 +1413,8 @@ function delayedCallback(callback, delay) {
     showHide("#btnRevealCharPlaceholder", !show)
 
     showHide("#btnShowCharacters", show);
+    showHide("#btnShowCharactersPlaceholder", !show);
+
     showHide("#btnGoNextCard", show);
   }
 
