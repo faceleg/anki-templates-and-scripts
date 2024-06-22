@@ -13,7 +13,33 @@
   "
 ></div>
 <div id="char_zhuyin">{{Zhuyin}}</div>
-<div id="char_pinyin">{{Pinyin}}</div>
+<div class="header-wrapper">
+    <div class="header-left">
+        <a class="btn" id="btnPlayAudio">
+            <div class="icon">
+                <i class="material-icons">play_arrow</i>
+            </div>
+        </a>
+        <a class="btn" id="btnRevealChar">
+            <div class="icon">
+                <i class="material-icons">gesture</i>
+            </div>
+        </a>
+    </div>
+    <div id="char_pinyin">{{Pinyin}}</div>
+    <div class="header-right">
+        <a class="btn" id="btnShowCharacters">
+            <div class="icon">
+                <i class="material-icons">translate</i>
+            </div>
+        </a>
+        <a class="btn" id="btnReloadQuiz">
+            <div class="icon">
+                <i class="material-icons">replay</i>
+            </div>
+        </a>
+    </div>
+</div>
 <div id="char_sim" class="char-card">{{Simplified}}</div>
 <div id="char_trad" class="char-card">{{Traditional}}</div>
 
@@ -31,36 +57,10 @@
     <hr >
 </div>
 
-<div class="modal-footer1">
+<div class="footer-wrapper">
     <a class="btn" id="btnShowMenu" onclick="openSidebar('sidebar')">
         <div class="icon">
             <i class="material-icons">menu</i>
-        </div>
-    </a>
-    <a class="btn" id="btnPlayAudio">
-        <div class="icon">
-            <i class="material-icons">play_arrow</i>
-        </div>
-    </a>
-    <a class="btn" id="btnRevealChar">
-        <div class="icon">
-            <i class="material-icons">gesture</i>
-        </div>
-    </a>
-    <a class="btn" id="btnShowCharacters">
-        <div class="icon">
-            <!-- <i class="material-icons">g_translate</i> -->
-            <i class="material-icons">translate</i>
-        </div>
-    </a>
-    <a class="btn" id="btnReloadQuiz">
-        <div class="icon">
-            <i class="material-icons">replay</i>
-        </div>
-    </a>
-    <a class="btn" id="btnGoNextCard">
-        <div class="icon">
-            <i class="material-icons">navigate_next</i>
         </div>
     </a>
     <a class="btn" id="btnMoreOptions" onclick="openSidebar('more-info-sidebar')">
@@ -69,6 +69,7 @@
         </div>
     </a>
 </div>
+
 <!-- Placeholder to stop crashing because I can't be bothered sorting out the show/hide JS for this section -->
 <div id="char_examples-parts-of-speech"></div>
 <div id="char_examples">{{Examples}}</div>
@@ -1220,22 +1221,6 @@ function delayedCallback(callback, delay) {
       writerQuiz(writer, characterElementsIndex + 1, characters.length);
       hanziWriterList.push(writer);
 
-      var revealClickCount = 0;
-      document.getElementById("btnGoNextCard").onclick = function () {
-        revealClickCount = 0;
-        writer = hanziWriterList[getCurrentHanziNum()];
-        writer.showOutline();
-        writer.showCharacter();
-
-        delayedCallback(function () {
-          onFinishQuizDrawHanzi();
-        }, 800);
-
-        delayedCallback(function () {
-          showNextHanzi();
-        }, 1000);
-      };
-
       document.getElementById("text-outline").onclick = function () {
         document.getElementById("text-outline").checked
           ? writer.showOutline()
@@ -1260,23 +1245,6 @@ function delayedCallback(callback, delay) {
         ShowNextStrokeManager.showNextStroke(
           (writer = hanziWriterList[getCurrentHanziNum()]),
         );
-
-        // Uncomment this for standard animation & show behaviour
-        // writer = hanziWriterList[getCurrentHanziNum()];
-        // writer.showOutline();
-        // if (revealClickCount == 0) {
-        //   writer.animateCharacter();
-        // } else if (revealClickCount == 1) {
-        //   writer.showCharacter();
-        // } else if (revealClickCount == 2) {
-        //   writer.hideCharacter();
-        //   writer.hideOutline();
-        //   writerQuiz(writer);
-        // } else {
-        //   revealClickCount = -1;
-        //   writerQuiz(writer);
-        // }
-        // revealClickCount++;
       };
 
       function writerQuiz(writer, currentCharacter, totalCharacters) {
@@ -1410,7 +1378,6 @@ function delayedCallback(callback, delay) {
   }
 
   function showNextAndRevealBtn(show) {
-    showHide("#btnGoNextCard", show);
     showHide("#btnRevealChar", show);
   }
 
