@@ -575,6 +575,7 @@ input[type="checkbox"] {
   position: relative;
   transform-style: preserve-3d;
   cursor: pointer;
+  appearance: none;
   -webkit-appearance: none;
   background: var(--surface1);
   border-radius: 20px;
@@ -616,6 +617,7 @@ input[type="number"] {
   padding: 4px;
   position: relative;
   cursor: text;
+  appearance: none;
   -webkit-appearance: none;
   transition: 0.5s;
   border: 1px solid var(--surface1);
