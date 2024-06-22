@@ -204,6 +204,14 @@
   justify-content: space-between;
 }
 
+#char_image {
+  display: none;
+}
+
+#back #char_image {
+  display: block;
+}
+
 .header-left a, .header-right a {
   margin: 0;
 }
