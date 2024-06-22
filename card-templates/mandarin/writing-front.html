@@ -25,6 +25,11 @@
                 <i class="material-icons">gesture</i>
             </div>
         </a>
+        <a class="btn" id="btnRevealCharPlaceholder" style="display:none; visibility: hidden;">
+            <div class="icon">
+              <i class="material-icons">gesture</i>
+          </div>
+        </a>
     </div>
     <div id="char_pinyin">{{Pinyin}}</div>
     <div class="header-right">
@@ -63,6 +68,11 @@
             <i class="material-icons">menu</i>
         </div>
     </a>
+    <a class="btn" id="btnGoNextCard">
+      <div class="icon">
+          <i class="material-icons">navigate_next</i>
+      </div>
+    </a>  
     <a class="btn" id="btnMoreOptions" onclick="openSidebar('more-info-sidebar')">
         <div class="icon">
             <i class="material-icons">more_vert</i>
@@ -1221,6 +1231,22 @@ function delayedCallback(callback, delay) {
       writerQuiz(writer, characterElementsIndex + 1, characters.length);
       hanziWriterList.push(writer);
 
+      var revealClickCount = 0;
+      document.getElementById("btnGoNextCard").onclick = function () {
+        revealClickCount = 0;
+        writer = hanziWriterList[getCurrentHanziNum()];
+        writer.showOutline();
+        writer.showCharacter();
+
+        delayedCallback(function () {
+          onFinishQuizDrawHanzi();
+        }, 800);
+
+        delayedCallback(function () {
+          showNextHanzi();
+        }, 1000);
+      };
+
       document.getElementById("text-outline").onclick = function () {
         document.getElementById("text-outline").checked
           ? writer.showOutline()
@@ -1379,6 +1405,10 @@ function delayedCallback(callback, delay) {
 
   function showNextAndRevealBtn(show) {
     showHide("#btnRevealChar", show);
+    showHide("#btnRevealCharPlaceholder", !show)
+
+    showHide("#btnShowCharacters", show);
+    showHide("#btnGoNextCard", show);
   }
 
   if (Persistence.isAvailable()) {
