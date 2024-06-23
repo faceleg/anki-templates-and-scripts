@@ -1,249 +1,256 @@
-<div id="char_image">{{Image}}</div>
+<div id="back">
+    <div id="char_image">{{Image}}</div>
+    <div id="char_zhuyin">{{Zhuyin}}</div>
+    <div id="char_pinyin">{{Pinyin}}</div>
+    <div id="char_sim" class="char-card">{{Simplified}}</div>
+    <div id="char_trad" class="char-card">{{Traditional}}</div>
+    <div id="char_meaning" class="meaning-card">
+        <hr >
+        {{Definitions}}
+        <hr >
+    </div>
+    <div id="char_examples">{{Examples}}</div>
+    <div id="audio" style="display: none">{{Audio}}</div>
 
-<div id="char_zhuyin">{{Zhuyin}}</div>
-<div id="char_pinyin">{{Pinyin}}</div>
-<div id="char_sim" class="char-card">{{Simplified}}</div>
-<div id="char_trad" class="char-card">{{Traditional}}</div>
-<div id="char_meaning" class="meaning-card">
-  <hr />
-  {{Definitions}}
-  <hr />
-</div>
-<div id="char_examples">{{Examples}}</div>
-<div id="audio" style="display: none">{{Audio}}</div>
+    <div class="modal-footer1">
+        <a class="btn" id="btnShowMenu" onclick="openSidebar('sidebar')">
+            <div class="icon">
+                <i class="material-icons">menu</i>
+            </div>
+        </a>
+        <a class="btn" id="btnPlayAudio">
+            <div class="icon">
+                <i class="material-icons">play_arrow</i>
+            </div>
+        </a>
+        <a class="btn" id="btnMoreOptions" onclick="openSidebar('more-info-sidebar')">
+            <div class="icon">
+                <i class="material-icons">more_vert</i>
+            </div>
+        </a>
+    </div>
 
-<div class="modal-footer1">
-  <a class="btn" id="btnShowMenu" onclick="openSidebar('sidebar')">
-    <div class="icon"><i class="material-icons">menu</i></div>
-  </a>
-  <a class="btn" id="btnPlayAudio">
-    <div class="icon"><i class="material-icons">play_arrow</i></div>
-  </a>
-  <a class="btn" id="btnMoreOptions" onclick="openSidebar('more-info-sidebar')">
-    <div class="icon"><i class="material-icons">more_vert</i></div>
-  </a>
-</div>
+    <div id="char_deck">{{Deck}}</div>
 
-<div id="char_deck">{{Deck}}</div>
+    <!--sidebar-->
 
-<!--sidebar-->
-
-<div id="sidebar" class="sidebar">
-  <section>
-    <fieldset style="border: none">
-      <div class="fieldset-item tappable">
-        <div
-          class="input-stack"
-          style="text-align: center; color: var(--text2)"
-        >
-          <label for="deck-title">
-            <h3 class="brand-title">写汉字</h3>
-            <div class="brand-sub-title">xiě hànzì</div>
-          </label>
-          <a onclick="closeSidebar('sidebar')" class="close-button">✖</a>
-        </div>
-      </div>
-    </fieldset>
-  </section>
-  <section>
-    <fieldset>
-      <div class="fieldset-item fs-item-3 practice fs-item-front-back">
-        <div
-          id="text-front"
-          class="input-stack front-back"
-          onclick="setActive('text-front')"
-        >
-          Front
-        </div>
-        <div
-          id="text-back"
-          class="input-stack front-back"
-          onclick="setActive('text-back')"
-        >
-          Back
-        </div>
-      </div>
-    </fieldset>
-  </section>
-  <section>
-    <fieldset>
-      <div class="fieldset-item fs-item-1 practice">
-        <div class="input-stack">
-          <label for="reading-practice-select">Practice</label>
-        </div>
-        <select
-          name="practice"
-          id="reading-practice-select"
-          onchange="setPrefs(this)"
-        >
-          <option>简</option>
-          <option>繁</option>
-        </select>
-      </div>
-    </fieldset>
-  </section>
-  <section>
-    <fieldset>
-      <div class="fieldset-item fs-item-1">
-        <div class="input-stack">
-          <label for="text-pinyin"> Pinyin </label>
-        </div>
-        <input
-          class="tappable"
-          type="checkbox"
-          id="text-pinyin"
-          name="text-pinyin"
-          onchange="setPrefs(this)"
-        />
-      </div>
-      <div class="fieldset-item fs-item-1">
-        <div class="input-stack">
-          <label for="text-zhuyin"> Zhuyin </label>
-        </div>
-        <input
-          class="tappable"
-          type="checkbox"
-          id="text-zhuyin"
-          name="text-zhuyin"
-          onchange="setPrefs(this)"
-        />
-      </div>
-      <div class="fieldset-item fs-item-1">
-        <div class="input-stack">
-          <label for="text-examples"> Examples </label>
-        </div>
-        <input
-          class="tappable"
-          type="checkbox"
-          id="text-examples"
-          name="text-examples"
-          onchange="setPrefs(this)"
-        />
-      </div>
-      <div class="fieldset-item fs-item-1">
-        <div class="input-stack">
-          <label for="text-examples-parts-of-speech">
-            Examples - Parts of Speech Headings
-          </label>
-        </div>
-        <input
-          class="tappable"
-          type="checkbox"
-          id="text-examples-parts-of-speech"
-          name="text-examples-parts-of-speech"
-          onchange="setPrefs(this)"
-        />
-      </div>
-      <div class="fieldset-item fs-item-1">
-        <div class="input-stack">
-          <label for="text-meaning"> Meaning </label>
-        </div>
-        <input
-          class="tappable"
-          type="checkbox"
-          id="text-meaning"
-          name="text-meaning"
-          onchange="setPrefs(this)"
-        />
-      </div>
-      <div class="fieldset-item fs-item-1">
-        <div class="input-stack">
-          <label for="text-sim"> Simplified </label>
-        </div>
-        <input
-          class="tappable"
-          type="checkbox"
-          id="text-sim"
-          name="text-sim"
-          onchange="setPrefs(this)"
-        />
-      </div>
-      <div class="fieldset-item fs-item-1">
-        <div class="input-stack">
-          <label for="text-trad"> Traditional </label>
-        </div>
-        <input
-          class="tappable"
-          type="checkbox"
-          id="text-trad"
-          name="text-trad"
-          onchange="setPrefs(this)"
-        />
-      </div>
-    </fieldset>
-  </section>
-  <section>
-    <fieldset>
-      <a href="https://github.com/krmanik/Anki-xiehanzi">
-        <div class="fieldset-item tappable">
-          <span style="font-size: 14px; text-align: center"
-            >View it on GitHub</span
+    <div id="sidebar" class="sidebar">
+        <section>
+            <fieldset style="border: none">
+                <div class="fieldset-item tappable">
+                    <div
+                        class="input-stack"
+                        style="text-align: center; color: var(--text2)"
+                    >
+                        <label for="deck-title">
+                            <h3 class="brand-title">写汉字</h3>
+                            <div class="brand-sub-title">xiě hànzì</div>
+                        </label>
+                        <a onclick="closeSidebar('sidebar')" class="close-button">✖</a>
+                    </div>
+                </div>
+            </fieldset>
+        </section>
+        <section>
+            <fieldset>
+                <div class="fieldset-item fs-item-3 practice fs-item-front-back">
+                    <div
+                        id="text-front"
+                        class="input-stack front-back"
+                        onclick="setActive('text-front')"
+                    >
+                        Front
+                    </div>
+                    <div
+                        id="text-back"
+                        class="input-stack front-back"
+                        onclick="setActive('text-back')"
+                    >
+                        Back
+                    </div>
+                </div>
+            </fieldset>
+        </section>
+        <section>
+            <fieldset>
+                <div class="fieldset-item fs-item-1 practice">
+                    <div class="input-stack">
+                        <label for="reading-practice-select">Practice</label>
+                    </div>
+                    <select
+                        name="practice"
+                        id="reading-practice-select"
+                        onchange="setPrefs(this)"
+                    >
+                        <option>简</option>
+                        <option>繁</option>
+                    </select>
+                </div>
+            </fieldset>
+        </section>
+        <section>
+            <fieldset>
+                <div class="fieldset-item fs-item-1">
+                    <div class="input-stack">
+                        <label for="text-pinyin"> Pinyin </label>
+                    </div>
+                    <input
+                        class="tappable"
+                        type="checkbox"
+                        id="text-pinyin"
+                        name="text-pinyin"
+                        onchange="setPrefs(this)"
+                    >
+                </div>
+                <div class="fieldset-item fs-item-1">
+                    <div class="input-stack">
+                        <label for="text-zhuyin"> Zhuyin </label>
+                    </div>
+                    <input
+                        class="tappable"
+                        type="checkbox"
+                        id="text-zhuyin"
+                        name="text-zhuyin"
+                        onchange="setPrefs(this)"
+                    >
+                </div>
+                <div class="fieldset-item fs-item-1">
+                    <div class="input-stack">
+                        <label for="text-examples"> Examples </label>
+                    </div>
+                    <input
+                        class="tappable"
+                        type="checkbox"
+                        id="text-examples"
+                        name="text-examples"
+                        onchange="setPrefs(this)"
+                    >
+                </div>
+                <div class="fieldset-item fs-item-1">
+                    <div class="input-stack">
+                        <label for="text-examples-parts-of-speech">
+                            Examples - Parts of Speech Headings
+                        </label>
+                    </div>
+                    <input
+                        class="tappable"
+                        type="checkbox"
+                        id="text-examples-parts-of-speech"
+                        name="text-examples-parts-of-speech"
+                        onchange="setPrefs(this)"
+                    >
+                </div>
+                <div class="fieldset-item fs-item-1">
+                    <div class="input-stack">
+                        <label for="text-meaning"> Meaning </label>
+                    </div>
+                    <input
+                        class="tappable"
+                        type="checkbox"
+                        id="text-meaning"
+                        name="text-meaning"
+                        onchange="setPrefs(this)"
+                    >
+                </div>
+                <div class="fieldset-item fs-item-1">
+                    <div class="input-stack">
+                        <label for="text-sim"> Simplified </label>
+                    </div>
+                    <input
+                        class="tappable"
+                        type="checkbox"
+                        id="text-sim"
+                        name="text-sim"
+                        onchange="setPrefs(this)"
+                    >
+                </div>
+                <div class="fieldset-item fs-item-1">
+                    <div class="input-stack">
+                        <label for="text-trad"> Traditional </label>
+                    </div>
+                    <input
+                        class="tappable"
+                        type="checkbox"
+                        id="text-trad"
+                        name="text-trad"
+                        onchange="setPrefs(this)"
+                    >
+                </div>
+            </fieldset>
+        </section>
+        <section>
+            <fieldset>
+                <a href="https://github.com/krmanik/Anki-xiehanzi">
+                    <div class="fieldset-item tappable">
+                        <span style="font-size: 14px; text-align: center"
+                        >View it on GitHub</span
           >
-        </div>
-      </a>
-    </fieldset>
-  </section>
-</div>
-<div id="more-info-sidebar" class="more-info-sidebar">
-  <a class="fieldset-item tappable">
-    <div class="more-side-brand">
-      <div class="brand-title">写汉字</div>
-      <div class="brand-sub-title">xiě hànzì</div>
+                    </div>
+                </a>
+            </fieldset>
+        </section>
     </div>
-    <div
-      onclick="closeSidebar('more-info-sidebar')"
-      class="close-button close2"
-    >
-      ✖
+    <div id="more-info-sidebar" class="more-info-sidebar">
+        <a class="fieldset-item tappable">
+            <div class="more-side-brand">
+                <div class="brand-title">写汉字</div>
+                <div class="brand-sub-title">xiě hànzì</div>
+            </div>
+            <div
+                onclick="closeSidebar('more-info-sidebar')"
+                class="close-button close2"
+            >
+                ✖
+            </div>
+        </a>
+        <a
+            class="fieldset-item tappable"
+            id="plecoMobile"
+            href="plecoapi://x-callback-url/df?hw={{Simplified}}"
+        >
+            <img src="_pleco.png">
+            <small>Pleco</small>
+        </a>
+        <a
+            class="fieldset-item tappable"
+            href="http://dict.youdao.com/search?q={{Simplified}}"
+        >
+            <img src="_youdao.png">
+            <small>Youdao</small>
+        </a>
+        <a
+            class="fieldset-item tappable"
+            href="https://hanzicraft.com/character/{{Simplified}}"
+        >
+            <img src="_hanzicraft.png">
+            <small>HanziCraft</small>
+        </a>
+        <a
+            class="fieldset-item tappable"
+            href="https://characterpop.com/characters/{{Simplified}}"
+        >
+            <img src="_characterpop.svg">
+            <small>CharacterPop</small>
+        </a>
+        <a
+            class="fieldset-item tappable"
+            href="http://rtega.be/chmn/index.php?c={{Simplified}}"
+        >
+            <img src="_rtega.png">
+            <small>Rtega</small>
+        </a>
+        <a
+            class="fieldset-item tappable"
+            href="https://tatoeba.org/en/sentences/search?from=cmn&query={{Simplified}}&to="
+        >
+            <img src="_tatoeba.png">
+            <small>Tatoeba</small>
+        </a>
     </div>
-  </a>
-  <a
-    class="fieldset-item tappable"
-    id="plecoMobile"
-    href="plecoapi://x-callback-url/df?hw={{Simplified}}"
-  >
-    <img src="_pleco.png" />
-    <small>Pleco</small>
-  </a>
-  <a
-    class="fieldset-item tappable"
-    href="http://dict.youdao.com/search?q={{Simplified}}"
-  >
-    <img src="_youdao.png" />
-    <small>Youdao</small>
-  </a>
-  <a
-    class="fieldset-item tappable"
-    href="https://hanzicraft.com/character/{{Simplified}}"
-  >
-    <img src="_hanzicraft.png" />
-    <small>HanziCraft</small>
-  </a>
-  <a
-    class="fieldset-item tappable"
-    href="https://characterpop.com/characters/{{Simplified}}"
-  >
-    <img src="_characterpop.svg" />
-    <small>CharacterPop</small>
-  </a>
-  <a
-    class="fieldset-item tappable"
-    href="http://rtega.be/chmn/index.php?c={{Simplified}}"
-  >
-    <img src="_rtega.png" />
-    <small>Rtega</small>
-  </a>
-  <a
-    class="fieldset-item tappable"
-    href="https://tatoeba.org/en/sentences/search?from=cmn&query={{Simplified}}&to="
-  >
-    <img src="_tatoeba.png" />
-    <small>Tatoeba</small>
-  </a>
 </div>
 <!-----sidebar------>
 
-<!-- Persistence -->
+    <!-- Persistence -->
 <script>
   // v1.0.0 - https://github.com/SimonLammer/anki-persistence/blob/eeb2e1a9e37c941dd63e1fe6c2a257f043c40e0d/script.js
   if (void 0 === window.Persistence) {
