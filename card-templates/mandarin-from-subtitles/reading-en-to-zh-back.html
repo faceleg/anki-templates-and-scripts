@@ -1,14 +1,74 @@
-<div class="char_img">{{Image}}</div>
-<br />
-<div class="char_meaning">{{Meaning}}</div>
-<hr />
 
-<div class="char_meaning">{{Simplified}}</div>
+<div id="back">
 
-<hr />
+    <div class="char_img">{{Image}}</div>
+    <br>
 
-<div id="char_reading" class="char-card">{{Reading}}</div>
-<div id="char_reading" class="char-card">{{Color}}</div>
-<span id="audio">{{Audio}}</span>
-<div id="char_deck">{{Deck}}</div>
-<br />
+    <div class="char_meaning">{{English}}</div>
+    <br>
+    <hr>
+    <div id="char_sim_coloured">{{Color}}</div>
+    <br >
+
+    <div id="char_reading">
+        <ruby>
+            {{Color}}<rt>{{Pinyin}}</rt>
+        </ruby>
+    </div>
+
+    
+    <div id="char_deck">
+        <span id="audio">{{Audio}}</span>{{Deck}}
+    </div>	
+</div>
+
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function() {
+    // Select the target element
+    let spans = document.querySelectorAll('span');
+
+    // Define the characters to remove
+    var charsToRemove = "\u200E"; // This is the Unicode for the Left-to-Right Mark
+
+    spans.forEach(function(span) {
+        // Replace the characters with an empty string
+        span.textContent = span.textContent.split(charsToRemove).join('');
+    });
+});
+</script>
+
+<script type="text/javascript">
+
+    /**
+     * Assign random class from this list to render the sentence in a different font every now and then
+     * to help readers learn to read in more than one font.
+     */
+    function assignClassBasedOnTime() {
+      // Get the char_sim element
+      var charSimColorElement = document.getElementById("char_sim_coloured");
+      var charReadingElement = document.getElementById("char_reading");
+  
+      // Get the current time
+      var now = new Date();
+      var minutes = now.getMinutes();
+      var seconds = now.getSeconds();
+      var segment = Math.floor((minutes * 60 + seconds) / 180); // Dividing total seconds in 3 minutes
+  
+      // Define the original class names you provided
+      var classes = [
+          "kaiti",
+          "arial",
+          "roboto",
+          "yumincho"
+      ];
+  
+      // Assign the class corresponding to the current 3-minute segment
+      charSimColorElement.className = "char-card " + classes[segment % classes.length];
+      if (charReadingElement) charReadingElement.className = "char-card " + classes[segment % classes.length];
+  }
+  
+  // Call the function to assign a class based on the current time
+  assignClassBasedOnTime();
+  
+  </script>
+  

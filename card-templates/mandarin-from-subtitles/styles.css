@@ -146,7 +146,7 @@
 }
 
 img {
-  border-radius: 10%;
+  border-radius: 2%;
 }
 
 .meaning {
@@ -187,18 +187,55 @@ img {
 /* Character styling */
 
 .char,
-#char_sim {
+#char_sim,
+#char_sim_coloured {
   font-size: 40px;
 }
 
-#char_sim.kaiti {
+#back #char_sim {
+  display: none;
+}
+
+#char_sim_coloured {
+  display: none;
+}
+
+#back #char_sim_coloured {
+  display: block;
+}
+
+#char_sim.kaiti,
+#char_sim_coloured.kaiti,
+#char_reading.kaiti {
   font-family: KaiTi;
 }
-#char_sim.arial {
+
+#char_sim.arial,
+#char_sim_coloured.arial,
+#char_reading.arial {
   font-family: Arial;
 }
-#char_sim.yumincho {
+
+#char_sim.yumincho,
+#char_sim_coloured.yumincho,
+#char_reading.yumincho {
   font-family: YuMincho;
+}
+
+#char_sim.roboto,
+#char_sim_coloured.roboto,
+#char_reading.roboto {
+  font-family: Roboto;
+}
+
+#audio {
+  display: inline-block;
+  height: 20px;
+  margin-right: 5px;
+}
+
+#audio .playImage {
+  height: 20px;
 }
 
 /* Pinyin ruby styling */

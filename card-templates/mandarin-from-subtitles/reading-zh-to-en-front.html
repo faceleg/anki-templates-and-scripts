@@ -1,6 +1,7 @@
 <div class="char_img">{{Image}}</div>
 <br />
 <div id="char_sim" class="char-card">{{Simplified}}</div>
+<div id="char_sim_coloured" class="char-card">{{Color}}</div>
 
 <script type="text/javascript">
 
@@ -11,6 +12,8 @@
   function assignClassBasedOnTime() {
     // Get the char_sim element
     var charSimElement = document.getElementById("char_sim");
+    var charSimColorElement = document.getElementById("char_sim_coloured");
+    var charReadingElement = document.getElementById("char_reading");
 
     // Get the current time
     var now = new Date();
@@ -28,6 +31,8 @@
 
     // Assign the class corresponding to the current 3-minute segment
     charSimElement.className = "char-card " + classes[segment % classes.length];
+    charSimColorElement.className = "char-card " + classes[segment % classes.length];
+    if (charReadingElement) charReadingElement.className = "char-card " + classes[segment % classes.length];
 }
 
 // Call the function to assign a class based on the current time

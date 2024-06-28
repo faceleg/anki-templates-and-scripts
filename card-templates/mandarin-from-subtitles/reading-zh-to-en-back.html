@@ -1,13 +1,32 @@
-{{FrontSide}}
+<div id="back">
 
-<hr />
+    {{FrontSide}}
 
-<div class="char_meaning">{{Meaning}}</div>
-<br />
-<div id="char_reading" class="char-card">
-    <ruby>{{Color}}<rt>{{Reading}}</rt></ruby>
+    <hr >
+
+    <div class="char_meaning">{{English}}</div>
+    <br >
+    <div id="char_reading">
+        <ruby>
+            {{Color}}<rt>{{Pinyin}}</rt>
+        </ruby>
+    </div>
+    <div id="char_deck">
+        <span id="audio">{{Audio}}</span>{{Deck}}
+    </div>
 </div>
 
-<span id="audio">{{Audio}}</span>
-<br />
-<div id="char_deck">{{Deck}}</div>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function() {
+    // Select the target element
+    var spans = document.querySelectorAll('span');
+
+    // Define the characters to remove
+    var charsToRemove = "\u200E"; // This is the Unicode for the Left-to-Right Mark
+
+    spans.forEach(function(span) {
+        // Replace the characters with an empty string
+        span.textContent = span.textContent.split(charsToRemove).join('');
+    });
+});
+</script>
