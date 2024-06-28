@@ -1395,7 +1395,8 @@ function delayedCallback(callback, delay) {
       generateHanziOnFinishQuiz("unset", true);
     }
 
-    playAudio();
+    // Audio is played on the last card, allowing quicker skipping to answer when writing complete
+    // playAudio();
     showHide("#char_sim", true);
     showTraditionalChar();
 

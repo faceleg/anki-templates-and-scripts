@@ -1,6 +1,13 @@
 <div id="back">{{FrontSide}}</div>
 
-<script>
+<script type="text/javascript">
+  function playAudio() {
+    var audioDiv = document.getElementById("audio");
+    var audio = audioDiv.getElementsByTagName("*");
+    audio[0].tagName == "AUDIO" ? audio[0].play() : audio[0].click();
+  }
+  playAudio();
+
   var colorCodes = {
     1: "#f44336",
     2: "#ff9800",
