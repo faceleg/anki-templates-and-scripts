@@ -317,3 +317,78 @@ hr {
   height: 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
+
+/* Material Icon Button */
+.card {
+  --icon-button-background: #63759d;
+  --icon-button-background-focus: #7d92c2;
+}
+
+/* Material Icon Font */
+@font-face {
+  font-family: "Material Icons";
+  font-style: normal;
+  font-weight: 300;
+  src: url(_MaterialIcons-Regular.woff2);
+}
+
+.material-icons {
+  font-family: "Material Icons";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+  /* Support for IE. */
+  font-feature-settings: "liga";
+}
+
+
+.icon {
+  margin: 3px;
+  position: relative;
+  display: inline-block;
+  color: white;
+  background-color: var(--icon-button-background);
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.12),
+    0 1px 2px rgba(0, 0, 0, 0.24);
+  transition: all 0.3s ease;
+}
+
+.icon .material-icons {
+  font-size: 1rem;
+  position: absolute;
+  left: 0.5rem;
+  top: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.icon:hover,
+.icon:focus {
+  background-color: var(--icon-button-background-focus);
+}
+
+#char_pinyin,
+#char_reading {
+  margin-bottom: 20px;
+}
+
+.button-wrapper {
+  margin-bottom: 20px;
+}

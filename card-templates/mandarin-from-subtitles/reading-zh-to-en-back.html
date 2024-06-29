@@ -2,31 +2,68 @@
 
     {{FrontSide}}
 
-    <hr >
+    <hr/>
 
     <div class="char_meaning">{{English}}</div>
-    <br >
-    <div id="char_reading">
+    <br/>
+
+    <div class="button-wrapper">
+        <a class="btn" id="btnShowPinyin">
+            <div class="icon">
+                <i class="material-icons">text_increase</i>
+            </div>
+        </a>
+        <a class="btn" id="btnShowRuby">
+            <div class="icon">
+                <i class="material-icons">text_rotation_none</i>
+            </div>
+        </a>
+        
+    </div>
+    
+    <div id="char_pinyin" style="display:none;">
+        {{Pinyin}}
+    </div>
+
+    <div id="char_reading" style="display:none">
         <ruby>
             {{Color}}<rt>{{Pinyin}}</rt>
         </ruby>
     </div>
+
     <div id="char_deck">
         <span id="audio">{{Audio}}</span>{{Deck}}
     </div>
 </div>
 
 <script type="text/javascript">
-document.addEventListener("DOMContentLoaded", function() {
-    // Select the target element
-    var spans = document.querySelectorAll('span');
 
-    // Define the characters to remove
-    var charsToRemove = "\u200E"; // This is the Unicode for the Left-to-Right Mark
+    document.addEventListener("DOMContentLoaded", function() {
+        // Select the target element
+        var spans = document.querySelectorAll('span');
 
-    spans.forEach(function(span) {
-        // Replace the characters with an empty string
-        span.textContent = span.textContent.split(charsToRemove).join('');
+        // Define the characters to remove
+        var charsToRemove = "\u200E"; // This is the Unicode for the Left-to-Right Mark
+
+        spans.forEach(function(span) {
+            // Replace the characters with an empty string
+            span.textContent = span.textContent.split(charsToRemove).join('');
+        });
     });
-});
+
+    // Show pinyin
+    var btnShowPinyin = document.getElementById('btnShowPinyin');
+    btnShowPinyin.onclick = function(event) {
+        const display = document.getElementById('char_pinyin').style.display;
+        document.getElementById('char_pinyin').style.display = display === "block" ? "none" : "block";
+    }
+    var btnShowPinyin = document.getElementById('btnShowRuby');
+    btnShowPinyin.onclick = function(event) {
+        const display = document.getElementById('char_reading').style.display;
+        document.getElementById('char_reading').style.display = display === "block" ? "none" : "block";
+    }
+
+    
+
+
 </script>
