@@ -1,3 +1,5 @@
+<!-- AnkiMobile: Mozilla/5.0 (iPhone; CPU iPhone OS 17_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 (1) -->
+<!-- Anki macOS: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) QtWebEngine/6.6.2 Chrome/112.0.5615.213 Safari/537.36 (0) -->
 <div
     id="debug-message-console"
     style="
@@ -426,7 +428,7 @@
   var loadStartedTimestamp = Date.now();
 
   // Set this to true to make the messenger appear with your messages
-  var DEBUG = true;
+  var DEBUG = false;
   function printDebugMessage(message) {
     var messageDiv = document.getElementById("debug-message-console");
 
@@ -440,10 +442,14 @@
   }
 </script>
 <script type="text/javascript">
+  if (DEBUG) printDebugMessage(navigator.userAgent);
+</script>
+<script type="text/javascript">
   // Browser based text to speech for use with multi character words
-  var utterance = new SpeechSynthesisUtterance();
+  
   function speak(phrase) {
-    
+    var utterance = new SpeechSynthesisUtterance();
+
     utterance.lang = 'zh'
     utterance.text = phrase
 
