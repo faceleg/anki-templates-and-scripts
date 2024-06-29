@@ -56,7 +56,7 @@
 <div id="char_sim" class="char-card">{{Simplified}}</div>
 <div id="char_trad" class="char-card">{{Traditional}}</div>
 
-<div id="onfinish-character-target-div" class="tappable"></div>
+<div id="onfinish-character-target-div" style="z-index: 30;" class="tappable"></div>
 <div id="character-target-div" class="tappable"></div>
 <div id="writing-feedback" style="display: none">
     <span id="writing-feedback-mistakes"></span>
@@ -81,6 +81,11 @@
             <i class="material-icons">navigate_next</i>
         </div>
     </a>  
+    <a class="btn" id="btnSwitchRenderer">
+        <div class="icon">
+            <i class="material-icons">draw_abstract</i>
+        </div>
+    </a>
     <a class="btn" id="btnMoreOptions" onclick="openSidebar('more-info-sidebar')">
         <div class="icon">
             <i class="material-icons">more_vert</i>
@@ -97,7 +102,9 @@
         style="color: #ea2322; display: none"
     >
         &#8226;
-    </span>{{Deck}}</div>
+    </span>
+    {{Deck}}<span id="which-renderer"></span>
+</div>
 
 <!--sidebar-->
 
@@ -676,6 +683,28 @@
 
   // *** Persistence wrapper end ***
 
+  // *** WhichRenderer wrapper ***
+  var WhichRenderer = {
+    _renderer: UniqueCardPersistence.getItem('renderer') || 'canvas',
+    getRenderer: function() {
+      return WhichRenderer._renderer;
+    },
+    switchRenderer: function() {
+      if (WhichRenderer.isCanvas()) {
+        WhichRenderer._renderer = 'svg'
+      } else {
+        WhichRenderer._renderer = 'canvas'
+      }
+
+      UniqueCardPersistence.setItem('renderer', WhichRenderer.getRenderer());
+    },
+    isCanvas: function() {
+      return WhichRenderer._renderer === 'canvas';
+    }
+  }
+
+  // *** WhichRenderer wrapper end ***
+
   // *** Show next stroke wrapper ***
 
   var ShowNextStrokeManager = {
@@ -1107,6 +1136,7 @@ function delayedCallback(callback, delay) {
     drawGrid.style = "";
     drawGrid.style.position = "absolute";
     drawGrid.style.display = "grid";
+    drawGrid.style.zIndex = 30;
     var size = 40;
     if (finish) {
       size = 100;
@@ -1130,6 +1160,8 @@ function delayedCallback(callback, delay) {
       span.style.display = style;
       drawGrid.appendChild(span);
       setStrokeColor(characterElementsIndex);
+
+      // Small HanziWriter
       var writer = HanziWriter.create(
         "onfinish-grid-background-target" + characterElementsIndex,
         character,
@@ -1139,6 +1171,7 @@ function delayedCallback(callback, delay) {
           height: size,
           padding: 5,
           strokeColor: stroke_color,
+          renderer: 'svg',
         },
       );
     }
@@ -1163,6 +1196,7 @@ function delayedCallback(callback, delay) {
   }
 
   function doPractice(p = false) {
+    document.getElementById('which-renderer').innerHTML = ` (renderer: ${WhichRenderer.getRenderer()})`
     if (document.getElementById("back")) {
       generateHanziOnFinishQuiz("unset", true);
       if (!p) {
@@ -1190,7 +1224,13 @@ function delayedCallback(callback, delay) {
     ) {
       var div = document.createElement("div");
       div.id = "div" + characterElementsIndex;
-      div.innerHTML = grid_data;
+      div.style.position = 'relative';
+
+      // Remove if WhichRenderer is no longer needed
+      var grid_data_canvas = `<div class='grid-color' style="background-color:rgba(0, 0, 0, 0); z-index: 20;position:relative;" id='grid-background-target'></div>`;
+      const grid_data_overlay = `<svg xmlns='http://www.w3.org/2000/svg' width='${charWidth}' height='${charHeight}' style="position:absolute;z-index:10;pointer-events:none;top:0;left:0;;" class='grid-color'><g id="char_grid"><line x1='0' y1='0' x2='100%' y2='100%' stroke='var(--surface1)' /><line x1='100%' y1='0' x2='0' y2='100%' stroke='var(--surface1)' /><line x1='50%' y1='0' x2='50%' y2='100%' stroke='var(--surface1)' /><line x1='0' y1='50%' x2='100%' y2='50%' stroke='var(--surface1)' /></g></svg>`
+      div.innerHTML = WhichRenderer.isCanvas() ? grid_data_canvas + grid_data_overlay : grid_data;
+
       div.children[0].id = "grid-background-target" + characterElementsIndex;
       
       drawGrid.appendChild(div);
@@ -1209,6 +1249,7 @@ function delayedCallback(callback, delay) {
       
       setStrokeColor(characterElementsIndex);
       
+      // Main HanziWriter
       var writer = HanziWriter.create(
         "grid-background-target" + characterElementsIndex,
         character,
@@ -1237,6 +1278,7 @@ function delayedCallback(callback, delay) {
           drawingColor: drawing_color,
           showHintAfterMisses: strokeAfterMisses,
           padding: 5,
+          renderer: WhichRenderer.getRenderer()
         },
       );
 
@@ -1258,6 +1300,13 @@ function delayedCallback(callback, delay) {
           showNextHanzi();
         }, 1000);
       };
+
+      document.getElementById('btnSwitchRenderer').onclick = function() {
+        WhichRenderer.switchRenderer();
+        doPractice(true);
+        generateHanziOnFinishQuiz("none");
+        showNextAndRevealBtn(true);
+      }
 
       document.getElementById("text-outline").onclick = function () {
         document.getElementById("text-outline").checked
