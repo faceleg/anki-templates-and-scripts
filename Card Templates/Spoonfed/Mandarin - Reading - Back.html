@@ -1,5 +1,10 @@
+<div id="char_image">{{Image}}</div>
+
 <div id="back">{{FrontSide}}</div>
-<div id="char_deck">{{Deck}}<br/>{{Card}}</div>
+
+    <div id="char_deck">
+        <span id="audio">{{Audio}}</span>{{Deck}}<br/>{{Card}}
+    </div>	
 
 <script>
   var colorCodes = {
@@ -80,7 +85,7 @@
   }
 
   function recolorPinyin(pinyinElement, decodedTones) {
-    var pinyinText = pinyinElement.textContent.trim();
+    var pinyinText = pinyinElement.innerHTML;
     var coloredPinyin = "";
     var wordIndex = 0;
 
@@ -94,6 +99,7 @@
       coloredPinyin +=
         '<span style="color:' + color + ';">' + pinyinText[i] + "</span>";
     }
+
     pinyinElement.innerHTML = coloredPinyin;
   }
 
@@ -120,6 +126,10 @@
     characterElement.innerHTML = coloredCharacters;
   }
 
+  function recolorTraditional(traditionalElement, decodedTones) {
+    console.log(traditionalElement.innerHTML);
+  }
+
   function applyColorization() {
     var pinyinElement = document.getElementById("char_pinyin");
     if (!pinyinElement) {
@@ -128,7 +138,7 @@
       );
       return;
     }
-    var decodedTones = decodePinyin(pinyinElement.textContent);
+    var decodedTones = decodePinyin(pinyinElement.innerHTML);
     recolorPinyin(pinyinElement, decodedTones);
 
     var hanziElement = document.getElementById("char_sim");
@@ -151,5 +161,5 @@
     }
   }
 
-  applyColorization();
+  applyColorization(); // Call the function to apply the color when the script is executed
 </script>

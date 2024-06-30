@@ -96,10 +96,28 @@
   font-size: 3em;
 }
 
+
 #char_deck {
   margin-top: 10px;
   font-size: 10px;
   font-style: italic;
+  height: 20px;
+  line-height: 20px;
+}
+
+#char_deck #audio {
+  display: inline-block;
+  height: 20px;
+  margin-right: 5px;
+}
+
+#char_deck #audio .replay-button {
+  margin: 0;
+}
+
+#char_deck #audio .playImage {
+  height: 20px;
+  width: 20px;
 }
 
 @font-face {
@@ -789,4 +807,16 @@ hr {
 
 .more-side-brand {
   padding: 8px;
+}
+
+.reading-without-audio-spacer {
+  margin-top: 200px;
+}
+
+#back .reading-without-audio-spacer {
+  margin-top: 0;
+}
+
+.modal-footer1 {
+  margin-top: 10px;
 }

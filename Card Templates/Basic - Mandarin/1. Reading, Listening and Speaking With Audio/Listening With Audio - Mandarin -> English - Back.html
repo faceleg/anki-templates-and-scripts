@@ -11,8 +11,19 @@
   <hr />
 </div>
 <div id="char_examples">{{Examples}}</div>
+<div class="modal-footer1">
+  <a class="btn" id="btnShowMenu" onclick="openSidebar('sidebar')">
+    <div class="icon"><i class="material-icons">menu</i></div>
+  </a>
+  <a class="btn" id="btnPlayAudio">
+    <div class="icon"><i class="material-icons">play_arrow</i></div>
+  </a>
+  <a class="btn" id="btnMoreOptions" onclick="openSidebar('more-info-sidebar')">
+    <div class="icon"><i class="material-icons">more_vert</i></div>
+  </a>
+</div>
 
-<div id="char_deck">{{Deck}}</div>
+<div id="char_deck">{{Deck}}<br/>{{Card}}</div>
 
 <script>
   var colorCodes = {
@@ -166,19 +177,6 @@
 
   applyColorization();
 </script>
-
-
-<div class="modal-footer1">
-  <a class="btn" id="btnShowMenu" onclick="openSidebar('sidebar')">
-    <div class="icon"><i class="material-icons">menu</i></div>
-  </a>
-  <a class="btn" id="btnPlayAudio">
-    <div class="icon"><i class="material-icons">play_arrow</i></div>
-  </a>
-  <a class="btn" id="btnMoreOptions" onclick="openSidebar('more-info-sidebar')">
-    <div class="icon"><i class="material-icons">more_vert</i></div>
-  </a>
-</div>
 
 
 <!-- Empty div to allow the setPrefs function to work (it expects a div with an id, and will then show/hide based on classes) -->

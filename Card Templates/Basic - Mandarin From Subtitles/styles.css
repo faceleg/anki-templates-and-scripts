@@ -96,6 +96,23 @@
   margin-top: 10px;
   font-size: 10px;
   font-style: italic;
+  height: 20px;
+  line-height: 20px;
+}
+
+#char_deck #audio {
+  display: inline-block;
+  height: 20px;
+  margin-right: 5px;
+}
+
+#char_deck #audio .replay-button {
+  margin: 0;
+}
+
+#char_deck #audio .playImage {
+  height: 20px;
+  width: 20px;
 }
 
 @font-face {
@@ -226,16 +243,6 @@ img {
 #char_sim_coloured.roboto,
 #char_reading.roboto {
   font-family: Roboto;
-}
-
-#audio {
-  display: inline-block;
-  height: 20px;
-  margin-right: 5px;
-}
-
-#audio .playImage {
-  height: 20px;
 }
 
 /* Pinyin ruby styling */
