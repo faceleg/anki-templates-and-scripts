@@ -734,18 +734,20 @@
   
 
 #char_deck {
-    margin-top: 10px;
-    font-size: 10px;
-    font-style: italic;
-    height: 20px;
-    line-height: 20px;
-  }
+  margin-top: 10px;
+  font-size: 10px;
+  font-style: italic;
+  line-height: 20px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
   
-  #char_deck #audio {
-    display: inline-block;
-    height: 20px;
-    margin-right: 5px;
-  }
+#char_deck #audio {
+  display: block;
+  height: 20px;
+  margin-right: 5px;
+}
   
   #char_deck #audio .replay-button {
     margin: 0;
