@@ -104,6 +104,7 @@
   display: flex;
   justify-content: center;
   align-content: center;
+  flex-direction: column;
 }
   
 #char_deck #audio {
@@ -823,5 +824,9 @@ hr {
 }
 
 #listening-with-audio #char_examples .char_examples-parts-of-speech {
+  display: none;
+}
+
+#back #listening-with-audio {
   display: none;
 }

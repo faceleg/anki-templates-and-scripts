@@ -10,7 +10,6 @@
   <hr />
 </div>
 <div id="char_examples">{{Examples}}</div>
-<div id="audio" style="display: none">{{Audio}}</div>
 
 <div class="modal-footer1">
   <a class="btn" id="btnShowMenu" onclick="openSidebar('sidebar')">
@@ -462,7 +461,7 @@
         break;
 
       default:
-        console.warn(_id + " not in switch list");
+        //console.warn(_id + " not in switch list");
         break;
     }
   }
@@ -743,9 +742,9 @@
   function applyColorization() {
     var pinyinElement = document.getElementById("char_pinyin");
     if (!pinyinElement) {
-      console.warn(
-        'Pinyin element not found with "#char_pinyin", will not attempt to recolour pinyin, simplified or traditional',
-      );
+      // console.warn(
+      //   'Pinyin element not found with "#char_pinyin", will not attempt to recolour pinyin, simplified or traditional',
+      // );
       return;
     }
     var decodedTones = decodePinyin(pinyinElement.innerHTML);
@@ -755,9 +754,9 @@
     if (hanziElement) {
       recolorCharacters(hanziElement, decodedTones);
     } else {
-      console.warn(
-        'Simpliifed element not found with "#char_sim", will not attempt to recolour simplified',
-      );
+      // console.warn(
+      //   'Simpliifed element not found with "#char_sim", will not attempt to recolour simplified',
+      // );
     }
 
     var traditionalElement = document.getElementById("char_trad");
@@ -765,9 +764,9 @@
     if (hanziElement) {
       recolorCharacters(traditionalElement, decodedTones);
     } else {
-      console.warn(
-        'Traditional element not found with "#char_trad", will not attempt to recolour traditional',
-      );
+      // console.warn(
+      //   'Traditional element not found with "#char_trad", will not attempt to recolour traditional',
+      // );
     }
   }
 

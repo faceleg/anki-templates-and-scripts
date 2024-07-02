@@ -128,16 +128,12 @@
     characterElement.innerHTML = coloredCharacters;
   }
 
-  function recolorTraditional(traditionalElement, decodedTones) {
-    console.log(traditionalElement.innerHTML);
-  }
-
   function applyColorization() {
     var pinyinElement = document.getElementById("char_pinyin");
     if (!pinyinElement) {
-      console.warn(
-        'Pinyin element not found with "#char_pinyin", will not attempt to recolour pinyin, simplified or traditional',
-      );
+      // console.warn(
+      //   'Pinyin element not found with "#char_pinyin", will not attempt to recolour pinyin, simplified or traditional',
+      // );
       return;
     }
     var decodedTones = decodePinyin(pinyinElement.innerHTML);
@@ -147,9 +143,9 @@
     if (hanziElement) {
       recolorCharacters(hanziElement, decodedTones);
     } else {
-      console.warn(
-        'Simpliifed element not found with "#char_sim", will not attempt to recolour simplified',
-      );
+      // console.warn(
+      //   'Simpliifed element not found with "#char_sim", will not attempt to recolour simplified',
+      // );
     }
 
     var traditionalElement = document.getElementById("char_trad");
@@ -157,9 +153,9 @@
     if (hanziElement) {
       recolorCharacters(traditionalElement, decodedTones);
     } else {
-      console.warn(
-        'Traditional element not found with "#char_trad", will not attempt to recolour traditional',
-      );
+      // console.warn(
+      //   'Traditional element not found with "#char_trad", will not attempt to recolour traditional',
+      // );
     }
   }
 
