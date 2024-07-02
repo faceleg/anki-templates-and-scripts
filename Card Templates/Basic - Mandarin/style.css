@@ -821,3 +821,7 @@ hr {
 .modal-footer1 {
   margin-top: 10px;
 }
+
+#listening-with-audio #char_examples .char_examples-parts-of-speech {
+  display: none;
+}
