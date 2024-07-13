@@ -756,3 +756,13 @@
     height: 20px;
     width: 20px;
   }
+
+  .lessonInfoHanzi {
+    font-family: SimSun;
+    font-size: 12px;
+    }
+    
+    .lessonInfo {
+    font-family: arial;
+    font-size: 10px;
+    }
