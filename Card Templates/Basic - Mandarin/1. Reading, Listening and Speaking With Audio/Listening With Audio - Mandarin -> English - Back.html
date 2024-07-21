@@ -1,4 +1,4 @@
-<div id="back">{{FrontSide}}</div>
+<div id="back">{{FrontSide}}
 
 <div id="char_image">{{Image}}</div>
 <div id="char_zhuyin">{{Zhuyin}}</div>
@@ -24,7 +24,7 @@
 </div>
 
 <div id="char_deck">{{Deck}}<br/>{{Card}}</div>
-
+</div>
 <script>
   var colorCodes = {
     1: "#f44336",
@@ -411,10 +411,16 @@
       return Persistence.getItem(keyPrefix + "-" + key);
     },
     setItem: function (key, value) {
+      if (value === 'true') {
+        value = true;
+      } else if (value === 'false') {
+        value = false;
+      }
       return Persistence.setItem(keyPrefix + "-" + key, value);
     },
   };
 
+  // Defaults management
   var switchIdList = [
     "text-pinyin",
     "text-zhuyin",
@@ -424,6 +430,25 @@
     "text-examples",
     "text-examples-parts-of-speech",
   ];
+
+  var preferenceDefaults = {
+    "text-pinyin": { front: false, back: true },
+    "text-zhuyin": { front: false, back: false },
+    "text-meaning": { front: false, back: true },
+    "text-sim": { front: true, back: true },
+    "text-trad": { front: false, back: false },
+    "text-examples": { front: true, back: true },
+    "text-examples-parts-of-speech": { front: false, back: false }
+  };
+
+  function getPreference(defaultName, frontOrBack) {
+    if (preferenceDefaults[defaultName] && preferenceDefaults[defaultName].hasOwnProperty(frontOrBack)) {
+      return preferenceDefaults[defaultName][frontOrBack];
+    } else {
+      throw new Error("Invalid default name or property");
+    }
+  }
+  // End defaults management
 
   var frontBack = "front";
   function setActive(side) {
@@ -464,12 +489,13 @@
     for (var _id of switchIdList) {
       var perId = frontBack + _id;
 
-      if (UniqueCardPersistence.getItem(perId) == "false") {
-        document.getElementById(_id).checked = false;
-      } else {
-        document.getElementById(_id).checked = true;
-        UniqueCardPersistence.setItem(perId, "true");
-      }
+      var preferenceValue = UniqueCardPersistence.getItem(perId)
+      if (preferenceValue === null) {
+        preferenceValue = getPreference(_id, frontBack);
+      } 
+
+      document.getElementById(_id).checked = preferenceValue;
+      UniqueCardPersistence.setItem(perId, preferenceValue);
 
       showHideFieldByCheckboxId(_id);
     }
