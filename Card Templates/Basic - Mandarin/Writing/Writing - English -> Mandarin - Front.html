@@ -669,14 +669,13 @@
 
   // *** Persistence wrapper ***
 
-  var keyPrefix = "writing";
+  var keyPrefix = "basic-mandarin-writing";
   var UniqueCardPersistence = {
     getKey: function (key) {
       return keyPrefix + ActiveSideManager.getActiveSide() + key;
     },
     getItem: function (key) {
       var item = Persistence.getItem(UniqueCardPersistence.getKey(key));
-
       // If no item for the key, return the default
       if (!item) {
         return switchObject[key];
@@ -684,6 +683,11 @@
       return item;
     },
     setItem: function (key, value) {
+      if (value === 'true') {
+        value = true;
+      } else if (value === 'false') {
+        value = false;
+      }
       return Persistence.setItem(UniqueCardPersistence.getKey(key), value);
     },
   };
@@ -691,8 +695,9 @@
   // *** Persistence wrapper end ***
 
   // *** WhichRenderer wrapper ***
+  var WHICH_RENDERER_KEY = 'renderer'
   var WhichRenderer = {
-    _renderer: UniqueCardPersistence.getItem('renderer') || 'canvas',
+    _renderer: UniqueCardPersistence.getItem(WHICH_RENDERER_KEY) || 'canvas',
     getRenderer: function() {
       return WhichRenderer._renderer;
     },
@@ -702,8 +707,7 @@
       } else {
         WhichRenderer._renderer = 'canvas'
       }
-
-      UniqueCardPersistence.setItem('renderer', WhichRenderer.getRenderer());
+      UniqueCardPersistence.setItem(WHICH_RENDERER_KEY, WhichRenderer.getRenderer());
     },
     isCanvas: function() {
       return WhichRenderer._renderer === 'canvas';
@@ -1076,7 +1080,7 @@ function delayedCallback(callback, delay) {
           printDebugMessage(
             "Request failed with status: " + xhr.status + " for URL: " + url,
           );
-          if (onFailuer) {
+          if (onFailure) {
             onFailure()
           }
         }
