@@ -249,110 +249,11 @@
 
 <!-- Persistence -->
 <script>
-  // v1.0.0 - https://github.com/SimonLammer/anki-persistence/blob/eeb2e1a9e37c941dd63e1fe6c2a257f043c40e0d/script.js
-  if (void 0 === window.Persistence) {
-    var e = "github.com/SimonLammer/anki-persistence/",
-      t = "_default";
-    if (
-      ((window.Persistence_localStorage = function () {
-        var i = !1;
-        try {
-          null !== window.localStorage &&
-            "object" == typeof window.localStorage &&
-            ((i = !0),
-            (this.clear = function () {
-              for (var t = 0; t < localStorage.length; t++) {
-                var i = localStorage.key(t);
-                0 == i.indexOf(e) && (localStorage.removeItem(i), t--);
-              }
-            }),
-            (this.setItem = function (i, n) {
-              void 0 == n && ((n = i), (i = t)),
-                localStorage.setItem(e + i, JSON.stringify(n));
-            }),
-            (this.getItem = function (i) {
-              return (
-                void 0 == i && (i = t), JSON.parse(localStorage.getItem(e + i))
-              );
-            }),
-            (this.removeItem = function (i) {
-              void 0 == i && (i = t), localStorage.removeItem(e + i);
-            }));
-        } catch (n) {}
-        this.isAvailable = function () {
-          return i;
-        };
-      }),
-      (window.Persistence_sessionStorage = function () {
-        var i = !1;
-        try {
-          "object" == typeof window.sessionStorage &&
-            ((i = !0),
-            (this.clear = function () {
-              for (var t = 0; t < sessionStorage.length; t++) {
-                var i = sessionStorage.key(t);
-                0 == i.indexOf(e) && (sessionStorage.removeItem(i), t--);
-              }
-            }),
-            (this.setItem = function (i, n) {
-              void 0 == n && ((n = i), (i = t)),
-                sessionStorage.setItem(e + i, JSON.stringify(n));
-            }),
-            (this.getItem = function (i) {
-              return (
-                void 0 == i && (i = t),
-                JSON.parse(sessionStorage.getItem(e + i))
-              );
-            }),
-            (this.removeItem = function (i) {
-              void 0 == i && (i = t), sessionStorage.removeItem(e + i);
-            }));
-        } catch (n) {}
-        this.isAvailable = function () {
-          return i;
-        };
-      }),
-      (window.Persistence_windowKey = function (i) {
-        var n = window[i],
-          o = !1;
-        "object" == typeof n &&
-          ((o = !0),
-          (this.clear = function () {
-            n[e] = {};
-          }),
-          (this.setItem = function (i, o) {
-            void 0 == o && ((o = i), (i = t)), (n[e][i] = o);
-          }),
-          (this.getItem = function (i) {
-            return void 0 == i && (i = t), void 0 == n[e][i] ? null : n[e][i];
-          }),
-          (this.removeItem = function (i) {
-            void 0 == i && (i = t), delete n[e][i];
-          }),
-          void 0 == n[e] && this.clear()),
-          (this.isAvailable = function () {
-            return o;
-          });
-      }),
-      (window.Persistence = new Persistence_sessionStorage()),
-      navigator.userAgent.indexOf("Mobile") > 0 &&
-        ((window.Persistence = new Persistence_localStorage()),
-        Persistence.isAvailable() ||
-          (window.Persistence = new Persistence_sessionStorage())),
-      Persistence.isAvailable() ||
-        (window.Persistence = new Persistence_windowKey("py")),
-      !Persistence.isAvailable())
-    ) {
-      var i = window.location.toString().indexOf("title"),
-        n = window.location.toString().indexOf("main", i);
-      i > 0 &&
-        n > 0 &&
-        n - i < 10 &&
-        (window.Persistence = new Persistence_windowKey("qt"));
-    }
-  }
+    // prettier-ignore
+  // v1.1.8 - https://github.com/SimonLammer/anki-persistence/blob/584396fea9dea0921011671a47a0fdda19265e62/script.js
+  if(void 0===window.Persistence){var e="github.com/SimonLammer/anki-persistence/",t="_default";if(window.Persistence_sessionStorage=function(){var i=!1;try{"object"==typeof window.sessionStorage&&(i=!0,this.clear=function(){for(var t=0;t<sessionStorage.length;t++){var i=sessionStorage.key(t);0==i.indexOf(e)&&(sessionStorage.removeItem(i),t--)}},this.setItem=function(i,n){void 0==n&&(n=i,i=t),sessionStorage.setItem(e+i,JSON.stringify(n))},this.getItem=function(i){return void 0==i&&(i=t),JSON.parse(sessionStorage.getItem(e+i))},this.removeItem=function(i){void 0==i&&(i=t),sessionStorage.removeItem(e+i)},this.getAllKeys=function(){for(var t=[],i=Object.keys(sessionStorage),n=0;n<i.length;n++){var s=i[n];0==s.indexOf(e)&&t.push(s.substring(e.length,s.length))}return t.sort()})}catch(n){}this.isAvailable=function(){return i}},window.Persistence_windowKey=function(i){var n=window[i],s=!1;"object"==typeof n&&(s=!0,this.clear=function(){n[e]={}},this.setItem=function(i,s){void 0==s&&(s=i,i=t),n[e][i]=s},this.getItem=function(i){return void 0==i&&(i=t),void 0==n[e][i]?null:n[e][i]},this.removeItem=function(i){void 0==i&&(i=t),delete n[e][i]},this.getAllKeys=function(){return Object.keys(n[e])},void 0==n[e]&&this.clear()),this.isAvailable=function(){return s}},window.Persistence=new Persistence_sessionStorage,Persistence.isAvailable()||(window.Persistence=new Persistence_windowKey("py")),!Persistence.isAvailable()){var i=window.location.toString().indexOf("title"),n=window.location.toString().indexOf("main",i);i>0&&n>0&&n-i<10&&(window.Persistence=new Persistence_windowKey("qt"))}}
 
-  var keyPrefix = "recall";
+  var keyPrefix = "basic-sentences-recall";
   var UniqueCardPersistence = {
     getItem: function (key) {
       return Persistence.getItem(keyPrefix + "-" + key);
@@ -361,9 +262,8 @@
       return Persistence.setItem(keyPrefix + "-" + key, value);
     },
   };
-</script>
 
-<script>
+  // Defaults management
   var switchIdList = [
     "text-pinyin",
     "text-zhuyin",
@@ -373,6 +273,25 @@
     "text-examples",
     "text-examples-parts-of-speech",
   ];
+
+  var preferenceDefaults = {
+    "text-pinyin": { front: false, back: true },
+    "text-zhuyin": { front: false, back: false },
+    "text-meaning": { front: false, back: true },
+    "text-sim": { front: true, back: true },
+    "text-trad": { front: false, back: false },
+    "text-examples": { front: true, back: true },
+    "text-examples-parts-of-speech": { front: false, back: false }
+  };
+
+  function getPreference(defaultName, frontOrBack) {
+    if (preferenceDefaults[defaultName] && preferenceDefaults[defaultName].hasOwnProperty(frontOrBack)) {
+      return preferenceDefaults[defaultName][frontOrBack];
+    } else {
+      throw new Error("Invalid default name or property");
+    }
+  }
+  // End defaults management
 
   var frontBack = "back";
   function setActive(side) {
@@ -413,12 +332,13 @@
     for (var _id of switchIdList) {
       var perId = frontBack + _id;
 
-      if (UniqueCardPersistence.getItem(perId) == "false") {
-        document.getElementById(_id).checked = false;
-      } else {
-        document.getElementById(_id).checked = true;
-        UniqueCardPersistence.setItem(perId, "true");
-      }
+      var preferenceValue = UniqueCardPersistence.getItem(perId)
+      if (preferenceValue === null) {
+        preferenceValue = getPreference(_id, frontBack);
+      } 
+
+      document.getElementById(_id).checked = preferenceValue;
+      UniqueCardPersistence.setItem(perId, preferenceValue);
 
       showHideFieldByCheckboxId(_id);
     }
@@ -771,4 +691,39 @@
   }
 
   applyColorization(); // Call the function to apply the color when the script is executed
+</script>
+
+</script>
+
+<script type="text/javascript">
+
+  /**
+   * Assign random class from this list to render the sentence in a different font every now and then
+   * to help readers learn to read in more than one font.
+   */
+  function assignClassBasedOnTime() {
+    // Get the char_sim element
+    var charSimElement = document.getElementById("char_sim");
+
+    // Get the current time
+    var now = new Date();
+    var minutes = now.getMinutes();
+    var seconds = now.getSeconds();
+    var segment = Math.floor((minutes * 60 + seconds) / 180); // Dividing total seconds in 3 minutes
+
+    // Define the original class names you provided
+    var classes = [
+        "kaiti",
+        "arial",
+        "roboto",
+        "yumincho"
+    ];
+
+    // Assign the class corresponding to the current 3-minute segment
+    charSimElement.className = "char-card " + classes[segment % classes.length];
+}
+
+// Call the function to assign a class based on the current time
+assignClassBasedOnTime();
+
 </script>

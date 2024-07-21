@@ -9,17 +9,12 @@
 <div id="char_meaning" class="meaning-card">
   <hr />
   {{Definitions}}
-  <hr />
 </div>
 <div id="char_examples">{{Examples}}</div>
-<div id="audio" style="display: none">{{Audio}}</div>
 
 <div class="modal-footer1">
   <a class="btn" id="btnShowMenu" onclick="openSidebar('sidebar')">
     <div class="icon"><i class="material-icons">menu</i></div>
-  </a>
-  <a class="btn" id="btnPlayAudio">
-    <div class="icon"><i class="material-icons">play_arrow</i></div>
   </a>
   <a class="btn" id="btnMoreOptions" onclick="openSidebar('more-info-sidebar')">
     <div class="icon"><i class="material-icons">more_vert</i></div>
@@ -351,12 +346,17 @@
     }
   }
 
-  var keyPrefix = "reading";
+  var keyPrefix = "basic-sentences-reading";
   var UniqueCardPersistence = {
     getItem: function (key) {
       return Persistence.getItem(keyPrefix + "-" + key);
     },
     setItem: function (key, value) {
+      if (value === 'true') {
+        value = true;
+      } else if (value === 'false') {
+        value = false;
+      }
       return Persistence.setItem(keyPrefix + "-" + key, value);
     },
   };
@@ -364,6 +364,7 @@
 
 <script>
 
+  // Defaults management
   var switchIdList = [
     "text-pinyin",
     "text-zhuyin",
@@ -373,6 +374,25 @@
     "text-examples",
     "text-examples-parts-of-speech",
   ];
+
+  var preferenceDefaults = {
+    "text-pinyin": { front: false, back: false },
+    "text-zhuyin": { front: false, back: false },
+    "text-meaning": { front: false, back: true },
+    "text-sim": { front: true, back: true },
+    "text-trad": { front: false, back: false },
+    "text-examples": { front: true, back: true },
+    "text-examples-parts-of-speech": { front: false, back: false }
+  };
+
+  function getPreference(defaultName, frontOrBack) {
+    if (preferenceDefaults[defaultName] && preferenceDefaults[defaultName].hasOwnProperty(frontOrBack)) {
+      return preferenceDefaults[defaultName][frontOrBack];
+    } else {
+      throw new Error("Invalid default name or property");
+    }
+  }
+  // End defaults management
 
   var frontBack = "front";
   function setActive(side) {
@@ -413,12 +433,13 @@
     for (var _id of switchIdList) {
       var perId = frontBack + _id;
 
-      if (UniqueCardPersistence.getItem(perId) == "false") {
-        document.getElementById(_id).checked = false;
-      } else {
-        document.getElementById(_id).checked = true;
-        UniqueCardPersistence.setItem(perId, "true");
-      }
+      var preferenceValue = UniqueCardPersistence.getItem(perId)
+      if (preferenceValue === null) {
+        preferenceValue = getPreference(_id, frontBack);
+      } 
+
+      document.getElementById(_id).checked = preferenceValue;
+      UniqueCardPersistence.setItem(perId, preferenceValue);
 
       showHideFieldByCheckboxId(_id);
     }
@@ -568,23 +589,6 @@
   }
 </script>
 <script>
-  function btnTapAudio() {
-    var audio = new Audio();
-    audio.src = "_press.mp3";
-    audio.load();
-    audio.play();
-  }
-
-  function playAudio() {
-    var audioDiv = document.getElementById("audio");
-    var audio = audioDiv.getElementsByTagName("*");
-    audio[0].tagName == "AUDIO" ? audio[0].play() : audio[0].click();
-  }
-
-  document.getElementById("btnPlayAudio").onclick = function () {
-    playAudio();
-  };
-
   var characters =
     document.getElementById("reading-practice-select").selectedIndex == "0"
       ? document.getElementById("char_sim").innerHTML
@@ -607,4 +611,37 @@
   if (Persistence.isAvailable()) {
     doPractice();
   }
+</script>
+
+<script type="text/javascript">
+
+  /**
+   * Assign random class from this list to render the sentence in a different font every now and then
+   * to help readers learn to read in more than one font.
+   */
+  function assignClassBasedOnTime() {
+    // Get the char_sim element
+    var charSimElement = document.getElementById("char_sim");
+
+    // Get the current time
+    var now = new Date();
+    var minutes = now.getMinutes();
+    var seconds = now.getSeconds();
+    var segment = Math.floor((minutes * 60 + seconds) / 180); // Dividing total seconds in 3 minutes
+
+    // Define the original class names you provided
+    var classes = [
+        "kaiti",
+        "arial",
+        "roboto",
+        "yumincho"
+    ];
+
+    // Assign the class corresponding to the current 3-minute segment
+    charSimElement.className = "char-card " + classes[segment % classes.length];
+}
+
+// Call the function to assign a class based on the current time
+assignClassBasedOnTime();
+
 </script>
