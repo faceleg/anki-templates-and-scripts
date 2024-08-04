@@ -26,13 +26,18 @@
         "kaiti",
         "arial",
         "roboto",
-        "yumincho"
+        "yumincho",
+        "mashanzheng",
+        "yrdzst",
+        "xxx",
+        "yyy"
     ];
 
     // Assign the class corresponding to the current 3-minute segment
     charSimElement.className = "char-card " + classes[segment % classes.length];
     charSimColorElement.className = "char-card " + classes[segment % classes.length];
     if (charReadingElement) charReadingElement.className = "char-card " + classes[segment % classes.length];
+    document.getElementById('font-name').innerHTML = classes[segment % classes.length]
 }
 
 // Call the function to assign a class based on the current time

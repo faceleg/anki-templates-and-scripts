@@ -130,6 +130,34 @@
   src: url(_yumin.ttf);
 }
 
+@font-face {
+  font-family: "MaShanZheng";
+  font-style: normal;
+  font-weight: 300;
+  src: url(_MaShanZheng-Regular.ttf);
+}
+
+@font-face {
+  font-family: "YRDZST";
+  font-style: normal;
+  font-weight: 300;
+  src: url(_YRDZSTSemibold.ttf);
+}
+
+@font-face {
+  font-family: "xxx";
+  font-style: normal;
+  font-weight: 300;
+  src: url(_xxx.ttf);
+}
+
+@font-face {
+  font-family: "yyy";
+  font-style: normal;
+  font-weight: 300;
+  src: url(_yyy.ttf);
+}
+
 /* Windows */
 .win .char-card {
   font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
@@ -244,6 +272,30 @@ img {
 #char_sim_coloured.roboto,
 #char_reading.roboto {
   font-family: Roboto;
+}
+
+#char_sim.mashanzheng,
+#char_sim_coloured.mashanzheng,
+#char_reading.mashanzheng {
+  font-family: MaShanZheng;
+}
+
+#char_sim.yrdzst,
+#char_sim_coloured.yrdzst,
+#char_reading.yrdzst {
+  font-family: YRDZST;
+}
+
+#char_sim.xxx,
+#char_sim_coloured.xxx,
+#char_reading.xxx {
+  font-family: xxx;
+}
+
+#char_sim.yyy,
+#char_sim_coloured.yyy,
+#char_reading.yyy {
+  font-family: yyy;
 }
 
 /* Pinyin ruby styling */

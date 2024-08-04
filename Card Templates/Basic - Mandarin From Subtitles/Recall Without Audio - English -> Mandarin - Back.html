@@ -37,6 +37,9 @@
     <div id="char_deck">
         <div>{{Deck}}</div>
         <div>{{Card}}</div>
+        <div>
+            font name: <span id="font-name"></span>
+        </div>
         <div id="audio">{{Audio}}</div>
     </div>	
 </div>
@@ -90,12 +93,17 @@
           "kaiti",
           "arial",
           "roboto",
-          "yumincho"
+          "yumincho",
+        "mashanzheng",
+        "yrdzst",
+        "xxx",
+        "yyy"
       ];
   
       // Assign the class corresponding to the current 3-minute segment
       charSimColorElement.className = "char-card " + classes[segment % classes.length];
       if (charReadingElement) charReadingElement.className = "char-card " + classes[segment % classes.length];
+      document.getElementById('font-name').innerHTML = classes[segment % classes.length]
   }
   
   // Call the function to assign a class based on the current time

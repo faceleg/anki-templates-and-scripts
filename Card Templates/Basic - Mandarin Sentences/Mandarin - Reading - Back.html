@@ -11,6 +11,9 @@
 <div id="char_deck">
   <div>{{Deck}}</div>
   <div>{{Card}}</div>
+  <div>
+    font name: <span id="font-name"></span>
+</div>
   <div id="audio">{{Audio}}</div>
 </div>	
 
@@ -177,4 +180,42 @@ var elements = document.querySelectorAll('.lessonInfoHanzi');
   }
 
   applyColorization(); // Call the function to apply the color when the script is executed
+</script>
+
+<script type="text/javascript">
+
+  /**
+   * Assign random class from this list to render the sentence in a different font every now and then
+   * to help readers learn to read in more than one font.
+   */
+  function assignClassBasedOnTime() {
+    // Get the char_sim element
+    var charSimElement = document.getElementById("char_sim");
+
+    // Get the current time
+    var now = new Date();
+    var minutes = now.getMinutes();
+    var seconds = now.getSeconds();
+    var segment = Math.floor((minutes * 60 + seconds) / 180); // Dividing total seconds in 3 minutes
+
+    // Define the original class names you provided
+    var classes = [
+        "kaiti",
+        "arial",
+        "roboto",
+        "yumincho",
+        "mashanzheng",
+        "yrdzst",
+        "xxx",
+        "yyy"
+    ];
+
+    // Assign the class corresponding to the current 3-minute segment
+    charSimElement.className = "char-card " + classes[segment % classes.length];
+    document.getElementById('font-name').innerHTML = classes[segment % classes.length]
+}
+
+// Call the function to assign a class based on the current time
+assignClassBasedOnTime();
+
 </script>
