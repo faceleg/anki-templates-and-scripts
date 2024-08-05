@@ -739,13 +739,6 @@
 }
 
 @font-face {
-  font-family: "YuMincho";
-  font-style: normal;
-  font-weight: 300;
-  src: url(_yumin.ttf);
-}
-
-@font-face {
   font-family: "MaShanZheng";
   font-style: normal;
   font-weight: 300;
@@ -779,10 +772,6 @@
 
 #char_sim.arial {
   font-family: Arial;
-}
-
-#char_sim.yumincho {
-  font-family: YuMincho;
 }
 
 #char_sim.roboto {
