@@ -92,44 +92,8 @@
     background-color: #1f1f1f;
   }
   
-  /* Simplified and Traditional Kai Ti Fonts */
-  /*
-  @font-face {
-      font-family: 'AR PL KaitiM Big5';
-      src: url('_ZenKai-Medium.ttf') format('ttf'),
-          url('_ZenKai-Medium.woff2') format('woff2'),
-          url('_ZenKai-Medium.woff') format('woff');
-      font-weight: 500;
-      font-style: normal;
-      font-display: swap;
-  }
-  
-  @font-face {
-      font-family: 'AR PL KaitiM GB';
-      src: url('_GBZenKai-Medium.ttf') format('ttf'),
-          url('_GBZenKai-Medium.woff2') format('woff2'),
-          url('_GBZenKai-Medium.woff') format('woff');
-      font-weight: 500;
-      font-style: normal;
-      font-display: swap;
-  }
-  */
-  
   .char-card {
     font-size: 3em;
-  }
-  
-  /* Windows */
-  .win .char-card {
-    font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
-  }
-  /* macOS */
-  .mac .char-card {
-    font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
-  }
-  /* Linux desktops */
-  .linux:not(.android) .char-card {
-    font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
   }
   
   /* Material Icon Font */
@@ -824,7 +788,6 @@
 #char_sim.roboto {
   font-family: Roboto;
 }
-
 
 #char_sim.mashanzheng {
   font-family: MaShanZheng;
