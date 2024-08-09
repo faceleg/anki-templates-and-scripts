@@ -586,7 +586,7 @@
       return [false, false];
     }
 
-    function getTone(str) {
+    function getToneNumberFromPinyinWithMacron(str) {
       var pure = str.replace(/a|e|i|o|u|ü|r/g, "");
       if (pure === "") {
         return 5;
@@ -605,7 +605,7 @@
 
     function flush() {
       if (buffer.length > 0) {
-        tonesArr.push(getTone(buffer.join("")));
+        tonesArr.push(getToneNumberFromPinyinWithMacron(buffer.join("")));
         buffer = [];
       }
     }
@@ -623,7 +623,7 @@
     }
 
     if (buffer.length > 0) {
-      tonesArr.push(getTone(buffer.join("")));
+      tonesArr.push(getToneNumberFromPinyinWithMacron(buffer.join("")));
     }
 
     return tonesArr;
@@ -1188,10 +1188,44 @@ function delayedCallback(callback, delay) {
     showNextAndRevealBtn(true);
   };
 
+  function getPinyinWithMacronFromPinyinWithNumber(pinyin) {
+    // Mapping of tone numbers to their corresponding marked vowels
+    const toneMap = {
+      1: ["ā", "ē", "ī", "ō", "ū", "ǖ"], // First tone
+      2: ["á", "é", "í", "ó", "ú", "ǘ"], // Second tone
+      3: ["ǎ", "ě", "ǐ", "ǒ", "ǔ", "ǚ"], // Third tone
+      4: ["à", "è", "ì", "ò", "ù", "ǜ"]  // Fourth tone
+    };
+
+    // String of vowels that can be marked with tones
+    const vowels = "aeiouü";
+
+    // Extract the tone number from the end of the pinyin string
+    const tone = parseInt(pinyin[pinyin.length - 1]);
+
+    // If the last character isn't a valid tone number (1-4), return the original string
+    if (isNaN(tone) || tone < 1 || tone > 4) return pinyin;
+
+    // Remove the tone number from the pinyin string
+    const base = pinyin.slice(0, -1);
+
+    // Loop through the string to find the main vowel to apply the tone mark to
+    for (let i = base.length - 1; i >= 0; i--) {
+      if (vowels.includes(base[i])) {
+        // Find the index of the vowel and replace it with the corresponding marked vowel
+        let vowelIndex = vowels.indexOf(base[i]);
+        return base.slice(0, i) + toneMap[tone][vowelIndex] + base.slice(i + 1);
+      }
+    }
+
+    // Return the original pinyin string if no vowel was found
+    return pinyin;
+  }
+
   function getAndSetCharacterMeaning(id, character, index) {
-    const pinyin = getPinyinAtIndex(index)
     var characterDefinitionDiv = document.getElementById(id)
     loadDataFromUrl("/_" + character + "_meaning.json", function(characterData) {
+      const pinyin = getPinyinWithMacronFromPinyinWithNumber(characterData.pinyin);
       characterDefinitionDiv.className = "character-meaning-div-populated"
       characterDefinitionDiv.innerHTML = pinyin + ': ' + characterData.definitions.join('; ');
     }, function() {
