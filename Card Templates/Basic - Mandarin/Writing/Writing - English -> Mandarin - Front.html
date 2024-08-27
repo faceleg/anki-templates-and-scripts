@@ -10,6 +10,7 @@
     left: 0px;
     padding: 2px;
     max-width: 100%;
+    z-index:1000;
   "
 ></div>
 <div id="char_zhuyin">{{Zhuyin}}</div>
@@ -463,7 +464,7 @@
       ")<br/>";
   }
 
-  if (DEBUG) printDebugMessage(navigator.userAgent);
+  //if (DEBUG) printDebugMessage(navigator.userAgent);
 
   // Browser based text to speech for use with multi character words
   function speak(phrase) {
@@ -474,9 +475,16 @@
 
     // Select a voice that speaks Mandarin or Taiwanese Mandarin
     const voices = speechSynthesis.getVoices().filter((voice) => {
-      if (voice.lang.indexOf('zh-TW') === 0) return true
-      else if (voice.lang.indexOf('zh-CN') === 0) return true
+    
+    // Only Tingting sounds good on iOS 18
+    if (voice.name=== "Tingting") return true
+    else return false
+/**
+
+      if (voice.lang.indexOf('zh-TW') === 0) { return false ; }
+      else if (voice.lang.indexOf('zh-CN') === 0) {return true}
       else return false
+*/
     });
     
     // Randomly choose one of these voices
