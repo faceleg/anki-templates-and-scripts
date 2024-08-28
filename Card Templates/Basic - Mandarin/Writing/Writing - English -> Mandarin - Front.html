@@ -437,7 +437,7 @@
 </script>
 
 <script type="text/javascript">
-  var DEBUG = false;
+  var DEBUG = true;
 
   function millisecondsSinceTimestamp(previousTimestamp) {
     // Get the current timestamp in milliseconds
@@ -464,32 +464,32 @@
       ")<br/>";
   }
 
-  //if (DEBUG) printDebugMessage(navigator.userAgent);
-
   // Browser based text to speech for use with multi character words
   function speak(phrase) {
-    var utterance = new SpeechSynthesisUtterance();
-
-    utterance.lang = 'zh'
+    if (!window.ankiUtterance) {
+      window.ankiUtterance = new SpeechSynthesisUtterance();
+      window.ankiUtterance.rate = 0.5;  
+      window.ankiUtterance.lang = 'zh'
+    }
+    
+    var utterance = window.ankiUtterance;
     utterance.text = phrase
 
     // Select a voice that speaks Mandarin or Taiwanese Mandarin
     const voices = speechSynthesis.getVoices().filter((voice) => {
-    
-    // Only Tingting sounds good on iOS 18
-    if (voice.name=== "Tingting") return true
-    else return false
-/**
-
-      if (voice.lang.indexOf('zh-TW') === 0) { return false ; }
-      else if (voice.lang.indexOf('zh-CN') === 0) {return true}
+      // Only Tingting sounds good on iOS 18
+      if (voice && voice.name.toLowerCase() === "tingting") return true
       else return false
-*/
+      // Return all zh-TW or zh-CN voices
+//       if (voice.lang.indexOf('zh-TW') === 0) { return false ; }
+//       else if (voice.lang.indexOf('zh-CN') === 0) {return true}
+//       else return false
     });
     
     // Randomly choose one of these voices
     const voiceIndex = (Math.floor(Math.random() * voices.length))    
     utterance.voice = voices[voiceIndex];
+    
     speechSynthesis.speak(utterance);
   }
 
