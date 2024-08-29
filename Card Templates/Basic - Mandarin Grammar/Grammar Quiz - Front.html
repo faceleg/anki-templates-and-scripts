@@ -1,4 +1,4 @@
-    <div
+<div
     id="debug-message-console"
     style="
         display: none;
@@ -11,9 +11,9 @@
         padding: 2px;
         max-width: 100%;
     "
-    ></div>
-    <script type="text/javascript">
-        function millisecondsSinceTimestamp(previousTimestamp) {
+></div>
+<script type="text/javascript">
+    function millisecondsSinceTimestamp(previousTimestamp) {
         // Get the current timestamp in milliseconds
         const currentTimestamp = Date.now();
     
@@ -37,37 +37,37 @@
             " (" +
             millisecondsSinceTimestamp(loadStartedTimestamp) +
             ")<br/>";
-        }
-    </script>
+    }
+</script>
 
-    <div id="split_sent">{{Split}}</div>
+<div id="split_sent">{{Split}}</div>
 
-    <div class="spacer"></div>
+<div class="spacer"></div>
 
-    <div id="no-touch-wrapper" class="tappable">
+<div id="no-touch-wrapper" class="tappable">
     <div id="dash"></div>
     ______
     <div class="spacerSmall"></div>
     <div id="container"></div>
-    </div>
-    <div class="spacer"></div>
-    <button class="btn-check" onclick="check();">CHECK</button>
-    <button class="btn-reset" onclick="reset();">RESET</button>
-    <button class="btn-hint" onclick="hint();">HINT</button>
-    <div class="spacer"></div>
-    <div id="correct"></div>
-    <div class="spacer"></div>
-    <div class="spacer"></div>
-    <div id="structure" style="display:none" class="structure">{{Structure}}</div>
-    <div class="spacerMedium"></div>
-    <div id="chinese" class="chinese" style="display:none">{{Simplified}}</div>
-    <!-- <div class="spacerSmall"></div>
+</div>
+<div class="spacer"></div>
+<button class="btn-check" onclick="check();">CHECK</button>
+<button class="btn-reset" onclick="reset();">RESET</button>
+<button class="btn-hint" onclick="hint();">HINT</button>
+<div class="spacer"></div>
+<div id="correct"></div>
+<div class="spacer"></div>
+<div class="spacer"></div>
+<div id="structure" style="display:none" class="structure">{{Structure}}</div>
+<div class="spacerMedium"></div>
+<div id="chinese" class="chinese" style="display:none">{{Simplified}}</div>
+<!-- <div class="spacerSmall"></div>
     <div id="pinyin" class="pinyin" style="display:none">{{Pinyin}}</div> -->
-    <div class="spacerMedium"></div>
-    <div id="translation" class="translation">{{English}}</div>
-    <div class="spacer"></div>
-    <div id="usedfor" class="notes" style="display:none">{{Used For}}</div>
-    <script type="text/javascript">
+<div class="spacerMedium"></div>
+<div id="translation" class="translation">{{English}}</div>
+<div class="spacer"></div>
+<div id="usedfor" class="notes" style="display:none">{{Used For}}</div>
+<script type="text/javascript">
     /**
      * Stop skipping to next card on misclicks around buttons or interactive components
      */ 
@@ -100,7 +100,8 @@
         }
     })();
     </script>
-    <script>
+
+<script>
         document.getElementById("split_sent").style.display = "none";
         var sen = document.getElementById("split_sent").innerHTML;
         var senTrim = sen.trim();
@@ -232,3 +233,14 @@
             }
         }
     </script>
+        <script>
+            (() => {
+                var container = document.getElementById("container");
+                var dash = document.getElementById("dash");
+                console.log(container, dash)
+                if (container && dash) {
+                    var containerHeight = container.offsetHeight;
+                    dash.style.height = containerHeight + "px";
+                }
+            })();
+        </script>
