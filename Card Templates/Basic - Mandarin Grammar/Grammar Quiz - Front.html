@@ -61,186 +61,166 @@
 <div id="structure" style="display:none" class="structure">{{Structure}}</div>
 <div class="spacerMedium"></div>
 <div id="chinese" class="chinese" style="display:none">{{Simplified}}</div>
-<!-- <div class="spacerSmall"></div>
-    <div id="pinyin" class="pinyin" style="display:none">{{Pinyin}}</div> -->
+<!-- <div class="spacerSmall"></div> -->
+<div id="pinyin" class="pinyin" style="display:none">{{Pinyin}}</div>
 <div class="spacerMedium"></div>
 <div id="translation" class="translation">{{English}}</div>
 <div class="spacer"></div>
 <div id="usedfor" class="notes" style="display:none">{{Used For}}</div>
 <script type="text/javascript">
-    /**
-     * Stop skipping to next card on misclicks around buttons or interactive components
-     */ 
-    (() => {
-        const noTouchWrapper = document.getElementById('no-touch-wrapper');
+/**
+ * Stop skipping to next card on misclicks around buttons or interactive components
+ */ 
+(() => {
+    const noTouchWrapper = document.getElementById('no-touch-wrapper');
 
-        if (noTouchWrapper) {
-            const allowedSelectors = ['button', '#container > div', '#dash > div'];
+    if (noTouchWrapper) {
+        const allowedSelectors = ['button', '#container > div', '#dash > div'];
 
-            function isAllowedTarget(target) {
-                return allowedSelectors.some(selector => {
-                    return target.matches(selector) || target.closest(selector);
-                });
-            }
-
-            function handleEvent(e) {
-                if (isAllowedTarget(e.target)) {
-                    return;
-                }
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                console.log(`${e.type} event intercepted!`);
-            }
-
-            const events = ['click', 'touchstart', 'touchmove', 'touchend', 'touchcancel'];
-
-            events.forEach(eventType => {
-                noTouchWrapper.addEventListener(eventType, handleEvent);
+        function isAllowedTarget(target) {
+            return allowedSelectors.some(selector => {
+                return target.matches(selector) || target.closest(selector);
             });
         }
-    })();
-    </script>
+
+        function handleEvent(e) {
+            if (isAllowedTarget(e.target)) {
+                return;
+            }
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        }
+
+        const events = ['click', 'touchstart', 'touchmove', 'touchend', 'touchcancel'];
+
+        events.forEach(eventType => {
+            noTouchWrapper.addEventListener(eventType, handleEvent);
+        });
+    }
+})();
+</script>
 
 <script>
-        document.getElementById("split_sent").style.display = "none";
-        var sen = document.getElementById("split_sent").innerHTML;
-        var senTrim = sen.trim();
-        var senArr = senTrim.split(/\s+/);
-        var dashElement = "";
-        var btnElements = "";
+(() => {
+    // Hide the original sentence element
+    const splitSentElement = document.getElementById("split_sent");
+    splitSentElement.style.display = "none";
 
-        function shuffle(array) {
-            array.sort(() => Math.random() - 0.5);
+    // Process the sentence into an array of words
+    const sentence = splitSentElement.innerText.trim();
+    const sentenceArray = sentence.split(/\s+/);
+
+    // Shuffle the array
+    function shuffle(array) {
+        array.sort(() => Math.random() - 0.5);
+    }
+    shuffle(sentenceArray);
+
+    // Create buttons for each word with unique IDs
+    let buttonHTML = "";
+    sentenceArray.forEach((word, index) => {
+        // Generate a unique ID using the word and its index
+        const uniqueId = `btn${index}`;
+        buttonHTML += `<div class='btn-q' id='${uniqueId}' onclick='btnClick("${uniqueId}")'>${word}</div>`;
+    });
+
+    // Add buttons to the container
+    document.getElementById("container").innerHTML = buttonHTML;
+
+    let picked = 0;
+
+    // Handle clicks on buttons
+    window.btnClick = function(clickedId) {
+        const clickedElement = document.getElementById(clickedId);
+        const text = clickedElement.innerText;
+
+        // Create a new dash element and append it
+        const dashElement = document.createElement("div");
+        dashElement.style.display = "inline";
+        const dashId = `dash${picked}`;
+        dashElement.innerHTML = `<span class='btn-a' id='${dashId}' onclick='dashClick("${dashId}")'>${text}</span>`;
+        document.getElementById("dash").appendChild(dashElement);
+
+        // Mark the clicked button as used
+        picked++;
+        clickedElement.style.opacity = "0.2";
+        clickedElement.style.pointerEvents = "none";
+    };
+
+    // Handle clicks on dash elements
+    window.dashClick = function(clickedId) {
+        const clickedElement = document.getElementById(clickedId);
+        const clickedText = clickedElement.innerText.trim();
+        const buttons = document.getElementsByClassName("btn-q");
+
+        // Re-enable the corresponding button
+        for (let button of buttons) {
+            if (button.innerText.trim() === clickedText && button.style.pointerEvents === "none") {
+                button.style.opacity = "1";
+                button.style.pointerEvents = "auto";
+                break;
+            }
         }
 
-        shuffle(senArr);
-        console.log(senArr);
-        //console.log(senArr2);
-        for (var i = 0; i < senArr.length; i++) {
-            btnElements += "<div class='btn-q' onclick='btnClick(this.id);' id = 'btn" + i + "'> " + senArr[i] + ' </div>';
+        // Remove the dash element
+        clickedElement.remove();
+    };
+
+    // Check if the current dash matches the original sentence
+    window.check = function() {
+        const dashElements = document.getElementById("dash").childNodes;
+        let assembledText = Array.from(dashElements)
+            .map(element => element.innerText)
+            .join(" ")
+            .trim();
+
+        const originalText = splitSentElement.innerText.trim();
+        const isCorrect = assembledText === originalText;
+
+        document.getElementById("correct").innerText = isCorrect ? "CORRECT" : "INCORRECT";
+        document.getElementById("correct").style.color = isCorrect ? "green" : "red";
+
+        if (isCorrect) {
+            ["chinese", "structure", "usedfor"].forEach(id => {
+                document.getElementById(id).style.display = "block";
+            });
+        }
+    };
+
+    // Reset the game state
+    window.reset = function() {
+        const buttons = document.getElementsByClassName("btn-q");
+        for (let button of buttons) {
+            button.style.opacity = "1";
+            button.style.pointerEvents = "auto";
         }
 
+        document.getElementById("dash").innerHTML = "";
+        document.getElementById("correct").innerText = "";
+
+        ["chinese", "pinyin", "structure", "usedfor"].forEach(id => {
+            document.getElementById(id).style.display = "none";
+        });
+    };
+
+    // Provide hints in stages
+    let hintTapCount = 0;
+    window.hint = function() {
+        const hints = ["structure", "chinese", "pinyin", "usedfor"];
+        if (hintTapCount < hints.length) {
+            document.getElementById(hints[hintTapCount]).style.display = "block";
+            hintTapCount++;
+        }
+    };
+})();
+</script>
+<script>
+    (() => {
         var container = document.getElementById("container");
-        container.innerHTML = btnElements;
-        var picked = 0;
-        function dashClick(clicked) {
-            //console.log(clicked);
-            var buttons = document.getElementsByClassName('btn-q');
-            console.log(buttons.length);
-            var dash = document.getElementById("dash");
-            dashChild = dash.childNodes;
-            //console.log(document.getElementById(clicked).innerText);
-            for (i = 0; i < senArr.length; i++) {
-                if (document.getElementById(clicked).innerText.trim() == buttons[i].innerText.trim()) {
-                    //console.log("Match");
-                    buttons[i].style.opacity = "1";
-                    buttons[i].style.pointerEvents = "auto";
-                }
-            }
-
-            var dash = document.getElementById("dash");
-            //console.log(dash.childElementCount);
-            document.getElementById(clicked).remove();
+        var dash = document.getElementById("dash");
+        if (container && dash) {
+            var containerHeight = container.offsetHeight;
+            dash.style.height = containerHeight + "px";
         }
-
-        function check() {
-            var dash = document.getElementById("dash");
-            dashChild = dash.childNodes;
-            console.log(dashChild.length);
-            var text = "";
-            for (i = 0; i < dashChild.length; i++) {
-                text += dashChild[i].innerText + " ";
-            }
-            newText = text.replace(/\s+/g, ' ').trim();
-            console.log(newText);
-
-            var origText = document.getElementById("split_sent").innerText;
-            //console.log(origText);
-            if (newText.trim() == origText.trim()) {
-                //alert("Matched");
-                document.getElementById("correct").innerHTML = "CORRECT";
-
-                document.getElementById("correct").style.color = "green";
-                document.getElementById("chinese").style.display = "block";
-                document.getElementById("pinyin").style.display = "block";
-                document.getElementById("translation").style.display = "block";
-                document.getElementById("structure").style.display = "block";
-                document.getElementById("usedfor").style.display = "block";
-            } else {
-                //alert("Not Matched");
-                document.getElementById("correct").innerHTML = "INCORRECT";
-                document.getElementById("correct").style.color = "red";
-            }
-
-        }
-
-        function reset() {
-            var buttons = document.getElementsByClassName('btn-q');
-            for (i = 0; i < senArr.length; i++) {
-                //console.log("Match");
-                buttons[i].style.opacity = "1";
-                buttons[i].style.pointerEvents = "auto";
-            }
-            var dash = document.getElementById("dash");
-            dash.innerHTML = "";
-            document.getElementById("correct").innerHTML = "";
-
-            document.getElementById("chinese").style.display = "none";
-            document.getElementById("pinyin").style.display = "none";
-            document.getElementById("translation").style.display = "none";
-            document.getElementById("structure").style.display = "none";
-            document.getElementById("usedfor").style.display = "none";
-        }
-
-        // Button click
-        function btnClick(clicked) {
-            var dashElement = document.createElement("div");
-            var text = document.getElementById(clicked).innerText;
-            dashElement.style.display = "inline";
-            dashElement.innerHTML = "<span class='btn-a' onclick='dashClick(this.id);' id=" + picked + ">" + text + " </span>"; // add text at top of button
-            document.getElementById("dash").appendChild(dashElement);
-            picked++;
-            document.getElementById(clicked).style.opacity = "0.2"; //hide button that has been clicked
-            document.getElementById(clicked).style.pointerEvents = "none";
-        }
-
-        var hintTapCount = 0;
-        function hint() {
-            switch (hintTapCount) {
-
-                case 0:
-                    document.getElementById("structure").style.display = "block";
-                    hintTapCount++;
-                    break;
-
-                case 1:
-                    document.getElementById("translation").style.display = "block";
-                    hintTapCount++;
-                    break;
-
-                case 2:
-                    document.getElementById("chinese").style.display = "block";
-                    document.getElementById("pinyin").style.display = "block";
-                    hintTapCount++;
-                    break;
-
-                default:
-                    document.getElementById("chinese").style.display = "block";
-                    document.getElementById("pinyin").style.display = "block";
-                    document.getElementById("translation").style.display = "block";
-                    document.getElementById("structure").style.display = "block";
-                    document.getElementById("usedfor").style.display = "block";
-            }
-        }
-    </script>
-        <script>
-            (() => {
-                var container = document.getElementById("container");
-                var dash = document.getElementById("dash");
-                console.log(container, dash)
-                if (container && dash) {
-                    var containerHeight = container.offsetHeight;
-                    dash.style.height = containerHeight + "px";
-                }
-            })();
-        </script>
+    })();
+</script>
