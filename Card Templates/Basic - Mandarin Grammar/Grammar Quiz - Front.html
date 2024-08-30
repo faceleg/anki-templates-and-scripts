@@ -171,10 +171,13 @@
         const dashElements = document.getElementById("dash").childNodes;
         let assembledText = Array.from(dashElements)
             .map(element => element.innerText)
-            .join(" ")
-            .trim();
+            .join('')
+            .replace(/\s+/g, '');
+        
 
-        const originalText = splitSentElement.innerText.trim();
+        const originalText = splitSentElement.innerText
+            .replace(/\s+/g, '');
+
         const isCorrect = assembledText === originalText;
 
         document.getElementById("correct").innerText = isCorrect ? "CORRECT" : "INCORRECT";
