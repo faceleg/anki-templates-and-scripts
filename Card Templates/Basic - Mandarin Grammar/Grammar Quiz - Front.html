@@ -190,8 +190,11 @@
         }
     };
 
+    let hintTapCount = 0;
+
     // Reset the game state
     window.reset = function() {
+        hintTapCount = 0;
         const buttons = document.getElementsByClassName("btn-q");
         for (let button of buttons) {
             button.style.opacity = "1";
@@ -207,7 +210,6 @@
     };
 
     // Provide hints in stages
-    let hintTapCount = 0;
     window.hint = function() {
         const hints = ["structure", "chinese", "pinyin", "usedfor"];
         if (hintTapCount < hints.length) {
