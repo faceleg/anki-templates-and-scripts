@@ -1,0 +1,44 @@
+<div id="char_sim" class="char-card">{{Simplified}}</div>
+<!-- <div id="char_sim_coloured" class="char-card">Color</div> -->
+<div id="char_sim_coloured" class="char-card">{{Simplified}}</div>
+
+<script type="text/javascript">
+
+  /**
+   * Assign random class from this list to render the sentence in a different font every now and then
+   * to help readers learn to read in more than one font.
+   */
+  function assignClassBasedOnTime() {
+    // Get the char_sim element
+    var charSimElement = document.getElementById("char_sim");
+    var charSimColorElement = document.getElementById("char_sim_coloured");
+    var charReadingElement = document.getElementById("char_reading");
+
+    // Get the current time
+    var now = new Date();
+    var minutes = now.getMinutes();
+    var seconds = now.getSeconds();
+    var segment = Math.floor((minutes * 60 + seconds) / 180); // Dividing total seconds in 3 minutes
+
+    // Define the original class names you provided
+    var classes = [
+        "kaiti",
+        "arial",
+        "roboto",
+                "mashanzheng",
+        "yrdzst",
+        "xxx",
+        "yyy"
+    ];
+
+    // Assign the class corresponding to the current 3-minute segment
+    charSimElement.className = "char-card " + classes[segment % classes.length];
+    charSimColorElement.className = "char-card " + classes[segment % classes.length];
+    if (charReadingElement) charReadingElement.className = "char-card " + classes[segment % classes.length];
+    document.getElementById('font-name').innerHTML = classes[segment % classes.length]
+}
+
+// Call the function to assign a class based on the current time
+assignClassBasedOnTime();
+
+</script>

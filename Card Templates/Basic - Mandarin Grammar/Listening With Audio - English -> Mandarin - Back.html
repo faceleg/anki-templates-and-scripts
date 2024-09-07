@@ -1,0 +1,94 @@
+<div id="back">
+
+    <div class="char_meaning">{{English}}</div>
+    <br>
+    <hr>
+    <!-- <div id="char_sim_coloured">Color</div> -->
+     <div id="char_sim_coloured">{{Simplified}}</div>
+    <br >
+
+    <div class="button-wrapper">
+        <a class="btn" id="btnShowPinyin">
+            <div class="icon">
+                <i class="material-icons">text_increase</i>
+            </div>
+        </a>
+        
+    </div>
+    
+    <div id="char_pinyin" style="display:none;">
+        {{Pinyin}}
+    </div>
+
+    <div id="char_deck">
+        <div>{{Deck}}</div>
+        <div>{{Card}}</div>
+        <div>
+            font name: <span id="font-name"></span>
+        </div>
+        <div id="audio">{{Sound}}</div>
+    </div>	
+</div>
+
+<script type="text/javascript">
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Select the target element
+        var spans = document.querySelectorAll('span');
+
+        // Define the characters to remove
+        var charsToRemove = "\u200E"; // This is the Unicode for the Left-to-Right Mark
+
+        spans.forEach(function(span) {
+            // Replace the characters with an empty string
+            span.textContent = span.textContent.split(charsToRemove).join('');
+        });
+    });
+
+    // Show pinyin
+    var btnShowPinyin = document.getElementById('btnShowPinyin');
+    btnShowPinyin.onclick = function(event) {
+        const display = document.getElementById('char_pinyin').style.display;
+        document.getElementById('char_pinyin').style.display = display === "block" ? "none" : "block";
+    }
+</script>
+<script type="text/javascript">
+
+    /**
+     * Assign random class from this list to render the sentence in a different font every now and then
+     * to help readers learn to read in more than one font.
+     */
+    function assignClassBasedOnTime() {
+      // Get the char_sim element
+      var charSimColorElement = document.getElementById("char_sim_coloured");
+      var charReadingElement = document.getElementById("char_reading");
+  
+      // Get the current time
+      var now = new Date();
+      var minutes = now.getMinutes();
+      var seconds = now.getSeconds();
+      var segment = Math.floor((minutes * 60 + seconds) / 180); // Dividing total seconds in 3 minutes
+  
+      // Define the original class names you provided
+      var classes = [
+          "kaiti",
+          "arial",
+          "roboto",
+          "mashanzheng",
+        "yrdzst",
+        "xxx",
+        "yyy"
+      ];
+  
+      // Assign the class corresponding to the current 3-minute segment
+      charSimColorElement.className = "char-card " + classes[segment % classes.length];
+      if (charReadingElement) charReadingElement.className = "char-card " + classes[segment % classes.length];
+      document.getElementById('font-name').innerHTML = classes[segment % classes.length]
+
+  }
+  
+  // Call the function to assign a class based on the current time
+  assignClassBasedOnTime();
+  
+  </script>
+  

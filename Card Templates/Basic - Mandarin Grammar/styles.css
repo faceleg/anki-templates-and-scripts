@@ -210,3 +210,446 @@ button.btn-play {
     align-content: center;
     flex-direction: column;
 }
+
+/* Non Grammar Quiz Cards */
+:root {
+    --tone-1: #f44336;
+    --tone-2: #ff9800;
+    --tone-3: #4caf50;
+    --tone-4: #2196f3;
+    --tone-5: #607d8b;
+    --brand-bg1: rgb(255, 117, 195);
+    --brand-bg2: rgb(157, 119, 255);
+    --brand-bg-gradient: linear-gradient(
+      to bottom,
+      var(--brand-bg2),
+      var(--brand-bg2)
+    );
+    --thumb-highlight-color: rgba(255, 255, 254, 0.2);
+    --space-xxs: 0.25rem;
+    --space-xs: 0.5rem;
+    --space-sm: 1rem;
+    --space-md: 1.5rem;
+    --space-lg: 2rem;
+    --space-xl: 3rem;
+    --space-xxl: 6rem;
+    --isLTR: 1;
+    --isRTL: -1;
+  }
+  
+  #char_image {
+    text-align: center;
+  }
+  
+  #char_image img {
+    max-height: 200px;
+  }
+  
+  .char_example {
+    line-height: 1.8;
+  }
+  
+  .card {
+    --title-color: grey;
+    --time-left-color: teal;
+    --hanzi-grid: #fafafa;
+    --stroke: #555;
+    --outline: #ddd;
+    --drawing: #333;
+    --pinyin-color: #ef6c00;
+    --simplified-color: #6495ed;
+    --traditional-color: #00796b;
+    --meaning-color: #607d8b;
+    --icon-button-background: #63759d;
+    --icon-button-background-focus: #7d92c2;
+    --sidebar-color: white;
+    --sidebar-background-color: #52575d;
+    --header-color: #455a64;
+    --surface1: rgb(226, 226, 226);
+    --surface2: rgb(255, 255, 254);
+    --surface3: rgb(249, 249, 249);
+    --surface4: rgb(212, 212, 212);
+    --text1: rgb(48, 48, 48);
+    --text2: rgb(94, 94, 94);
+    --brand: rgb(47, 167, 214);
+    --thumb-highlight-color: rgba(0, 0, 0, 0.2);
+    font-size: 20px;
+    text-align: center;
+    color: black;
+    background-color: white;
+  }
+  
+  .card.night_mode {
+    --header-color: white;
+    --title-color: #00bcd4;
+    --time-left-color: #fff;
+    --hanzi-grid: #262626;
+    --stroke: #ffffff;
+    --outline: #5b5b5b;
+    --drawing: #fff;
+    --pinyin-color: #27b46e;
+    --simplified-color: #6495ed;
+    --traditional-color: #fba910;
+    --meaning-color: #00bfa5;
+    --icon-button-background: #63759d;
+    --icon-button-background-focus: #7d92c2;
+    --sidebar-color: white;
+    --sidebar-background-color: #52575d;
+    --surface1: rgb(27, 27, 27);
+    --surface2: rgb(37, 37, 37);
+    --surface3: rgb(48, 48, 48);
+    --surface4: rgb(59, 59, 59);
+    --text1: rgb(240, 240, 240);
+    --text2: rgb(184, 184, 184);
+    --brand: rgb(118, 161, 184);
+    color: white;
+    background-color: #1f1f1f;
+  }
+  
+  #char_deck {
+    margin-top: 10px;
+    font-size: 10px;
+    font-style: italic;
+    line-height: 20px;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+  }
+    
+  #char_deck #audio {
+    height: 20px;
+  }
+  
+  #char_deck #audio .replay-button {
+    margin: 0;
+  }
+  
+  #char_deck #audio .playImage {
+    height: 20px;
+    width: 20px;
+  }
+  
+  @font-face {
+    font-family: "KaiTi";
+    font-style: normal;
+    font-weight: 300;
+    src: url(_KaiTi.ttf);
+  }
+  
+  @font-face {
+    font-family: "MaShanZheng";
+    font-style: normal;
+    font-weight: 300;
+    src: url(_MaShanZheng-Regular.ttf);
+  }
+  
+  @font-face {
+    font-family: "YRDZST";
+    font-style: normal;
+    font-weight: 300;
+    src: url(_YRDZSTSemibold.ttf);
+  }
+  
+  @font-face {
+    font-family: "xxx";
+    font-style: normal;
+    font-weight: 300;
+    src: url(_xxx.ttf);
+  }
+  
+  @font-face {
+    font-family: "yyy";
+    font-style: normal;
+    font-weight: 300;
+    src: url(_yyy.ttf);
+  }
+  
+  /* Windows */
+  .win .char-card {
+    font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
+  }
+  /* macOS */
+  .mac .char-card,
+  .iphone .char-card {
+    font-family: "KaiTi";
+  }
+  /* Linux desktops */
+  .linux:not(.android) .char-card {
+    font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
+  }
+  
+  .text-color1 {
+    font-size: 16px;
+    color: var(--pinyin-color);
+  }
+  
+  .text-color2 {
+    color: var(--traditional-color);
+  }
+  
+  .text-color3 {
+    color: var(--meaning-color);
+  }
+  
+  .text-color4 {
+    font-size: 30px;
+    font-weight: bold;
+    color: var(--simplified-color);
+  }
+  
+  img {
+    border-radius: 2%;
+  }
+  
+  .meaning {
+    text-align: center;
+  }
+  
+  .tone1 {
+    color: #f44336;
+  }
+  
+  .tone2 {
+    color: #ff9800;
+  }
+  
+  .tone3 {
+    color: #4caf50;
+  }
+  
+  .tone4 {
+    color: #2196f3;
+  }
+  
+  .tone5 {
+    color: #555;
+  }
+  
+  /* Text block styling */
+  
+  .meaning-card {
+    text-align: center;
+    padding: 10px;
+  }
+  
+  .meaning {
+    display: block;
+  }
+  
+  /* Character styling */
+  
+  .char,
+  #char_sim,
+  #char_sim_coloured {
+    font-size: 40px;
+  }
+  
+  #back #char_sim {
+    display: none;
+  }
+  
+  #char_sim_coloured {
+    display: none;
+  }
+  
+  #back #char_sim_coloured {
+    display: block;
+  }
+  
+  #char_sim.kaiti,
+  #char_sim_coloured.kaiti,
+  #char_reading.kaiti {
+    font-family: KaiTi;
+  }
+  
+  #char_sim.arial,
+  #char_sim_coloured.arial,
+  #char_reading.arial {
+    font-family: Arial;
+  }
+  
+  #char_sim.roboto,
+  #char_sim_coloured.roboto,
+  #char_reading.roboto {
+    font-family: Roboto;
+  }
+  
+  #char_sim.mashanzheng,
+  #char_sim_coloured.mashanzheng,
+  #char_reading.mashanzheng {
+    font-family: MaShanZheng;
+  }
+  
+  #char_sim.yrdzst,
+  #char_sim_coloured.yrdzst,
+  #char_reading.yrdzst {
+    font-family: YRDZST;
+  }
+  
+  #char_sim.xxx,
+  #char_sim_coloured.xxx,
+  #char_reading.xxx {
+    font-family: xxx;
+  }
+  
+  #char_sim.yyy,
+  #char_sim_coloured.yyy,
+  #char_reading.yyy {
+    font-family: yyy;
+  }
+  
+  /* Pinyin ruby styling */
+  ruby { 
+    ruby-position: over;
+    ruby-align: center; 
+  }
+  
+  /* Characters */
+  ruby > span {
+    font-size: 20px;
+  }
+  
+  /* Pinyin */
+  rt > span {
+    font-family: 'San Francisco', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 7.5px;
+    padding-bottom: 5px;
+  }
+  
+  rt > span,
+  ruby > span {
+    min-width: 25px;
+    display: inline-block;
+    text-align: center;
+  }
+  
+  .header {
+    color: var(--header-color);
+  }
+  
+  .question-sub-text {
+    color: #f44336;
+    font-weight: bold;
+  }
+  
+  .char-tone1 {
+    color: var(--tone-1);
+  }
+  
+  .char-tone2 {
+    color: var(--tone-2);
+  }
+  
+  .char-tone3 {
+    color: var(--tone-3);
+  }
+  
+  .char-tone4 {
+    color: var(--tone-4);
+  }
+  
+  .char-sim-1 {
+    margin: 2px;
+    font-size: 30px;
+  }
+  
+  .char-trad-1 {
+    margin: 2px;
+    font-size: 30px;
+  }
+  
+  .char-pin-1 {
+    margin: 2px;
+    line-height: 32px;
+  }
+  
+  .char-zhy-1 {
+    margin: 2px;
+    line-height: 32px;
+  }
+  
+  small {
+    line-height: 1.5;
+  }
+  
+  hr {
+    border: 0;
+    height: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  
+  /* Material Icon Button */
+  .card {
+    --icon-button-background: #63759d;
+    --icon-button-background-focus: #7d92c2;
+  }
+  
+  /* Material Icon Font */
+  @font-face {
+    font-family: "Material Icons";
+    font-style: normal;
+    font-weight: 300;
+    src: url(_MaterialIcons-Regular.woff2);
+  }
+  
+  .material-icons {
+    font-family: "Material Icons";
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    /* Preferred icon size */
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing: antialiased;
+    /* Support for Safari and Chrome. */
+    text-rendering: optimizeLegibility;
+    /* Support for Firefox. */
+    -moz-osx-font-smoothing: grayscale;
+    /* Support for IE. */
+    font-feature-settings: "liga";
+  }
+  
+  
+  .icon {
+    margin: 3px;
+    position: relative;
+    display: inline-block;
+    color: white;
+    background-color: var(--icon-button-background);
+    width: 2rem;
+    height: 2rem;
+    border-radius: 8px;
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.12),
+      0 1px 2px rgba(0, 0, 0, 0.24);
+    transition: all 0.3s ease;
+  }
+  
+  .icon .material-icons {
+    font-size: 1rem;
+    position: absolute;
+    left: 0.5rem;
+    top: 0.5rem;
+    transition: all 0.3s ease;
+  }
+  
+  .icon:hover,
+  .icon:focus {
+    background-color: var(--icon-button-background-focus);
+  }
+  
+  #char_pinyin,
+  #char_reading {
+    margin-bottom: 20px;
+  }
+  
+  .button-wrapper {
+    margin-bottom: 20px;
+  }
