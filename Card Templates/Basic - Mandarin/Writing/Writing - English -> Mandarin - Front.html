@@ -464,32 +464,26 @@
       ")<br/>";
   }
 
+  // Select TingTing Mandarin, and only do it once
+  var voice = speechSynthesis.getVoices().filter((voice) => {
+    if (voice && voice.lang.indexOf('zh-CN') === 0 && voice.name.toLowerCase() === "tingting") {
+      return true;
+    } else {
+      return false
+    }
+  })[0];
+
   // Browser based text to speech for use with multi character words
   function speak(phrase) {
     if (!window.ankiUtterance) {
       window.ankiUtterance = new SpeechSynthesisUtterance();
       window.ankiUtterance.rate = 0.5;  
       window.ankiUtterance.lang = 'zh'
+      window.ankiUtterance.voice = voice;
     }
     
     var utterance = window.ankiUtterance;
     utterance.text = phrase
-
-    // Select a voice that speaks Mandarin or Taiwanese Mandarin
-    const voices = speechSynthesis.getVoices().filter((voice) => {
-      // Only Tingting sounds good on iOS 18
-      if (voice && voice.name.toLowerCase() === "tingting") return true
-      else return false
-      // Return all zh-TW or zh-CN voices
-//       if (voice.lang.indexOf('zh-TW') === 0) { return false ; }
-//       else if (voice.lang.indexOf('zh-CN') === 0) {return true}
-//       else return false
-    });
-    
-    // Randomly choose one of these voices
-    const voiceIndex = (Math.floor(Math.random() * voices.length))    
-    utterance.voice = voices[voiceIndex];
-    
     speechSynthesis.speak(utterance);
   }
 
