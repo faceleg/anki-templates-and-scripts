@@ -395,24 +395,24 @@ img {
   text-align: center;
 }
 
-.tone1 {
+.tone1, .t1 {
   color: #f44336;
 }
 
-.tone2 {
+.tone2, .t2 {
   color: #ff9800;
 }
 
-.tone3 {
+.tone3, .t3 {
   color: #4caf50;
 }
 
-.tone4 {
+.tone4, .t4 {
   color: #2196f3;
 }
 
-.tone5 {
-  color: #555;
+.tone5, .t5 {
+  color: #fff;
 }
 
 .meaning-card {
