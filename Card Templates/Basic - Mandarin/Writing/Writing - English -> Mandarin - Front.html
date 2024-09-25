@@ -699,20 +699,25 @@
   // *** WhichRenderer wrapper ***
   var WHICH_RENDERER_KEY = 'renderer'
   var WhichRenderer = {
-    _renderer: UniqueCardPersistence.getItem(WHICH_RENDERER_KEY) || 'canvas',
     getRenderer: function() {
-      return WhichRenderer._renderer;
+      const renderer = UniqueCardPersistence.getItem(WHICH_RENDERER_KEY);
+      // Return canvas if the stored value is not svg or canvas
+      if (renderer === 'svg' || renderer === 'canvas') {
+        return renderer;
+      }
+
+      return 'canvas'
     },
     switchRenderer: function() {
+      let newRenderer = ''
       if (WhichRenderer.isCanvas()) {
-        WhichRenderer._renderer = 'svg'
+        UniqueCardPersistence.setItem(WHICH_RENDERER_KEY, 'svg');
       } else {
-        WhichRenderer._renderer = 'canvas'
+        UniqueCardPersistence.setItem(WHICH_RENDERER_KEY, 'canvas');
       }
-      UniqueCardPersistence.setItem(WHICH_RENDERER_KEY, WhichRenderer.getRenderer());
     },
     isCanvas: function() {
-      return WhichRenderer._renderer === 'canvas';
+      return WhichRenderer.getRenderer();;
     }
   }
 
