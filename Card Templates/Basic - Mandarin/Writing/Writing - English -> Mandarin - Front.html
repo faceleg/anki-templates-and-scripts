@@ -478,6 +478,7 @@
     if (!window.ankiUtterance) {
       window.ankiUtterance = new SpeechSynthesisUtterance();
       window.ankiUtterance.rate = 0.5;  
+      window.ankiUtterance.volume = 0.5;  
       window.ankiUtterance.lang = 'zh'
       window.ankiUtterance.voice = voice;
     }
@@ -700,13 +701,15 @@
   var WHICH_RENDERER_KEY = 'renderer'
   var WhichRenderer = {
     getRenderer: function() {
-      const renderer = UniqueCardPersistence.getItem(WHICH_RENDERER_KEY);
-      // Return canvas if the stored value is not svg or canvas
-      if (renderer === 'svg' || renderer === 'canvas') {
-        return renderer;
-      }
+      // I only ever want to use canvas
+      return 'canvas';
+      // const renderer = UniqueCardPersistence.getItem(WHICH_RENDERER_KEY);
+      // // Return canvas if the stored value is not svg or canvas
+      // if (renderer === 'svg' || renderer === 'canvas') {
+      //   return renderer;
+      // }
 
-      return 'canvas'
+      // return 'canvas'
     },
     switchRenderer: function() {
       let newRenderer = ''
