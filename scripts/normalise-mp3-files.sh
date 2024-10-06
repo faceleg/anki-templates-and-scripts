@@ -6,6 +6,7 @@
 # cd to the working directory
 # execute this file
 # copy mp3 files back into the anki folder
+# find . -name '*.mp3'  -exec mv "{}" ~/Library/Application Support/Anki2/<profile>/collection.media/ \;
 
 # Find all MP3 files and process them in batches
 find . -name "*.mp3" | while read -r file; do
