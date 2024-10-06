@@ -44,11 +44,22 @@
 
 <div class="spacer"></div>
 
+<div id="translation" class="translation">{{English}}</div>
+
+<div class="spacer"></div>
+
 <div id="no-touch-wrapper" class="tappable">
-    <div id="dash"></div>
+
+    <div class="free_text_wrapper"><textarea id="free_text"></textarea></div>
+
+    <div id="dash" style="display:none"></div>
+
+    <div style="display:none">
+
     ______
     <div class="spacerSmall"></div>
-    <div id="container"></div>
+</div>
+<div id="container"></div>
 </div>
 <div class="spacer"></div>
 <button class="btn-check" onclick="check();">CHECK</button>
@@ -64,7 +75,7 @@
 <!-- <div class="spacerSmall"></div> -->
 <div id="pinyin" class="pinyin" style="display:none">{{Pinyin}}</div>
 <div class="spacerMedium"></div>
-<div id="translation" class="translation">{{English}}</div>
+
 <div class="spacer"></div>
 <div id="usedfor" class="notes" style="display:none">{{Used For}}</div>
 <script type="text/javascript">
@@ -75,7 +86,7 @@
     const noTouchWrapper = document.getElementById('no-touch-wrapper');
 
     if (noTouchWrapper) {
-        const allowedSelectors = ['button', '#container > div', '#dash > div'];
+        const allowedSelectors = ['button', '#container > div', '#dash > div', '.free_text_wrapper'];
 
         function isAllowedTarget(target) {
             return allowedSelectors.some(selector => {
@@ -121,64 +132,23 @@
     sentenceArray.forEach((word, index) => {
         // Generate a unique ID using the word and its index
         const uniqueId = `btn${index}`;
-        buttonHTML += `<div class='btn-q' id='${uniqueId}' onclick='btnClick("${uniqueId}")'>${word}</div>`;
+        buttonHTML += `<div class='btn-q' id='${uniqueId}'>${word}</div>`;
     });
 
-    // Add buttons to the container
-    document.getElementById("container").innerHTML = buttonHTML;
+    document.getElementById('container').innerHTML = buttonHTML;
 
-    let picked = 0;
 
-    // Handle clicks on buttons
-    window.btnClick = function(clickedId) {
-        const clickedElement = document.getElementById(clickedId);
-        const text = clickedElement.innerText;
 
-        // Create a new dash element and append it
-        const dashElement = document.createElement("div");
-        dashElement.style.display = "inline";
-        const dashId = `dash${picked}`;
-        dashElement.innerHTML = `<span class='btn-a' id='${dashId}' onclick='dashClick("${dashId}")'>${text}</span>`;
-        document.getElementById("dash").appendChild(dashElement);
-
-        // Mark the clicked button as used
-        picked++;
-        clickedElement.style.opacity = "0.2";
-        clickedElement.style.pointerEvents = "none";
-    };
-
-    // Handle clicks on dash elements
-    window.dashClick = function(clickedId) {
-        const clickedElement = document.getElementById(clickedId);
-        const clickedText = clickedElement.innerText.trim();
-        const buttons = document.getElementsByClassName("btn-q");
-
-        // Re-enable the corresponding button
-        for (let button of buttons) {
-            if (button.innerText.trim() === clickedText && button.style.pointerEvents === "none") {
-                button.style.opacity = "1";
-                button.style.pointerEvents = "auto";
-                break;
-            }
-        }
-
-        // Remove the dash element
-        clickedElement.remove();
-    };
-
-    // Check if the current dash matches the original sentence
+    // Check if the current text matches the original sentence
     window.check = function() {
-        const dashElements = document.getElementById("dash").childNodes;
-        let assembledText = Array.from(dashElements)
-            .map(element => element.innerText)
-            .join('')
-            .replace(/\s+/g, '');
         
+        const freeText = document.getElementById("free_text").value.replace(/\s+/g, '');
 
         const originalText = splitSentElement.innerText
             .replace(/\s+/g, '');
 
-        const isCorrect = assembledText === originalText;
+
+        const isCorrect = freeText === originalText;
 
         document.getElementById("correct").innerText = isCorrect ? "CORRECT" : "INCORRECT";
         document.getElementById("correct").style.color = isCorrect ? "green" : "red";
@@ -195,14 +165,9 @@
     // Reset the game state
     window.reset = function() {
         hintTapCount = 0;
-        const buttons = document.getElementsByClassName("btn-q");
-        for (let button of buttons) {
-            button.style.opacity = "1";
-            button.style.pointerEvents = "auto";
-        }
 
-        document.getElementById("dash").innerHTML = "";
         document.getElementById("correct").innerText = "";
+        document.getElementById("free_text").value = "";
 
         ["chinese", "pinyin", "structure", "usedfor"].forEach(id => {
             document.getElementById(id).style.display = "none";
@@ -218,14 +183,4 @@
         }
     };
 })();
-</script>
-<script>
-    (() => {
-        var container = document.getElementById("container");
-        var dash = document.getElementById("dash");
-        if (container && dash) {
-            var containerHeight = container.offsetHeight;
-            dash.style.height = containerHeight + "px";
-        }
-    })();
 </script>
