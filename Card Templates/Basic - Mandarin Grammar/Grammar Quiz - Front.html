@@ -1,3 +1,6 @@
+<!-- NOTE: 
+To turn off "undo" confirmation popup when shaking to undo card "done" state:
+Toggle "shake to undo" off in accessibility settings of ios -->
 <div
     id="debug-message-console"
     style="
@@ -50,12 +53,13 @@
 
 <div id="no-touch-wrapper" class="tappable">
 
-    <div class="free_text_wrapper"><textarea id="free_text"></textarea></div>
+    <div id="free_text_wrapper_id" class="free_text_wrapper">
+        <textarea id="free_text"></textarea>
+    </div>
 
     <div id="dash" style="display:none"></div>
 
     <div style="display:none">
-
     ______
     <div class="spacerSmall"></div>
 </div>
@@ -78,6 +82,7 @@
 
 <div class="spacer"></div>
 <div id="usedfor" class="notes" style="display:none">{{Used For}}</div>
+
 <script type="text/javascript">
 /**
  * Stop skipping to next card on misclicks around buttons or interactive components
