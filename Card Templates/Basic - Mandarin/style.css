@@ -31,8 +31,14 @@
   max-height: 200px;
 }
 
-.char_example {
+.char_example,
+.char_examples_blank {
   line-height: 1.8;
+}
+
+
+.char_example_blank {
+	letter-spacing: 2px;
 }
 
 .card {
@@ -95,6 +101,7 @@
 .char-card {
   font-size: 3em;
 }
+
 
 #char_deck {
   margin-top: 10px;

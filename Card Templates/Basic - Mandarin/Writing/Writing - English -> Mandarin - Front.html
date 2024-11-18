@@ -95,6 +95,8 @@
 <!-- Placeholder to stop crashing because I can't be bothered sorting out the show/hide JS for this section -->
 <div id="char_examples-parts-of-speech"></div>
 <div id="char_examples">{{Examples}}</div>
+<div id="char_examples_blank">{{ExamplesBlank}}</div>
+
 <div id="char_deck">
   <div class="deck-information">
     <span
@@ -478,7 +480,7 @@
     if (!window.ankiUtterance) {
       window.ankiUtterance = new SpeechSynthesisUtterance();
       window.ankiUtterance.rate = 0.5;  
-      window.ankiUtterance.volume = 0.5;  
+      window.ankiUtterance.volume = 0.75;  
       window.ankiUtterance.lang = 'zh'
       window.ankiUtterance.voice = voice;
     }
@@ -1159,6 +1161,9 @@ function delayedCallback(callback, delay) {
       drawGrid.style.display = "block";
       drawGrid.style.whiteSpace = "nowrap";
       drawGrid.style.overflow = "scroll";
+
+document.getElementById("char_examples").style.display = "block";
+
     }
 
     for (

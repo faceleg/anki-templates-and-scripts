@@ -1,6 +1,12 @@
 <div id="back">{{FrontSide}}</div>
 
 <script type="text/javascript">
+
+document.querySelectorAll('.char_examples_blank').forEach(function(element) {
+    element.style.display = 'none';
+});
+
+
   function playAudio() {
     var audioDiv = document.getElementById("audio");
     var audio = audioDiv.getElementsByTagName("*");
@@ -135,7 +141,7 @@
       return;
     }
     var decodedTones = decodePinyin(pinyinElement.textContent);
-    recolorPinyin(pinyinElement, decodedTones);
+    // recolorPinyin(pinyinElement, decodedTones);
 
     var hanziElement = document.getElementById("char_sim");
     if (hanziElement) {
@@ -158,4 +164,7 @@
   }
 
   applyColorization();
+
+document.getElementById("char_examples").style.display = "block";
+
 </script>
