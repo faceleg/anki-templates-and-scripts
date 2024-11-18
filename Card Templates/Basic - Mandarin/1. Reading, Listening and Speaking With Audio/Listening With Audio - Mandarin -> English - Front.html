@@ -1,4 +1,13 @@
 <div id="listening-with-audio">
     <div id="audio">{{ Audio }}</div>
     <div id="char_examples_blank">{{ExamplesBlank}}</div>
-</div>;
+</div>
+
+<script type="text/javascript">
+    const elements = document.querySelectorAll('.char_examples-parts-of-speech');
+    
+    // Loop through each element and hide it
+    elements.forEach(element => {
+      element.style.display = 'none';
+    });
+</script>
