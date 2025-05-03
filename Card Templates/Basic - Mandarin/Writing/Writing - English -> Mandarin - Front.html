@@ -477,15 +477,12 @@
 
   // Browser based text to speech for use with multi character words
   function speak(phrase) {
-    //if (!window.ankiUtterance) {
-      var ankiUtterance = new SpeechSynthesisUtterance();
-      ankiUtterance.rate = 0.5;  
-      ankiUtterance.volume = 0.75;  
-      ankiUtterance.lang = 'zh'
-      ankiUtterance.voice = voice;
-    //}
+    var ankiUtterance = new SpeechSynthesisUtterance();
+    ankiUtterance.rate = 0.5;  
+    ankiUtterance.volume = 0.75;  
+    ankiUtterance.lang = 'zh'
+    ankiUtterance.voice = voice;
     
-    //var utterance = window.ankiUtterance;
     ankiUtterance.text = phrase
     speechSynthesis.speak(ankiUtterance);
   }
@@ -1134,10 +1131,27 @@ function delayedCallback(callback, delay) {
   var strokeWidth = document.getElementById("stroke-size").value;
   var strokeAfterMisses = document.getElementById("hint-miss").value;
 
-  function playAudio() {
+  /**
+   *  options = { isFirstShowing: boolean }
+   */
+  function playAudio(options = {}) {
     var audioDiv = document.getElementById("audio");
     var audio = audioDiv.getElementsByTagName("*");
-    audio[0].tagName == "AUDIO" ? audio[0].play() : audio[0].click();
+
+    // If the card has audio, play it
+    if (audio[0]) {
+
+      // If there is an audio tag and this is the first showing, do not play
+      // Anki will play this automatically
+      if (isFirstShowing) {
+        return;
+      }
+      audio[0].tagName == "AUDIO" ? audio[0].play() : audio[0].click();
+      return;
+    }
+
+    // If not, speak using text to speech
+    speak(getCharactersToDraw());
   }
 
   document.getElementById("btnPlayAudio").onclick = function () {
@@ -1682,6 +1696,7 @@ var colorCodes = {
     }
   }
 
+  playAudio({ isFirstShowing: true })
   applyColorization();
 
 </script>
