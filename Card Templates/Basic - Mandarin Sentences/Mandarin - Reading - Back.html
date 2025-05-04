@@ -21,20 +21,20 @@
   // Hide lesson info if there is none
 var elements = document.querySelectorAll('.lessonInfoHanzi');
     
-elements.forEach(function(element) {
-    if (element.textContent.trim() === "") {
-      document.querySelectorAll('.lessonInfo').forEach(function(lessonInfoElement) {
-        lessonInfoElement.style.display = 'none';
-      })
-    }
-});
+    elements.forEach(function(element) {
+        if (element.textContent.trim() === "") {
+          document.querySelectorAll('.lessonInfo').forEach(function(lessonInfoElement) {
+            lessonInfoElement.style.display = 'none';
+          })
+        }
+    });
 
   var colorCodes = {
     1: "#f44336",
     2: "#ff9800",
     3: "#4caf50",
     4: "#2196f3",
-    5: "#555",
+    5: "#fff",
   };
 
   function decodePinyin(pinyin) {
@@ -203,7 +203,7 @@ elements.forEach(function(element) {
         "kaiti",
         "arial",
         "roboto",
-                "mashanzheng",
+        "mashanzheng",
         "yrdzst",
         "xxx",
         "yyy"

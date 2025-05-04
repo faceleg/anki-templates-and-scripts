@@ -36,7 +36,7 @@ var colorCodes = {
     2: "#ff9800",
     3: "#4caf50",
     4: "#2196f3",
-    5: "#555",
+    5: "#ffffff",
 };
 
 function decodePinyin(pinyin) {
@@ -126,7 +126,7 @@ function recolorPinyin(pinyinElement, decodedTones) {
 
     pinyinElement.innerHTML = coloredPinyin;
   }
-  
+
 function isChineseCharacter(char) {
     return /^[\u4e00-\u9fff]$/.test(char);
 }
