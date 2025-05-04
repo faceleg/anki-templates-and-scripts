@@ -21,13 +21,13 @@
   // Hide lesson info if there is none
 var elements = document.querySelectorAll('.lessonInfoHanzi');
     
-    elements.forEach(function(element) {
-        if (element.textContent.trim() === "") {
-          document.querySelectorAll('.lessonInfo').forEach(function(lessonInfoElement) {
-            lessonInfoElement.style.display = 'none';
-          })
-        }
-    });
+elements.forEach(function(element) {
+    if (element.textContent.trim() === "") {
+      document.querySelectorAll('.lessonInfo').forEach(function(lessonInfoElement) {
+        lessonInfoElement.style.display = 'none';
+      })
+    }
+});
 
   var colorCodes = {
     1: "#f44336",

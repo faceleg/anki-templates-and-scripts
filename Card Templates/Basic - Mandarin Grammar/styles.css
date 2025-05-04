@@ -29,12 +29,12 @@
 
 .chinese {
   font-size: 2.2rem;
-  color: #fba910;
+  /* color: #fba910; */
 }
 
 .pinyin {
   font-size: 1rem;
-  color: #27b46e;
+  /* color: #27b46e; */
 }
 
 .translation {
