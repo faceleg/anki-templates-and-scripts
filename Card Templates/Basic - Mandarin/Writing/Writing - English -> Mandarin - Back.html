@@ -15,33 +15,11 @@ document.querySelectorAll('.char_examples_blank').forEach(function(element) {
     }
   })[0];
 
-  // Browser based text to speech for use with multi character words
-  function speak(phrase) {
-    var ankiUtterance = new SpeechSynthesisUtterance();
-    ankiUtterance.rate = 0.5;  
-    ankiUtterance.volume = 0.75;  
-    ankiUtterance.lang = 'zh'
-    ankiUtterance.voice = voice;
-    
-    ankiUtterance.text = phrase
-    speechSynthesis.speak(ankiUtterance);
-  }
-
   function playAudio() {
     var audioDiv = document.getElementById("audio");
     var audio = audioDiv.getElementsByTagName("*");
-
-    // If the card has audio, play it
-    if (audio[0]) {
-      audio[0].tagName == "AUDIO" ? audio[0].play() : audio[0].click();
-    } else {
-
-      // If not, speak using text to speech
-      speak(getCharactersToDraw());
-    }
+    audio[0].tagName == "AUDIO" ? audio[0].play() : audio[0].click();
   }
-
-  playAudio();
 
   var colorCodes = {
     1: "#f44336",
