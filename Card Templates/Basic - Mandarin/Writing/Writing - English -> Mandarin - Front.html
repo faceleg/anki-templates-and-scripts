@@ -466,6 +466,18 @@
       ")<br/>";
   }
 
+  // Global error handler
+  window.onerror = function (message, source, lineno, colno, error) {
+    const errorMessage = `
+      Error: ${error?.name || "Unknown Error"}
+      Message: ${message}
+      Source: ${source}
+      Line: ${lineno}, Column: ${colno}
+      Description: ${error?.message || "No description available"}
+    `;
+    printDebugMessage(errorMessage);
+  };
+
   // Select TingTing Mandarin, and only do it once
   var voice = speechSynthesis.getVoices().filter((voice) => {
     if (voice && voice.lang.indexOf('zh-CN') === 0 && voice.name.toLowerCase() === "tingting") {
