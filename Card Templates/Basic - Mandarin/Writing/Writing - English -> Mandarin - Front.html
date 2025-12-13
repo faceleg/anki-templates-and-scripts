@@ -440,6 +440,9 @@
 
 <script type="text/javascript">
   var DEBUG = true;
+  var activeTimers = [];
+  var quizFinished = false;
+
 
   function millisecondsSinceTimestamp(previousTimestamp) {
     // Get the current timestamp in milliseconds
@@ -833,19 +836,28 @@
   // *** setTimeout wrapper that cancels the callback if visibility change happens
   window.currentCharacter = document.getElementById('char_sim').textContent.trim(); // Get the content of the element with id "char_sim"
 
-function delayedCallback(callback, delay) {
-  const currentCharacter = document.getElementById('char_sim').textContent.trim(); // Get the content of the element with id "char_sim"
+  function delayedCallback(callback, delay) { 
 
-  const timer = setTimeout(() => {
-	// Check if the currentCharacter has changed since the setTimeout was called
-	if (window.currentCharacter !== currentCharacter) {
-	  clearTimeout(timer); // Cancel the timeout
-	  // printDebugMessage("Callback canceled due to character change.");
-	} else {
-	  callback(); // Execute the callback if currentCharacter hasn't changed
-	}
-  }, delay);
-}
+    const currentCharacter = document.getElementById('char_sim').textContent.trim(); // Get the content of the element with id "char_sim"
+
+    const timer = setTimeout(() => {
+      if (quizFinished) {
+        // printDebugMessage('Cancelled delayed callback due to quiz being finished');
+        return;
+      }
+
+      // Check if the currentCharacter has changed since the setTimeout was called
+      if (window.currentCharacter !== currentCharacter) {
+        clearTimeout(timer); // Cancel the timeout
+        // printDebugMessage("Callback canceled due to character change.");
+      } else {
+        callback(); // Execute the callback if currentCharacter hasn't changed
+        activeTimers = activeTimers.filter(t => t !== timer);
+      }
+    }, delay);
+    activeTimers.push(timer);
+    return timer;
+  }
 
   // *** setTimeout wrapper that cancels the callback if visibility change happens
 
@@ -1258,6 +1270,8 @@ function delayedCallback(callback, delay) {
   }
 
   function doPractice(p = false) {
+    quizFinished = false;
+
     document.getElementById('which-renderer').innerHTML = ` (renderer: ${WhichRenderer.getRenderer()})`
     if (document.getElementById("back")) {
       generateHanziOnFinishQuiz("unset", true);
@@ -1492,10 +1506,18 @@ function delayedCallback(callback, delay) {
     }
   }
 
+  function cancelAllDelayedCallbacks() {
+    printDebugMessage(`Cancelling ${activeTimers.length} delayed callbacks`);
+    activeTimers.forEach(timer => clearTimeout(timer));
+    activeTimers = [];
+    quizFinished = true;
+  }
+
   /**
    * Finish the quiz if this is the last character.
    */
   function onFinishQuiz(characterElementsIndex, characterElementsLength) {
+
     WritingFeedbackManager.showFinalFeedbackForCharacter();
 
     if (characterElementsIndex != characterElementsLength - 1) {
@@ -1503,6 +1525,9 @@ function delayedCallback(callback, delay) {
       speak(getCharactersToDraw()[characterElementsIndex + 1])
       return;
     }
+
+    cancelAllDelayedCallbacks();
+    quizFinished = true;
 
     // If the last character element is reached:
     if (characterElementsIndex + 1 == characterElementsLength) {
