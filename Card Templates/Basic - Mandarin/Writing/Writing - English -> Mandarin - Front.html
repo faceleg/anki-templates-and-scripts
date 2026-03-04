@@ -373,7 +373,9 @@ var Quiz = (function () {
       parts.push(_mistakesThisChar === 1 ? "1 mistake for this character"
         : _mistakesThisChar + " mistakes for this character");
     }
-    if (_totalMistakes > 0) {
+    if (_totalMistakes === 0) {
+      parts.push("no mistakes for this quiz");
+    } else {
       parts.push(_totalMistakes === 1 ? "1 mistake for the quiz"
         : _totalMistakes + " mistakes for the quiz");
     }
@@ -381,13 +383,13 @@ var Quiz = (function () {
     var mistakes = document.getElementById("writing-feedback-mistakes");
     if (fb && mistakes) {
       mistakes.innerHTML = parts.join("<br/>");
-      fb.style.display = parts.length ? "block" : "none";
+      fb.style.display = "block";
     }
   }
 
   var RATING_COLORS = {
-    easy: "#4caf50",
-    good: "#2196f3",
+    easy: "#2196f3",
+    good: "#4caf50",
     hard: "#ff9800",
     again: "#f44336",
   };
@@ -528,7 +530,7 @@ var Quiz = (function () {
 
       onMistake: function (data) {
         if (!guard()) return;
-        _mistakesThisChar = data.mistakesOnStroke;
+        _mistakesThisChar++;
         _totalMistakes++;
         _weightedMistakeScore += 1 / (data.strokeNum + 1);
         _updateFeedback();
@@ -537,7 +539,6 @@ var Quiz = (function () {
 
       onCorrectStroke: function (data) {
         if (!guard()) return;
-        _mistakesThisChar = data.mistakesOnStroke;
         _nextStrokeIndex = data.strokeNum + 1;
         _updateFeedback();
       },
@@ -622,9 +623,6 @@ var Quiz = (function () {
       debugLog("Quiz.start: characters='" + characters + "' length=" + characters.length);
       _characters = characters.split("");
 
-      var feedback = document.getElementById("writing-feedback");
-      if (feedback) feedback.style.display = "none";
-
       _updateLoadStatus(null);
 
       if (document.getElementById("back")) {
@@ -633,6 +631,9 @@ var Quiz = (function () {
         document.getElementById("char_examples_blank").style.display = "none";
         return;
       }
+
+      _updateFeedback();
+      _updateRatingIndicator();
 
       document.getElementById("char_examples").style.display = "none";
       document.getElementById("char_examples_blank").style.display = "block";
