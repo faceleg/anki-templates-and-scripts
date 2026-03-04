@@ -79,7 +79,7 @@
         <div class="icon">
             <i class="material-icons">navigate_next</i>
         </div>
-    </a>  
+    </a>
     <a class="btn" id="btnSwitchRenderer">
         <div class="icon">
             <i class="material-icons">draw_abstract</i>
@@ -299,10 +299,9 @@
         <fieldset>
             <div class="fieldset-item fs-item-1">
                 <div class="input-stack">
-                    <label for="draw-size" id="text-draw-size" aria-hidden="true"
-                    >
-                        <small>Grid size</small></label
-          >
+                    <label for="draw-size" id="text-draw-size" aria-hidden="true">
+                        <small>Grid size</small>
+                    </label>
                 </div>
                 <input
                     class="tappable"
@@ -318,10 +317,9 @@
             </div>
             <div class="fieldset-item fs-item-1">
                 <div class="input-stack">
-                    <label for="stroke-size" id="text-stroke-size" aria-hidden="true"
-                    >
-                        <small>Stroke width</small></label
-          >
+                    <label for="stroke-size" id="text-stroke-size" aria-hidden="true">
+                        <small>Stroke width</small>
+                    </label>
                 </div>
                 <input
                     class="tappable"
@@ -337,10 +335,9 @@
             </div>
             <div class="fieldset-item fs-item-1">
                 <div class="input-stack">
-                    <label for="hint-miss" id="text-hint-miss" aria-hidden="true"
-                    >
-                        <small>Hint after misses</small></label
-          >
+                    <label for="hint-miss" id="text-hint-miss" aria-hidden="true">
+                        <small>Hint after misses</small>
+                    </label>
                 </div>
                 <input
                     class="tappable"
@@ -360,9 +357,7 @@
         <fieldset>
             <a href="https://github.com/krmanik/Anki-xiehanzi">
                 <div class="fieldset-item tappable">
-                    <span style="font-size: 14px; text-align: center"
-                    >View it on GitHub</span
-          >
+                    <span style="font-size: 14px; text-align: center">View it on GitHub</span>
                 </div>
             </a>
         </fieldset>
@@ -439,234 +434,81 @@
 </script>
 
 <script type="text/javascript">
-  var DEBUG = true;
-  var activeTimers = [];
-  var quizFinished = false;
+"use strict";
 
+// ---------------------------------------------------------------------------
+// AudioManager
+// Handles TTS. Voices are loaded lazily since speechSynthesis.getVoices() is
+// async in most browsers/WebViews and returns [] when called synchronously.
+// ---------------------------------------------------------------------------
+var AudioManager = (function () {
+  var _voice = null;
+  var _voicesLoaded = false;
 
-  function millisecondsSinceTimestamp(previousTimestamp) {
-    // Get the current timestamp in milliseconds
-    const currentTimestamp = Date.now();
-
-    // Calculate the difference between current and previous timestamps
-    const differenceMilliseconds = currentTimestamp - previousTimestamp;
-
-    return differenceMilliseconds;
+  function _findVoice() {
+    var voices = speechSynthesis.getVoices();
+    // Prefer TingTing (zh-CN), fall back to any zh voice
+    return (
+      voices.find(function (v) {
+        return v.lang.indexOf("zh-CN") === 0 && v.name.toLowerCase() === "tingting";
+      }) ||
+      voices.find(function (v) {
+        return v.lang.indexOf("zh") === 0;
+      }) ||
+      null
+    );
   }
 
-  var loadStartedTimestamp = Date.now();
-
-  // Set this to true to make the messenger appear with your messages
-  function printDebugMessage(message) {
-    var messageDiv = document.getElementById("debug-message-console");
-
-    messageDiv.style.display = DEBUG ? "block" : "none";
-
-    messageDiv.innerHTML +=
-      message +
-      " (" +
-      millisecondsSinceTimestamp(loadStartedTimestamp) +
-      ")<br/>";
+  // Load voices eagerly if already available, otherwise wait for the event.
+  function _loadVoices() {
+    _voice = _findVoice();
+    _voicesLoaded = true;
   }
 
-  // Global error handler
-  window.onerror = function (message, source, lineno, colno, error) {
-    const errorMessage = `
-      Error: ${error?.name || "Unknown Error"}
-      Message: ${message}
-      Source: ${source}
-      Line: ${lineno}, Column: ${colno}
-      Description: ${error?.message || "No description available"}
-    `;
-    printDebugMessage(errorMessage);
-  };
+  if (speechSynthesis.getVoices().length > 0) {
+    _loadVoices();
+  } else {
+    speechSynthesis.addEventListener("voiceschanged", function onVoicesChanged() {
+      _loadVoices();
+      speechSynthesis.removeEventListener("voiceschanged", onVoicesChanged);
+    });
+  }
 
-  // Select TingTing Mandarin, and only do it once
-  var voice = speechSynthesis.getVoices().filter((voice) => {
-    if (voice && voice.lang.indexOf('zh-CN') === 0 && voice.name.toLowerCase() === "tingting") {
-      return true;
-    } else {
-      return false
-    }
-  })[0];
-
-  // Browser based text to speech for use with multi character words
   function speak(phrase) {
-    var ankiUtterance = new SpeechSynthesisUtterance();
-    ankiUtterance.rate = 0.5;  
-    ankiUtterance.volume = 0.75;  
-    ankiUtterance.lang = 'zh'
-    ankiUtterance.voice = voice;
-    
-    ankiUtterance.text = phrase
-    speechSynthesis.speak(ankiUtterance);
+    if (!phrase) return;
+    // Ensure voices are resolved before speaking
+    if (!_voicesLoaded) {
+      _voice = _findVoice();
+      _voicesLoaded = true;
+    }
+    var utterance = new SpeechSynthesisUtterance();
+    utterance.rate = 0.5;
+    utterance.volume = 0.75;
+    utterance.lang = "zh";
+    if (_voice) utterance.voice = _voice;
+    utterance.text = phrase;
+    speechSynthesis.speak(utterance);
   }
 
-  // *** Side management ***
-
-  /**
-   * Manages the active side.
-   * @returns {Object} An object containing functions to get and set the active side.
-   */
-  var ActiveSideManager = (function () {
-    let frontBack = "front";
-
-    /**
-     * Returns the active side.
-     * @returns {string} The active side ("front" or "back").
-     */
-    function getActiveSide() {
-      return frontBack;
-    }
-
-    /**
-     * Sets the active side and updates the interface accordingly.
-     * @param {string} side - The side to set as active ("text-front" or "text-back").
-     * @returns {void}
-     */
-    function setActive(side) {
-      if (side === "text-front") {
-        frontBack = "front";
-        document.getElementById("text-front").classList.add("btn-active");
-        document.getElementById("text-back").classList.remove("btn-active");
-      }
-      if (side === "text-back") {
-        frontBack = "back";
-        document.getElementById("text-front").classList.remove("btn-active");
-        document.getElementById("text-back").classList.add("btn-active");
-      }
-      initSwitchPrefs();
-    }
-
-    // Expose functions
-    return {
-      getActiveSide,
-      setActive,
-    };
-  })();
-
-  /**
-   * Helper function for onclick attributes. Sets the active side and updates the interface accordingly.
-   * @param {string} side - The side to set as active ("text-front" or "text-back").
-   * @returns {void}
-   */
-  function setActive(side) {
-    ActiveSideManager.setActive(side);
+  function playAnkiAudio() {
+    var audioDiv = document.getElementById("audio");
+    if (!audioDiv) return;
+    var els = audioDiv.getElementsByTagName("*");
+    if (!els.length) return;
+    els[0].tagName === "AUDIO" ? els[0].play() : els[0].click();
   }
 
-  // *** Side management end
+  return { speak: speak, playAnkiAudio: playAnkiAudio };
+})();
 
-  // *** Colour mananagement ***
+// ---------------------------------------------------------------------------
+// Prefs
+// Wraps anki-persistence with typed get/set and sensible defaults.
+// ---------------------------------------------------------------------------
+var Prefs = (function () {
+  var KEY_PREFIX = "basic-mandarin-writing";
 
-  // Change color
-  var stroke_color = "#555";
-  var outline_color = "#DDD";
-  var drawing_color = "#333";
-
-  if (document.body.classList.contains("night_mode")) {
-    stroke_color = "#ffffff";
-    outline_color = "#5B5B5B";
-    drawing_color = "#fff";
-  }
-
-  var colorCodes = {
-    1: "#f44336",
-    2: "#ff9800",
-    3: "#4caf50",
-    4: "#2196f3",
-    5: document.body.classList.contains("night_mode") ? "#fff" : "#555",
-  };
-
-  function decodePinyin(pinyin) {
-    var coreVowels = ["a", "e", "i", "o", "u", "ü", "v"];
-    var tonesArr = [];
-    var buffer = [];
-
-    function isCore(char, charPrevTwo, charNext) {
-      if (
-        char === "r" &&
-        (charNext === " " || charNext === "") &&
-        charPrevTwo !== " " &&
-        charPrevTwo !== ""
-      ) {
-        return [true, true];
-      }
-      char = char
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase();
-      for (var i = 0; i < coreVowels.length; i++) {
-        if (char === coreVowels[i]) {
-          return [true, false];
-        }
-      }
-      return [false, false];
-    }
-
-    function getToneNumberFromPinyinWithMacron(str) {
-      var pure = str.replace(/a|e|i|o|u|ü|r/g, "");
-      if (pure === "") {
-        return 5;
-      } else if (["ā", "ē", "ī", "ō", "ū", "ǖ", "v̄"].indexOf(pure) !== -1) {
-        return 1;
-      } else if (["á", "é", "í", "ó", "ú", "ǘ", "v́"].indexOf(pure) !== -1) {
-        return 2;
-      } else if (["ǎ", "ě", "ǐ", "ǒ", "ǔ", "ǚ", "v̌"].indexOf(pure) !== -1) {
-        return 3;
-      } else if (["à", "è", "ì", "ò", "ù", "ǜ", "v̀"].indexOf(pure) !== -1) {
-        return 4;
-      } else {
-        return 4; // Probably 绿 with v̀
-      }
-    }
-
-    function flush() {
-      if (buffer.length > 0) {
-        tonesArr.push(getToneNumberFromPinyinWithMacron(buffer.join("")));
-        buffer = [];
-      }
-    }
-
-    for (var i = 0; i < pinyin.length; i++) {
-      var result = isCore(pinyin[i], pinyin[i - 2], pinyin[i + 1]);
-      if (result[1]) {
-        flush();
-      }
-      if (result[0]) {
-        buffer.push(pinyin[i]);
-      } else {
-        flush();
-      }
-    }
-
-    if (buffer.length > 0) {
-      tonesArr.push(getToneNumberFromPinyinWithMacron(buffer.join("")));
-    }
-
-    return tonesArr;
-  }
-  var decodedPinyin = decodePinyin(
-    getPinyinString()
-  );
-
-  function getPinyinString() {
-    return document.getElementById("char_pinyin").innerText
-  }
-
-  function getPinyinAtIndex(index) {
-    return getPinyinString().split(' ')[index];
-  }
-
-  function getToneColor(characterIndex) {
-    return colorCodes[decodedPinyin[characterElementsIndex]];
-  }
-
-  // *** Colour mananagement end ***
-
-  // *** Default preferences ***
-
-  // Default switch item values
-  var switchObject = {
+  var DEFAULTS = {
     "text-pinyin": true,
     "text-zhuyin": false,
     "text-meaning": true,
@@ -677,1044 +519,770 @@
     "text-grid": true,
     "text-outline": false,
     "text-stroke-color": true,
+    "draw-size": 400,
+    "stroke-size": 64,
+    "hint-miss": 5,
+    "reading-practice-select": 0,
+    side: "front",
   };
 
-  function getSwitchIds() {
-    return Object.keys(switchObject);
+  function _key(id) {
+    return KEY_PREFIX + get("side") + id;
   }
-  // *** Default preferences end ***
 
-  // *** Persistence wrapper ***
-
-  var keyPrefix = "basic-mandarin-writing";
-  var UniqueCardPersistence = {
-    getKey: function (key) {
-      return keyPrefix + ActiveSideManager.getActiveSide() + key;
-    },
-    getItem: function (key) {
-      var item = Persistence.getItem(UniqueCardPersistence.getKey(key));
-      // If no item for the key, return the default
-      if (!item) {
-        return switchObject[key];
-      }
-      return item;
-    },
-    setItem: function (key, value) {
-      if (value === 'true') {
-        value = true;
-      } else if (value === 'false') {
-        value = false;
-      }
-      return Persistence.setItem(UniqueCardPersistence.getKey(key), value);
-    },
-  };
-
-  // *** Persistence wrapper end ***
-
-  // *** WhichRenderer wrapper ***
-  var WHICH_RENDERER_KEY = 'renderer'
-  var WhichRenderer = {
-    getRenderer: function() {
-      // I only ever want to use canvas
-      return 'canvas';
-      // const renderer = UniqueCardPersistence.getItem(WHICH_RENDERER_KEY);
-      // // Return canvas if the stored value is not svg or canvas
-      // if (renderer === 'svg' || renderer === 'canvas') {
-      //   return renderer;
-      // }
-
-      // return 'canvas'
-    },
-    switchRenderer: function() {
-      let newRenderer = ''
-      if (WhichRenderer.isCanvas()) {
-        UniqueCardPersistence.setItem(WHICH_RENDERER_KEY, 'svg');
-      } else {
-        UniqueCardPersistence.setItem(WHICH_RENDERER_KEY, 'canvas');
-      }
-    },
-    isCanvas: function() {
-      return WhichRenderer.getRenderer();;
+  function get(id) {
+    if (id === "side") {
+      var raw = Persistence.getItem(KEY_PREFIX + "side");
+      return raw !== null ? raw : DEFAULTS["side"];
     }
+    var raw = Persistence.getItem(_key(id));
+    if (raw === null || raw === undefined) return DEFAULTS[id];
+    if (raw === "true") return true;
+    if (raw === "false") return false;
+    return raw;
   }
 
-  // *** WhichRenderer wrapper end ***
-
-  // *** Show next stroke wrapper ***
-
-  var ShowNextStrokeManager = {
-    _nextStrokeIndex: 0,
-
-    setNextStroke: function (nextStrokeIndex) {
-      ShowNextStrokeManager._nextStrokeIndex = nextStrokeIndex;
-    },
-
-    incrementStroke: function () {
-      ShowNextStrokeManager._nextStrokeIndex =
-        ShowNextStrokeManager._nextStrokeIndex + 1;
-    },
-
-    showNextStroke: function (writer) {
-      writer.highlightStroke(ShowNextStrokeManager._nextStrokeIndex);
-    },
-  };
-
-  // *** Show next stroke wrapper end ***
-
-  // *** Mistake feedback wrapper ***
-
-  /**
-   * WritingFeedbackManager - Manages the writing feedback and the total mistakes for a quiz.
-   */
-  var WritingFeedbackManager = {
-    /**
-     * Total number of mistakes for the entire quiz.
-     * @type {number}
-     * @private
-     */
-    _totalMistakesForQuiz: 0,
-
-    addToTotalMistakes: function (mistakes) {
-      WritingFeedbackManager._totalMistakesForQuiz += mistakes;
-    },
-
-    /**
-     * Updates the writing feedback based on the provided feedback data.
-     *
-     * @param {object} feedback - Feedback data object.
-     * @param {number} feedback.totalMistakes - Total number of mistakes for this character.
-     * @returns {void}
-     */
-    updateWritingFeedback: function (feedback) {
-      WritingFeedbackManager._updateFeedbackText(feedback.totalMistakes);
-    },
-
-    _updateFeedbackText(currentMistakes) {
-      var writingFeedback = [];
-
-      if (currentMistakes > 0) {
-        WritingFeedbackManager.showHideFeedback(true);
-        writingFeedback.push(
-          currentMistakes === 1
-            ? "1 mistake for this character"
-            : currentMistakes + " mistakes for this character",
-        );
-      }
-
-      if (WritingFeedbackManager._totalMistakesForQuiz > 0) {
-        WritingFeedbackManager.showHideFeedback(true);
-
-        writingFeedback.push(
-          WritingFeedbackManager._totalMistakesForQuiz === 1
-            ? "1 mistake for the quiz"
-            : WritingFeedbackManager._totalMistakesForQuiz +
-                " mistakes for the quiz",
-        );
-      }
-
-      document.getElementById("writing-feedback-mistakes").innerHTML =
-        writingFeedback.join("<br/>");
-    },
-
-    showFinalFeedbackForCharacter: function () {
-      WritingFeedbackManager._updateFeedbackText(0);
-    },
-
-    /**
-     * Toggles the visibility of the writing feedback.
-     *
-     * @param {boolean} showOrHide - Indicates whether to show or hide the feedback.
-     * @returns {void}
-     */
-    showHideFeedback: function (showOrHide) {
-      return showHide("#writing-feedback", showOrHide, "block");
-    },
-  };
-
-  // *** Mistake feedback wrapper end ***
-
-  // *** setTimeout wrapper that cancels the callback if visibility change happens
-  window.currentCharacter = document.getElementById('char_sim').textContent.trim(); // Get the content of the element with id "char_sim"
-
-  function delayedCallback(callback, delay) { 
-
-    const currentCharacter = document.getElementById('char_sim').textContent.trim(); // Get the content of the element with id "char_sim"
-
-    const timer = setTimeout(() => {
-      if (quizFinished) {
-        // printDebugMessage('Cancelled delayed callback due to quiz being finished');
-        return;
-      }
-
-      // Check if the currentCharacter has changed since the setTimeout was called
-      if (window.currentCharacter !== currentCharacter) {
-        clearTimeout(timer); // Cancel the timeout
-        // printDebugMessage("Callback canceled due to character change.");
-      } else {
-        callback(); // Execute the callback if currentCharacter hasn't changed
-        activeTimers = activeTimers.filter(t => t !== timer);
-      }
-    }, delay);
-    activeTimers.push(timer);
-    return timer;
-  }
-
-  // *** setTimeout wrapper that cancels the callback if visibility change happens
-
-  if (!document.getElementById("back")) {
-    ActiveSideManager.setActive("text-front");
-  } else {
-    ActiveSideManager.setActive("text-back");
-  }
-
-  function initPractice() {
-    var _selectPracticeId =
-      ActiveSideManager.getActiveSide() + "reading-practice-select";
-    var selectPracticeElem = document.getElementById("reading-practice-select");
-    var selectPracticeStore = UniqueCardPersistence.getItem(_selectPracticeId);
-
-    if (selectPracticeStore == undefined) {
-      selectPracticeElem.selectedIndex = 0;
-      UniqueCardPersistence.setItem(_selectPracticeId, 0);
-    } else {
-      selectPracticeElem.selectedIndex = selectPracticeStore;
-      UniqueCardPersistence.setItem(_selectPracticeId, selectPracticeStore);
-    }
-  }
-
-  function initSwitchPrefs() {
-    for (var _id of getSwitchIds()) {
-      var divId = _id.replace("text-", "char_");
-
-      var drawIds = ["text-grid", "text-stroke-color", "text-outline"];
-      if (UniqueCardPersistence.getItem(_id) == false) {
-        document.getElementById(_id).checked = false;
-        if (!drawIds.includes(_id)) {
-          document.getElementById(divId).style.display = "none";
-        }
-      } else {
-        document.getElementById(_id).checked = true;
-        UniqueCardPersistence.setItem(_id, true);
-        if (!drawIds.includes(_id)) {
-          document.getElementById(divId).style.display = "block";
-        }
-      }
-
-      if (UniqueCardPersistence.getItem(_id) == false) {
-        document.getElementById(_id).checked = false;
-      } else {
-        document.getElementById(_id).checked = true;
-        UniqueCardPersistence.setItem(_id, true);
-      }
-
-      showHideFieldByCheckboxId(_id);
-    }
-
-    showTraditionalChar();
-  }
-
-  function showTraditionalChar() {
-    var tradChar = document.getElementById("char_trad");
-    var simChar = document.getElementById("char_sim");
-    if (tradChar.innerText != simChar.innerText) {
-      if (UniqueCardPersistence.getItem("text-trad") == true) {
-        tradChar.style.display = "block";
-      }
-    } else {
-      if (UniqueCardPersistence.getItem("text-sim") == true) {
-        tradChar.style.display = "none";
-      }
-    }
-  }
-
-  function initDrawPrefs() {
-    var drawPrefsList = ["draw-size", "stroke-size", "hint-miss"];
-    for (var _id of drawPrefsList) {
-      var elem = document.getElementById(_id);
-      var storedValue = UniqueCardPersistence.getItem(_id);
-      if (storedValue) {
-        elem.value = storedValue;
-      } else {
-        var value = _id == "draw-size" ? 400 : _id == "stroke-size" ? 64 : 5;
-        elem.value = value;
-        UniqueCardPersistence.setItem(_id, value);
-      }
-    }
-
-    // Set traditional/simplified draw selector
-    if (UniqueCardPersistence.getItem("reading-practice-select")) {
-      // Traditional
-      document.getElementById("reading-practice-select").selectedIndex = 1;
-    } else {
-      // Simplified
-      document.getElementById("reading-practice-select").selectedIndex = 0;
-    }
-  }
-
-  function showHideFieldByCheckboxId(_id) {
-    var isShowField = document.getElementById(_id).checked ? true : false;
-    var divId = _id.replace("text-", "char_");
-
-    // Use the generic showhide on the element first
-    showHide("#" + divId, isShowField, "block");
-
-    // Perform additional show/hide on special elements
-    switch (_id) {
-      case "text-pinyin":
-        showHide(".pinyin", isShowField);
-        break;
-
-      case "text-zhuyin":
-        showHide(".zhuyin", isShowField);
-        break;
-
-      case "text-examples-parts-of-speech":
-        showHide(".char_examples-parts-of-speech", isShowField);
-        break;
-
-      case "text-sim":
-        showHide("#char-sim-id", isShowField);
-        break;
-
-      case "text-trad":
-        showHide("#char-trad-id", isShowField);
-        showHide(".sep", isShowField);
-        break;
-
-      default:
-        // Warning this breaks AnkiMobile
-        // console.warn(_id + " not in switch list");
-        break;
-    }
-  }
-
-  function setPrefs(e) {
-    if (e.id == "reading-practice-select") {
-      UniqueCardPersistence.setItem(e.id, e.selectedIndex);
-      doPractice();
-    }
-
-    if (e.type == "checkbox") {
-      UniqueCardPersistence.setItem(e.id, e.checked);
-      var divId = e.id.replace("text-", "char_");
-      if (e.id == "text-stroke-color" || e.id == "text-outline") {
-        return;
-      }
-
-      showHideFieldByCheckboxId(e.id);
-    }
-
-    if (e.type == "number") {
-      UniqueCardPersistence.setItem(e.id, e.value);
-      var elem = document.getElementById(e.id);
-      elem.value = e.value;
-    }
-  }
-
-  function showHide(type, isShow, style = "inline") {
-    if (isShow) {
-      document.querySelectorAll(type).forEach(function (val) {
-        val.style.display = style;
-      });
-    } else {
-      document.querySelectorAll(type).forEach(function (val) {
-        val.style.display = "none";
-      });
-    }
-  }
-
-  function openSidebar(id) {
-    var width = id == "sidebar" ? "250px" : "160px";
-    document.getElementById(id).style.width = width;
-  }
-
-  function closeSidebar(id) {
-    document.getElementById(id).style.width = "0";
-  }
-
-  document.addEventListener("click", function (event) {
-    if (
-      !document.getElementById("sidebar") ||
-      !document.getElementById("more-info-sidebar")
-    ) {
+  function set(id, value) {
+    if (id === "side") {
+      Persistence.setItem(KEY_PREFIX + "side", value);
       return;
     }
-    if (!document.getElementById("sidebar").contains(event.target)) {
-      closeSidebar("sidebar");
+    if (value === "true") value = true;
+    else if (value === "false") value = false;
+    Persistence.setItem(_key(id), value);
+  }
+
+  return { get: get, set: set };
+})();
+
+// ---------------------------------------------------------------------------
+// UI helpers
+// ---------------------------------------------------------------------------
+function showHide(selector, isShow, style) {
+  style = style || "inline";
+  document.querySelectorAll(selector).forEach(function (el) {
+    el.style.display = isShow ? style : "none";
+  });
+}
+
+function openSidebar(id) {
+  document.getElementById(id).style.width = id === "sidebar" ? "250px" : "160px";
+}
+
+function closeSidebar(id) {
+  document.getElementById(id).style.width = "0";
+}
+
+document.addEventListener("click", function (e) {
+  var sidebar = document.getElementById("sidebar");
+  var moreSidebar = document.getElementById("more-info-sidebar");
+  var btnMenu = document.getElementById("btnShowMenu");
+  var btnMore = document.getElementById("btnMoreOptions");
+  if (!sidebar || !moreSidebar) return;
+  if (btnMenu && btnMenu.contains(e.target)) { openSidebar("sidebar"); return; }
+  if (btnMore && btnMore.contains(e.target)) { openSidebar("more-info-sidebar"); return; }
+  if (!sidebar.contains(e.target)) closeSidebar("sidebar");
+  if (!moreSidebar.contains(e.target)) closeSidebar("more-info-sidebar");
+});
+
+// ---------------------------------------------------------------------------
+// Side manager (Front / Back toggle in sidebar)
+// ---------------------------------------------------------------------------
+var SideManager = (function () {
+  function setActive(side) {
+    // side is "text-front" or "text-back"
+    var isFront = side === "text-front";
+    Prefs.set("side", isFront ? "front" : "back");
+    document.getElementById("text-front").classList.toggle("btn-active", isFront);
+    document.getElementById("text-back").classList.toggle("btn-active", !isFront);
+    applyPrefsToUI();
+  }
+
+  function init() {
+    var isBack = !!document.getElementById("back");
+    setActive(isBack ? "text-back" : "text-front");
+  }
+
+  return { setActive: setActive, init: init };
+})();
+
+// Exposed globally for onclick attributes in HTML
+function setActive(side) {
+  SideManager.setActive(side);
+}
+
+// ---------------------------------------------------------------------------
+// Preferences <-> UI sync
+// ---------------------------------------------------------------------------
+var DRAW_IDS = ["text-grid", "text-stroke-color", "text-outline"];
+var SWITCH_IDS = [
+  "text-pinyin", "text-zhuyin", "text-meaning", "text-examples",
+  "text-examples-parts-of-speech", "text-sim", "text-trad",
+  "text-grid", "text-outline", "text-stroke-color",
+];
+
+function applyPrefsToUI() {
+  SWITCH_IDS.forEach(function (id) {
+    var checked = Prefs.get(id) !== false;
+    var checkbox = document.getElementById(id);
+    if (checkbox) checkbox.checked = checked;
+
+    if (!DRAW_IDS.includes(id)) {
+      var divId = id.replace("text-", "char_");
+      var el = document.getElementById(divId);
+      if (el) el.style.display = checked ? "block" : "none";
     }
-    if (!document.getElementById("more-info-sidebar").contains(event.target)) {
-      closeSidebar("more-info-sidebar");
-    }
-    if (document.getElementById("btnShowMenu").contains(event.target)) {
-      openSidebar("sidebar");
-    }
-    if (document.getElementById("btnMoreOptions").contains(event.target)) {
-      openSidebar("more-info-sidebar");
-    }
+    _applySpecialShowHide(id, checked);
   });
 
-  if (Persistence.isAvailable()) {
-    if (window.ankiPlatform == "desktop" || isInWebView()) {
-      initPractice();
-      initSwitchPrefs();
-      initDrawPrefs();
-    } else {
-      window.addEventListener("load", initPractice, false);
-      window.addEventListener("load", initSwitchPrefs, false);
-      window.addEventListener("load", initDrawPrefs, false);
+  _applyTraditionalVisibility();
+
+  // Numeric prefs
+  ["draw-size", "stroke-size", "hint-miss"].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.value = Prefs.get(id);
+  });
+
+  // Practice select
+  var sel = document.getElementById("reading-practice-select");
+  if (sel) sel.selectedIndex = Prefs.get("reading-practice-select");
+}
+
+function _applySpecialShowHide(id, isShow) {
+  switch (id) {
+    case "text-pinyin": showHide(".pinyin", isShow); break;
+    case "text-zhuyin": showHide(".zhuyin", isShow); break;
+    case "text-examples-parts-of-speech": showHide(".char_examples-parts-of-speech", isShow); break;
+    case "text-sim": showHide("#char-sim-id", isShow); break;
+    case "text-trad":
+      showHide("#char-trad-id", isShow);
+      showHide(".sep", isShow);
+      break;
+  }
+}
+
+function _applyTraditionalVisibility() {
+  var trad = document.getElementById("char_trad");
+  var sim = document.getElementById("char_sim");
+  if (!trad || !sim) return;
+  if (trad.innerText !== sim.innerText) {
+    if (Prefs.get("text-trad")) trad.style.display = "block";
+  } else {
+    if (Prefs.get("text-sim")) trad.style.display = "none";
+  }
+}
+
+// Called by onchange attributes in HTML
+function setPrefs(el) {
+  if (el.id === "reading-practice-select") {
+    Prefs.set("reading-practice-select", el.selectedIndex);
+    Quiz.restart();
+    return;
+  }
+  if (el.type === "checkbox") {
+    Prefs.set(el.id, el.checked);
+    if (el.id === "text-stroke-color" || el.id === "text-outline") return;
+    var divId = el.id.replace("text-", "char_");
+    var divEl = document.getElementById(divId);
+    if (divEl && !DRAW_IDS.includes(el.id)) {
+      divEl.style.display = el.checked ? "block" : "none";
     }
+    _applySpecialShowHide(el.id, el.checked);
   }
-  // audio in Anki Web on different systems
+  if (el.type === "number") {
+    Prefs.set(el.id, el.value);
+  }
+}
 
-  function isInWebView() {
-    var UA = navigator.userAgent;
-    if (/iPhone|iPod|iPad/.test(UA)) {
-      if (/(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(UA)) {
-        return true;
-      }
+// ---------------------------------------------------------------------------
+// Pinyin / tone utilities  (shared with back template via {{FrontSide}})
+// ---------------------------------------------------------------------------
+var TONE_COLORS = {
+  1: "#f44336",
+  2: "#ff9800",
+  3: "#4caf50",
+  4: "#2196f3",
+  5: document.body.classList.contains("night_mode") ? "#fff" : "#555",
+};
+
+function decodePinyin(pinyin) {
+  var coreVowels = ["a", "e", "i", "o", "u", "ü", "v"];
+  var tonesArr = [];
+  var buffer = [];
+
+  function isCore(char, charPrevTwo, charNext) {
+    if (char === "r" && (charNext === " " || charNext === "") &&
+        charPrevTwo !== " " && charPrevTwo !== "") {
+      return [true, true];
     }
-    if (window.location.href.includes("ankiuser.net")) {
-      return true;
+    var normalized = char.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    for (var i = 0; i < coreVowels.length; i++) {
+      if (normalized === coreVowels[i]) return [true, false];
     }
-    return false;
-  }
-
-  /**
-   * Strips A-Za-z0-9 characters from a string.
-   * @param {string} str - The input string.
-   * @returns {string} The string with ASCII characters removed.
-   */
-  function stripAscii(str) {
-    return str.replace(/[A-Za-z0-9]/g, "");
-  }
-
-  function getCharactersToDraw() {
-    const charactersText =
-      document.getElementById("reading-practice-select").selectedIndex === 0
-        ? document.getElementById("char_sim").innerText
-        : document.getElementById("char_trad").innerText;
-    return stripAscii(charactersText);
-  }
-
-  // Function to load character data from a given URL
-  function loadDataFromUrl(url, onComplete, onFailure) {
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", url, true);
-
-    // Set up a callback function to handle the response
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState === XMLHttpRequest.DONE) {
-        if (xhr.status === 200) {
-          // Parse the JSON response
-          var charData = JSON.parse(xhr.responseText);
-          onComplete(charData);
-        } else {
-          // Log an error message if the request fails
-          printDebugMessage(
-            "Request failed with status: " + xhr.status + " for URL: " + url,
-          );
-          if (onFailure) {
-            onFailure()
-          }
-        }
-      }
-    };
-
-    // Send the request
-    xhr.send();
-  }
-
-  /**
-   * Load character data from file or fallback to URL
-   */
-  function charDataLoader(character, onComplete) {
-    var initialUrl = "/_" + character + ".json";
-
-    // Attempt to load character data from the initial URL
-    loadDataFromUrl(
-      initialUrl,
-      function (charData) {
-        onComplete(charData);
-      },
-      function () {
-        // If the initial load fails, fallback to loading from another URL
-        var fallbackUrl =
-          "https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0/" +
-          character +
-          ".json";
-        loadDataFromUrl(fallbackUrl, function (charData) {
-          onComplete(charData);
-        });
-      },
-    );
+    return [false, false];
   }
 
-  var charHW = document.getElementById("draw-size").value;
-  var charHeight = charHW;
-  var charWidth = charHW;
-  var strokeWidth = document.getElementById("stroke-size").value;
-  var strokeAfterMisses = document.getElementById("hint-miss").value;
-
-  function playAudio() {
-    var audioDiv = document.getElementById("audio");
-    var audio = audioDiv.getElementsByTagName("*");
-    audio[0].tagName == "AUDIO" ? audio[0].play() : audio[0].click();
+  function getTone(str) {
+    var pure = str.replace(/a|e|i|o|u|ü|r/g, "");
+    if (pure === "") return 5;
+    if (["ā","ē","ī","ō","ū","ǖ","v̄"].indexOf(pure) !== -1) return 1;
+    if (["á","é","í","ó","ú","ǘ","v́"].indexOf(pure) !== -1) return 2;
+    if (["ǎ","ě","ǐ","ǒ","ǔ","ǚ","v̌"].indexOf(pure) !== -1) return 3;
+    if (["à","è","ì","ò","ù","ǜ","v̀"].indexOf(pure) !== -1) return 4;
+    return 4;
   }
 
-  document.getElementById("btnPlayAudio").onclick = function () {
-    playAudio();
-  };
-
-  var grid_data = `<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%' class='grid-color'  id='grid-background-target'><g id="char_grid"><line x1='0' y1='0' x2='100%' y2='100%' stroke='var(--surface1)' /><line x1='100%' y1='0' x2='0' y2='100%' stroke='var(--surface1)' /><line x1='50%' y1='0' x2='50%' y2='100%' stroke='var(--surface1)' /><line x1='0' y1='50%' x2='100%' y2='50%' stroke='var(--surface1)' /></g></svg>`;
-
-  function generateHanziOnFinishQuiz(style = "none", finish = false) {
-    var characters = getCharactersToDraw();
-    var drawGrid = document.getElementById("onfinish-character-target-div");
-    drawGrid.innerHTML = "";
-    drawGrid.style = "";
-    drawGrid.style.position = "absolute";
-    drawGrid.style.display = "grid";
-    drawGrid.style.zIndex = 30;
-    var size = 40;
-    if (finish) {
-      size = 100;
-      drawGrid.style.position = "unset";
-      drawGrid.style.display = "block";
-      drawGrid.style.whiteSpace = "nowrap";
-      drawGrid.style.overflow = "scroll";
-      document.getElementById("char_examples").style.display = "block";
-      document.getElementById("char_examples_blank").style.display = "none";
-    }
-
-    for (
-      characterElementsIndex = 0;
-      characterElementsIndex < characters.length;
-      characterElementsIndex++
-    ) {
-      var character = characters[characterElementsIndex];
-      var span = document.createElement("span");
-      span.innerHTML = grid_data;
-      span.children[0].id =
-        "onfinish-grid-background-target" + characterElementsIndex;
-      span.children[0].style.margin = finish ? "6px" : "2px";
-      span.style.display = style;
-      drawGrid.appendChild(span);
-      setStrokeColor(characterElementsIndex);
-
-      // Small HanziWriter
-      var writer = HanziWriter.create(
-        "onfinish-grid-background-target" + characterElementsIndex,
-        character,
-        {
-          charDataLoader,
-          width: size,
-          height: size,
-          padding: 5,
-          strokeColor: stroke_color,
-          renderer: 'svg',
-        },
-      );
-    }
-  }
-
-  document.getElementById("btnReloadQuiz").onclick = function () {
-    doPractice(true);
-    generateHanziOnFinishQuiz("none");
-    showNextAndRevealBtn(true);
-  };
-
-  function getPinyinWithMacronFromPinyinWithNumber(pinyin) {
-    // Mapping of tone numbers to their corresponding marked vowels
-    const toneMap = {
-      1: ["ā", "ē", "ī", "ō", "ū", "ǖ"], // First tone
-      2: ["á", "é", "í", "ó", "ú", "ǘ"], // Second tone
-      3: ["ǎ", "ě", "ǐ", "ǒ", "ǔ", "ǚ"], // Third tone
-      4: ["à", "è", "ì", "ò", "ù", "ǜ"]  // Fourth tone
-    };
-
-    // String of vowels that can be marked with tones
-    const vowels = "aeiouü";
-
-    // Extract the tone number from the end of the pinyin string
-    const tone = parseInt(pinyin[pinyin.length - 1]);
-
-    // If the last character isn't a valid tone number (1-4), return the original string
-    if (isNaN(tone) || tone < 1 || tone > 4) return pinyin;
-
-    // Remove the tone number from the pinyin string
-    const base = pinyin.slice(0, -1);
-
-    // Loop through the string to find the main vowel to apply the tone mark to
-    for (let i = base.length - 1; i >= 0; i--) {
-      if (vowels.includes(base[i])) {
-        // Find the index of the vowel and replace it with the corresponding marked vowel
-        let vowelIndex = vowels.indexOf(base[i]);
-        return base.slice(0, i) + toneMap[tone][vowelIndex] + base.slice(i + 1);
-      }
-    }
-
-    // Return the original pinyin string if no vowel was found
-    return pinyin;
-  }
-
-  function getAndSetCharacterMeaning(id, character, index) {
-    var characterDefinitionDiv = document.getElementById(id)
-    loadDataFromUrl("/_" + character + "_meaning.json", function(characterData) {
-      const pinyin = getPinyinWithMacronFromPinyinWithNumber(characterData.pinyin);
-      characterDefinitionDiv.className = "character-meaning-div-populated"
-      characterDefinitionDiv.innerHTML = pinyin + ': ' + characterData.definitions.join('; ');
-    }, function() {
-      characterDefinitionDiv.display = "none";
-      printDebugMessage('Failed to load meaning data for ' + "/_" + character + "_meaning.json")
-    })
-  }
-
-  function doPractice(p = false) {
-    quizFinished = false;
-
-    document.getElementById('which-renderer').innerHTML = ` (renderer: ${WhichRenderer.getRenderer()})`
-    if (document.getElementById("back")) {
-      generateHanziOnFinishQuiz("unset", true);
-      if (!p) {
-        showNextAndRevealBtn(false);
-        return;
-      }
-    } else {
-      generateHanziOnFinishQuiz("none");
-    }
-
-    document.getElementById("ch_load_status").innerHTML = "&#8226;";
-    document.getElementById("ch_load_status").style.display = "inline";
-
-    WritingFeedbackManager.showHideFeedback(false);
-
-    var hanziWriterList = [];
-    var drawGrid = document.getElementById("character-target-div");
-    drawGrid.innerHTML = "";
-
-    var characters = getCharactersToDraw();
-    for (
-      characterElementsIndex = 0;
-      characterElementsIndex < characters.length;
-      characterElementsIndex++
-    ) {
-      var div = document.createElement("div");
-      div.id = "div" + characterElementsIndex;
-      div.style.position = 'relative';
-
-      // Remove if WhichRenderer is no longer needed
-      var grid_data_canvas = `<div class='grid-color' style="background-color:rgba(0, 0, 0, 0); z-index: 20;position:relative;" id='grid-background-target'></div>`;
-      const grid_data_overlay = `<svg xmlns='http://www.w3.org/2000/svg' width='${charWidth}' height='${charHeight}' style="position:absolute;z-index:10;pointer-events:none;top:0;left:0;;" class='grid-color'><g id="char_grid"><line x1='0' y1='0' x2='100%' y2='100%' stroke='var(--surface1)' /><line x1='100%' y1='0' x2='0' y2='100%' stroke='var(--surface1)' /><line x1='50%' y1='0' x2='50%' y2='100%' stroke='var(--surface1)' /><line x1='0' y1='50%' x2='100%' y2='50%' stroke='var(--surface1)' /></g></svg>`
-      div.innerHTML = WhichRenderer.isCanvas() ? grid_data_canvas + grid_data_overlay : grid_data;
-
-      div.children[0].id = "grid-background-target" + characterElementsIndex;
-      
-      drawGrid.appendChild(div);
-
-      var character = characters[characterElementsIndex];
-
-      // Only show special individual character meaning section if this word is multi-character
-      if (characters.length > 1) {
-        var characterMeandingDiv = document.createElement("div");
-        var characterMeaningDivId = "div-characterMeaning" + characterElementsIndex
-        characterMeandingDiv.id = characterMeaningDivId;
-        div.appendChild(characterMeandingDiv);
-
-        getAndSetCharacterMeaning(characterMeaningDivId, character, characterElementsIndex)
-      }
-      
-      setStrokeColor(characterElementsIndex);
-      
-      // Main HanziWriter
-      var writer = HanziWriter.create(
-        "grid-background-target" + characterElementsIndex,
-        character,
-        {
-          onLoadCharDataSuccess: function (data) {
-            document.getElementById("ch_load_status").style.color = "#4caf50";
-          },
-          onLoadCharDataError: function (reason) {
-            document.getElementById("ch_load_status").style.color = "#ea2322";
-          },
-          charDataLoader,
-          strokeAnimationSpeed: 2,
-          delayBetweenStrokes: 125, // milliseconds
-          width: charWidth,
-          height: charHeight,
-          showCharacter: false,
-          showOutline:
-            UniqueCardPersistence.getItem("text-outline") == true
-              ? true
-              : false,
-          highlightOnComplete: true,
-          highlightCompleteColor: stroke_color,
-          drawingWidth: strokeWidth,
-          strokeColor: stroke_color,
-          outlineColor: outline_color,
-          drawingColor: drawing_color,
-          showHintAfterMisses: strokeAfterMisses,
-          padding: 5,
-          renderer: WhichRenderer.getRenderer()
-        },
-      );
-
-      writerQuiz(writer, characterElementsIndex + 1, characters.length);
-      hanziWriterList.push(writer);
-
-      var revealClickCount = 0;
-      document.getElementById("btnGoNextCard").onclick = function () {
-        revealClickCount = 0;
-        writer = hanziWriterList[getCurrentHanziNum()];
-        writer.showOutline();
-        writer.showCharacter();
-
-        delayedCallback(function () {
-          onFinishQuizDrawHanzi();
-        }, 800);
-
-        delayedCallback(function () {
-          showNextHanzi();
-        }, 1000);
-      };
-
-      document.getElementById('btnSwitchRenderer').onclick = function() {
-        WhichRenderer.switchRenderer();
-        doPractice(true);
-        generateHanziOnFinishQuiz("none");
-        showNextAndRevealBtn(true);
-      }
-
-      document.getElementById("text-outline").onclick = function () {
-        document.getElementById("text-outline").checked
-          ? writer.showOutline()
-          : writer.hideOutline();
-      };
-
-      function isVisible(selector) {
-        var element = document.querySelector(selector);
-        if (element) {
-          var style = window.getComputedStyle(element);
-          return style.display !== "none";
-        }
-        return false; // If selector doesn't match any element
-      }
-
-      document.getElementById("btnShowCharacters").onclick = function () {
-        showHide("#char_sim", !isVisible("#char_sim"));
-      };
-
-      document.getElementById("btnRevealChar").onclick = function () {
-        // Comment this out and uncomment block below to return to standard animation & show behaviour
-        ShowNextStrokeManager.showNextStroke(
-          (writer = hanziWriterList[getCurrentHanziNum()]),
-        );
-      };
-
-      function writerQuiz(writer, currentCharacter, totalCharacters) {
-        writer.quiz({
-          onComplete: function (summaryData) {
-            
-            // Only read the character if this is a multi character word
-            if (totalCharacters > 1) {
-              speak(summaryData.character)
-            }
-            WritingFeedbackManager.addToTotalMistakes(
-              summaryData.totalMistakes,
-            );
-            ShowNextStrokeManager.setNextStroke(0);
-            onFinishQuizDrawHanzi();
-            
-            delayedCallback(function () {
-              showNextHanzi();
-            }, 1000);
-          },
-          onMistake: WritingFeedbackManager.updateWritingFeedback,
-          onCorrectStroke: function (feedback) {
-            WritingFeedbackManager.updateWritingFeedback(feedback);
-            ShowNextStrokeManager.incrementStroke();
-          },
-        });
-      }
-
-      function getCurrentHanziNum() {
-        var characterDiv = document.querySelector("#character-target-div");
-        var characterElements = characterDiv.children;
-        var len = characterElements.length;
-        for (
-          characterElementsIndex = 0;
-          characterElementsIndex < len;
-          characterElementsIndex++
-        ) {
-          var style = characterElements[characterElementsIndex].style.display;
-          if (style === "block" || style === "") {
-            return characterElementsIndex;
-          }
-        }
-      }
-
-      /**
-       * Show the finished characters
-       */
-      function onFinishQuizDrawHanzi() {
-        var finishCharacterDiv = document.getElementById(
-          "onfinish-character-target-div",
-        );
-        var characterElements = finishCharacterDiv.children;
-        var characterElementsLength = characterElements.length;
-        for (
-          characterElementsIndex = 0;
-          characterElementsIndex < characterElementsLength;
-          characterElementsIndex++
-        ) {
-          var style = characterElements[characterElementsIndex].style.display;
-          if (style === "none" || style === "") {
-            characterElements[characterElementsIndex].style.display = "unset";
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  function setStrokeColor(i) {
-    if (UniqueCardPersistence.getItem("text-stroke-color") == true) {
-      var toneColor = getToneColor(i);
-      drawing_color = toneColor;
-      stroke_color = toneColor;
-    }
-  }
-
-  function showNextHanzi() {
-    var characterDiv = document.querySelector("#character-target-div");
-    var characterElements = characterDiv.children;
-    var characterElementsLength = characterElements.length;
-
-    for (
-      characterElementsIndex = 0;
-      characterElementsIndex < characterElementsLength;
-      characterElementsIndex++
-    ) {
-      var style = characterElements[characterElementsIndex].style.display;
-      if (style === "block" || style === "") {
-        characterElements[characterElementsIndex].style.display = "none";
-        characterElements[
-          (characterElementsIndex + 1) % characterElements.length
-        ].style.display = "block";
-        onFinishQuiz(characterElementsIndex, characterElementsLength);
-        break;
-      }
-    }
-  }
-
-  function cancelAllDelayedCallbacks() {
-    printDebugMessage(`Cancelling ${activeTimers.length} delayed callbacks`);
-    activeTimers.forEach(timer => clearTimeout(timer));
-    activeTimers = [];
-    quizFinished = true;
-  }
-
-  /**
-   * Finish the quiz if this is the last character.
-   */
-  function onFinishQuiz(characterElementsIndex, characterElementsLength) {
-
-    WritingFeedbackManager.showFinalFeedbackForCharacter();
-
-    if (characterElementsIndex != characterElementsLength - 1) {
-      // Speak the next character to draw
-      speak(getCharactersToDraw()[characterElementsIndex + 1])
-      return;
-    }
-
-    cancelAllDelayedCallbacks();
-    quizFinished = true;
-
-    // If the last character element is reached:
-    if (characterElementsIndex + 1 == characterElementsLength) {
-      // Clear character target div and hide loading status.
-      document.querySelector("#character-target-div").innerHTML = "";
-      document.getElementById("ch_load_status").style.display = "none";
-      generateHanziOnFinishQuiz("unset", true);
-    }
-
-    // Audio is played on the last card, allowing quicker skipping to answer when writing complete
-    // playAudio();
-    showHide("#char_sim", true);
-    showTraditionalChar();
-
-    showHide("#char_meaning", true, "block");
-    if (document.getElementById("text-pinyin").checked) {
-      showHide(".pinyin", true);
-    }
-    if (document.getElementById("text-zhuyin").checked) {
-      showHide(".zhuyin", true);
-    }
-    showNextAndRevealBtn(false);
-  }
-
-  function showNextAndRevealBtn(show) {
-    showHide("#btnRevealChar", show);
-    showHide("#btnRevealCharPlaceholder", !show)
-
-    showHide("#btnShowCharacters", show);
-    showHide("#btnShowCharactersPlaceholder", !show);
-
-    showHide("#btnGoNextCard", show);
-  }
-
-  if (Persistence.isAvailable()) {
-    doPractice();
-  }
-
-var colorCodes = {
-    1: "#f44336",
-    2: "#ff9800",
-    3: "#4caf50",
-    4: "#2196f3",
-    5: document.body.classList.contains("night_mode") ? "#fff" : "#555",
-  };
-
-  function decodePinyin(pinyin) {
-    var coreVowels = ["a", "e", "i", "o", "u", "ü", "v"];
-    var tonesArr = [];
-    var buffer = [];
-
-    function isCore(char, charPrevTwo, charNext) {
-      if (
-        char === "r" &&
-        (charNext === " " || charNext === "") &&
-        charPrevTwo !== " " &&
-        charPrevTwo !== ""
-      ) {
-        return [true, true];
-      }
-      char = char
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase();
-      for (var i = 0; i < coreVowels.length; i++) {
-        if (char === coreVowels[i]) {
-          return [true, false];
-        }
-      }
-      return [false, false];
-    }
-
-    function getTone(str) {
-      var pure = str.replace(/a|e|i|o|u|ü|r/g, "");
-      if (pure === "") {
-        return 5;
-      } else if (["ā", "ē", "ī", "ō", "ū", "ǖ", "v̄"].indexOf(pure) !== -1) {
-        return 1;
-      } else if (["á", "é", "í", "ó", "ú", "ǘ", "v́"].indexOf(pure) !== -1) {
-        return 2;
-      } else if (["ǎ", "ě", "ǐ", "ǒ", "ǔ", "ǚ", "v̌"].indexOf(pure) !== -1) {
-        return 3;
-      } else if (["à", "è", "ì", "ò", "ù", "ǜ", "v̀"].indexOf(pure) !== -1) {
-        return 4;
-      } else {
-        return 4; // Probably 绿 with v̀
-      }
-    }
-
-    function flush() {
-      if (buffer.length > 0) {
-        tonesArr.push(getTone(buffer.join("")));
-        buffer = [];
-      }
-    }
-
-    for (var i = 0; i < pinyin.length; i++) {
-      var result = isCore(pinyin[i], pinyin[i - 2], pinyin[i + 1]);
-      if (result[1]) {
-        flush();
-      }
-      if (result[0]) {
-        buffer.push(pinyin[i]);
-      } else {
-        flush();
-      }
-    }
-
+  function flush() {
     if (buffer.length > 0) {
       tonesArr.push(getTone(buffer.join("")));
+      buffer = [];
+    }
+  }
+
+  for (var i = 0; i < pinyin.length; i++) {
+    var result = isCore(pinyin[i], pinyin[i - 2], pinyin[i + 1]);
+    if (result[1]) flush();
+    if (result[0]) buffer.push(pinyin[i]);
+    else flush();
+  }
+  if (buffer.length > 0) tonesArr.push(getTone(buffer.join("")));
+
+  return tonesArr;
+}
+
+var _decodedPinyin = decodePinyin(
+  (document.getElementById("char_pinyin") || {innerText: ""}).innerText
+);
+
+// ---------------------------------------------------------------------------
+// Hanzi drawing helpers
+// ---------------------------------------------------------------------------
+var NIGHT_MODE = document.body.classList.contains("night_mode");
+var STROKE_COLOR   = NIGHT_MODE ? "#ffffff" : "#555";
+var OUTLINE_COLOR  = NIGHT_MODE ? "#5B5B5B" : "#DDD";
+var DRAWING_COLOR  = NIGHT_MODE ? "#fff"    : "#333";
+
+var GRID_OVERLAY_TPL = function (w, h) {
+  return (
+    "<svg xmlns='http://www.w3.org/2000/svg' width='" + w + "' height='" + h +
+    "' style='position:absolute;z-index:10;pointer-events:none;top:0;left:0;' class='grid-color'>" +
+    "<g id='char_grid'>" +
+    "<line x1='0' y1='0' x2='100%' y2='100%' stroke='var(--surface1)' />" +
+    "<line x1='100%' y1='0' x2='0' y2='100%' stroke='var(--surface1)' />" +
+    "<line x1='50%' y1='0' x2='50%' y2='100%' stroke='var(--surface1)' />" +
+    "<line x1='0' y1='50%' x2='100%' y2='50%' stroke='var(--surface1)' />" +
+    "</g></svg>"
+  );
+};
+
+var GRID_SMALL_TPL =
+  "<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%' class='grid-color' id='grid-background-target'>" +
+  "<g id='char_grid'>" +
+  "<line x1='0' y1='0' x2='100%' y2='100%' stroke='var(--surface1)' />" +
+  "<line x1='100%' y1='0' x2='0' y2='100%' stroke='var(--surface1)' />" +
+  "<line x1='50%' y1='0' x2='50%' y2='100%' stroke='var(--surface1)' />" +
+  "<line x1='0' y1='50%' x2='100%' y2='50%' stroke='var(--surface1)' />" +
+  "</g></svg>";
+
+function getStrokeColorForIndex(charIndex) {
+  if (Prefs.get("text-stroke-color") === false) return STROKE_COLOR;
+  return TONE_COLORS[_decodedPinyin[charIndex]] || STROKE_COLOR;
+}
+
+function loadCharData(character, onComplete, onFailure) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", "/_" + character + ".json", true);
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState !== XMLHttpRequest.DONE) return;
+    if (xhr.status === 200) {
+      onComplete(JSON.parse(xhr.responseText));
+    } else {
+      if (onFailure) onFailure();
+    }
+  };
+  xhr.send();
+}
+
+function charDataLoader(character, onComplete) {
+  loadCharData(
+    character,
+    onComplete,
+    function () {
+      var fallback = new XMLHttpRequest();
+      fallback.open("GET", "https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0/" + character + ".json", true);
+      fallback.onreadystatechange = function () {
+        if (fallback.readyState === XMLHttpRequest.DONE && fallback.status === 200) {
+          onComplete(JSON.parse(fallback.responseText));
+        }
+      };
+      fallback.send();
+    }
+  );
+}
+
+function loadCharMeaning(character, onComplete) {
+  loadCharData(character + "_meaning", onComplete, null);
+}
+
+function getPinyinWithMacron(pinyin) {
+  var toneMap = {
+    1: ["ā","ē","ī","ō","ū","ǖ"],
+    2: ["á","é","í","ó","ú","ǘ"],
+    3: ["ǎ","ě","ǐ","ǒ","ǔ","ǚ"],
+    4: ["à","è","ì","ò","ù","ǜ"],
+  };
+  var vowels = "aeiouü";
+  var tone = parseInt(pinyin[pinyin.length - 1]);
+  if (isNaN(tone) || tone < 1 || tone > 4) return pinyin;
+  var base = pinyin.slice(0, -1);
+  for (var i = base.length - 1; i >= 0; i--) {
+    if (vowels.includes(base[i])) {
+      return base.slice(0, i) + toneMap[tone][vowels.indexOf(base[i])] + base.slice(i + 1);
+    }
+  }
+  return pinyin;
+}
+
+function stripAscii(str) {
+  return str.replace(/[A-Za-z0-9]/g, "");
+}
+
+function getCharactersToDraw() {
+  var sel = document.getElementById("reading-practice-select");
+  var useTraditional = sel && sel.selectedIndex === 1;
+  var src = useTraditional
+    ? document.getElementById("char_trad")
+    : document.getElementById("char_sim");
+  return stripAscii((src || {innerText: ""}).innerText);
+}
+
+// ---------------------------------------------------------------------------
+// Quiz — the core state machine
+//
+// States: idle → running(charIndex) → complete
+//
+// Each call to Quiz.start() increments a session ID. Any closure that captured
+// an older session ID is a no-op when it fires, eliminating all race conditions
+// between restart, delayed callbacks, and onComplete handlers.
+// ---------------------------------------------------------------------------
+var Quiz = (function () {
+
+  var _sessionId = 0;       // incremented on every start/restart
+  var _writers = [];        // HanziWriter instances, one per character
+  var _characters = [];     // array of character strings
+  var _currentIndex = 0;    // which character we are currently quizzing
+  var _totalMistakes = 0;
+  var _mistakesThisChar = 0;
+  var _nextStrokeIndex = 0;
+
+  // Returns a guard function. Call it inside any async callback:
+  // if (!guard()) return;  →  safely drops stale callbacks.
+  function _makeGuard(capturedId) {
+    return function () { return _sessionId === capturedId; };
+  }
+
+  function _getDrawSize()       { return parseInt(Prefs.get("draw-size"),   10) || 400; }
+  function _getStrokeWidth()    { return parseInt(Prefs.get("stroke-size"), 10) || 6;   }
+  function _getHintAfterMiss()  { return parseInt(Prefs.get("hint-miss"),   10) || 5;   }
+  function _showOutline()       { return Prefs.get("text-outline") === true; }
+
+  // -- Feedback display --
+  function _updateFeedback() {
+    var parts = [];
+    if (_mistakesThisChar > 0) {
+      parts.push(_mistakesThisChar === 1 ? "1 mistake for this character"
+        : _mistakesThisChar + " mistakes for this character");
+    }
+    if (_totalMistakes > 0) {
+      parts.push(_totalMistakes === 1 ? "1 mistake for the quiz"
+        : _totalMistakes + " mistakes for the quiz");
+    }
+    var fb = document.getElementById("writing-feedback");
+    var mistakes = document.getElementById("writing-feedback-mistakes");
+    if (fb && mistakes) {
+      mistakes.innerHTML = parts.join("<br/>");
+      fb.style.display = parts.length ? "block" : "none";
+    }
+  }
+
+  // -- Completed-character thumbnail strip --
+  function _revealThumbnail(charIndex) {
+    var container = document.getElementById("onfinish-character-target-div");
+    if (!container) return;
+    var children = container.children;
+    if (charIndex < children.length) {
+      children[charIndex].style.display = "unset";
+    }
+  }
+
+  function _buildThumbnails(characters) {
+    var container = document.getElementById("onfinish-character-target-div");
+    if (!container) return;
+    container.innerHTML = "";
+    container.style.cssText = "";
+    container.style.position = "absolute";
+    container.style.display = "grid";
+    container.style.zIndex = "30";
+
+    characters.split("").forEach(function (char, idx) {
+      var span = document.createElement("span");
+      span.innerHTML = GRID_SMALL_TPL;
+      var svgEl = span.children[0];
+      svgEl.id = "onfinish-grid-bg-" + idx;
+      svgEl.style.margin = "2px";
+      span.style.display = "none"; // hidden until character is completed
+      container.appendChild(span);
+
+      HanziWriter.create("onfinish-grid-bg-" + idx, char, {
+        charDataLoader: charDataLoader,
+        width: 40,
+        height: 40,
+        padding: 5,
+        strokeColor: getStrokeColorForIndex(idx),
+        renderer: "svg",
+      });
+    });
+  }
+
+  function _buildCompletedView(characters) {
+    // Full-size completed characters shown after quiz finishes
+    var container = document.getElementById("onfinish-character-target-div");
+    if (!container) return;
+    container.innerHTML = "";
+    container.style.cssText = "";
+    container.style.position = "unset";
+    container.style.display = "block";
+    container.style.whiteSpace = "nowrap";
+    container.style.overflow = "scroll";
+    container.style.zIndex = "30";
+
+    characters.split("").forEach(function (char, idx) {
+      var span = document.createElement("span");
+      span.innerHTML = GRID_SMALL_TPL;
+      var svgEl = span.children[0];
+      svgEl.id = "onfinish-full-grid-bg-" + idx;
+      svgEl.style.margin = "6px";
+      container.appendChild(span);
+
+      HanziWriter.create("onfinish-full-grid-bg-" + idx, char, {
+        charDataLoader: charDataLoader,
+        width: 100,
+        height: 100,
+        padding: 5,
+        strokeColor: getStrokeColorForIndex(idx),
+        renderer: "svg",
+      });
+    });
+  }
+
+  // -- Start quiz for a single character at charIndex --
+  function _startCharacterQuiz(charIndex, guard) {
+    if (!guard()) return;
+
+    _currentIndex = charIndex;
+    _mistakesThisChar = 0;
+    _nextStrokeIndex = 0;
+
+    var characters = _characters;
+    var writer = _writers[charIndex];
+    if (!writer) return;
+
+    // Show only the current character's canvas, hide others
+    var mainDiv = document.getElementById("character-target-div");
+    if (mainDiv) {
+      Array.from(mainDiv.children).forEach(function (child, i) {
+        child.style.display = i === charIndex ? "block" : "none";
+      });
     }
 
-    return tonesArr;
+    writer.quiz({
+      showHintAfterMisses: _getHintAfterMiss(),
+      highlightOnComplete: true,
+      highlightCompleteColor: STROKE_COLOR,
+
+      onMistake: function (data) {
+        if (!guard()) return;
+        _mistakesThisChar = data.mistakesOnStroke;
+        _totalMistakes++;
+        _updateFeedback();
+      },
+
+      onCorrectStroke: function (data) {
+        if (!guard()) return;
+        _mistakesThisChar = data.mistakesOnStroke;
+        _nextStrokeIndex = data.strokeNum + 1;
+        _updateFeedback();
+      },
+
+      onComplete: function (data) {
+        if (!guard()) return;
+        _totalMistakes += data.totalMistakes;
+        _nextStrokeIndex = 0;
+
+        // Speak: current char then next char (if this is a multi-char word
+        // and not the last character)
+        if (characters.length > 1) {
+          AudioManager.speak(characters[charIndex]);
+          if (charIndex + 1 < characters.length) {
+            AudioManager.speak(characters[charIndex + 1]);
+          }
+        }
+
+        _revealThumbnail(charIndex);
+
+        var nextIndex = charIndex + 1;
+        if (nextIndex < characters.length) {
+          // Small delay so the highlight-complete animation is visible
+          setTimeout(function () {
+            if (!guard()) return;
+            _startCharacterQuiz(nextIndex, guard);
+          }, 1000);
+        } else {
+          _onQuizComplete(guard);
+        }
+      },
+    });
   }
 
-  function recolorPinyin(pinyinElement, decodedTones) {
-    var pinyinText = pinyinElement.textContent.trim();
-    var coloredPinyin = "";
-    var wordIndex = 0;
+  function _onQuizComplete(guard) {
+    if (!guard()) return;
 
-    for (var i = 0; i < pinyinText.length; i++) {
-      if (pinyinText[i] === " ") {
-        coloredPinyin += " ";
-        wordIndex++;
-        continue;
-      }
-      var color = colorCodes[decodedTones[wordIndex]] || "#000"; // Default color to black if tone is not found
-      coloredPinyin +=
-        '<span style="color:' + color + ';">' + pinyinText[i] + "</span>";
-    }
-    pinyinElement.innerHTML = coloredPinyin;
+    document.getElementById("char_examples").style.display = "block";
+    document.getElementById("char_examples_blank").style.display = "none";
+
+    _buildCompletedView(_characters.join(""));
+
+    var feedback = document.getElementById("writing-feedback");
+    if (feedback) feedback.style.display = "none";
+
+    _updateLoadStatus(true);
   }
 
-  function isChineseCharacter(char) {
-    return /^[\u4e00-\u9fff]$/.test(char);
+  function _updateLoadStatus(success) {
+    var el = document.getElementById("ch_load_status");
+    if (!el) return;
+    if (success === true)  { el.style.color = "#4caf50"; el.style.display = "inline"; return; }
+    if (success === false) { el.style.color = "#ea2322"; el.style.display = "inline"; return; }
+    el.style.color = "#ea2322";
+    el.style.display = "inline";
   }
 
-  function recolorCharacters(characterElement, decodedTones) {
-    var characterText = characterElement.innerHTML;
-    var coloredCharacters = "";
-    var wordIndex = 0;
+  // -- Public: start (or restart) the quiz --
+  function start() {
+    _sessionId++;
+    var guard = _makeGuard(_sessionId);
 
-    for (var i = 0; i < characterText.length; i++) {
-      if (!isChineseCharacter([characterText[i]])) {
-        coloredCharacters += characterText[i];
-      } else {
-        var color = colorCodes[decodedTones[wordIndex]] || "#555"; // Default color to grey if tone is not found
-        coloredCharacters +=
-          '<span style="color:' + color + ';">' + characterText[i] + "</span>";
-        wordIndex++;
-      }
-    }
+    _writers = [];
+    _totalMistakes = 0;
+    _mistakesThisChar = 0;
+    _nextStrokeIndex = 0;
 
-    characterElement.innerHTML = coloredCharacters;
-  }
+    var characters = getCharactersToDraw();
+    _characters = characters.split("");
 
-  function applyColorization() {
-    var pinyinElement = document.getElementById("char_pinyin");
-    if (!pinyinElement) {
-      console.warn(
-        'Pinyin element not found with "#char_pinyin", will not attempt to recolour pinyin, simplified or traditional',
-      );
+    var feedback = document.getElementById("writing-feedback");
+    if (feedback) feedback.style.display = "none";
+
+    _updateLoadStatus(null);
+
+    // If we're on the back, show completed view immediately without quizzing
+    if (document.getElementById("back")) {
+      _buildCompletedView(characters);
+      document.getElementById("char_examples").style.display = "block";
+      document.getElementById("char_examples_blank").style.display = "none";
       return;
     }
-    var decodedTones = decodePinyin(pinyinElement.textContent);
-    recolorPinyin(pinyinElement, decodedTones);
 
-    var hanziElement = document.getElementById("char_sim");
-    if (hanziElement) {
-      recolorCharacters(hanziElement, decodedTones);
-    } else {
-      console.warn(
-        'Simpliifed element not found with "#char_sim", will not attempt to recolour simplified',
-      );
-    }
+    document.getElementById("char_examples").style.display = "none";
+    document.getElementById("char_examples_blank").style.display = "block";
 
-    var traditionalElement = document.getElementById("char_trad");
-    var hanziElement = document.getElementById("char_sim");
-    if (hanziElement) {
-      recolorCharacters(traditionalElement, decodedTones);
-    } else {
-      console.warn(
-        'Traditional element not found with "#char_trad", will not attempt to recolour traditional',
-      );
-    }
+    _buildThumbnails(characters);
+
+    var mainDiv = document.getElementById("character-target-div");
+    if (!mainDiv) return;
+    mainDiv.innerHTML = "";
+
+    var charSize = _getDrawSize();
+    var strokeWidth = _getStrokeWidth();
+    var showOutline = _showOutline();
+
+    var writersReady = 0;
+
+    _characters.forEach(function (char, idx) {
+      var div = document.createElement("div");
+      div.id = "quiz-char-div-" + idx;
+      div.style.position = "relative";
+      div.style.display = idx === 0 ? "block" : "none";
+
+      var canvasWrapper = document.createElement("div");
+      canvasWrapper.className = "grid-color";
+      canvasWrapper.style.cssText = "background-color:rgba(0,0,0,0);z-index:20;position:relative;";
+      canvasWrapper.id = "quiz-canvas-" + idx;
+      div.appendChild(canvasWrapper);
+
+      var overlay = document.createElement("div");
+      overlay.innerHTML = GRID_OVERLAY_TPL(charSize, charSize);
+      overlay.firstChild.style.pointerEvents = "none";
+      div.appendChild(overlay.firstChild);
+
+      // Per-character meaning label (multi-char words only)
+      if (_characters.length > 1) {
+        var meaningDiv = document.createElement("div");
+        meaningDiv.id = "char-meaning-" + idx;
+        meaningDiv.className = "character-meaning-div";
+        div.appendChild(meaningDiv);
+        loadCharMeaning(char, function (data) {
+          if (!guard()) return;
+          var pinyin = getPinyinWithMacron(data.pinyin);
+          meaningDiv.className = "character-meaning-div-populated";
+          meaningDiv.innerHTML = pinyin + ": " + data.definitions.join("; ");
+        });
+      }
+
+      mainDiv.appendChild(div);
+
+      var writer = HanziWriter.create("quiz-canvas-" + idx, char, {
+        charDataLoader: charDataLoader,
+        strokeAnimationSpeed: 2,
+        delayBetweenStrokes: 125,
+        width: charSize,
+        height: charSize,
+        showCharacter: false,
+        showOutline: showOutline,
+        highlightOnComplete: true,
+        highlightCompleteColor: STROKE_COLOR,
+        drawingWidth: strokeWidth,
+        strokeColor: getStrokeColorForIndex(idx),
+        outlineColor: OUTLINE_COLOR,
+        drawingColor: DRAWING_COLOR,
+        showHintAfterMisses: _getHintAfterMiss(),
+        padding: 5,
+        renderer: "canvas",
+        onLoadCharDataSuccess: function () {
+          _updateLoadStatus(true);
+          writersReady++;
+          if (writersReady === _characters.length) {
+            // All writers loaded — start quizzing the first character
+            _startCharacterQuiz(0, guard);
+          }
+        },
+        onLoadCharDataError: function () {
+          _updateLoadStatus(false);
+        },
+      });
+
+      _writers[idx] = writer;
+    });
   }
 
-  applyColorization();
+  // Public: restart (called by reload button and practice-select change)
+  function restart() {
+    start();
+  }
 
+  // Public: skip/reveal the current stroke (hint button)
+  function hintCurrentStroke() {
+    var writer = _writers[_currentIndex];
+    if (writer) writer.highlightStroke(_nextStrokeIndex);
+  }
+
+  // Public: skip the current character (next-card button)
+  function skipCurrentCharacter() {
+    var writer = _writers[_currentIndex];
+    if (!writer) return;
+    writer.showOutline();
+    writer.showCharacter();
+    _revealThumbnail(_currentIndex);
+
+    var guard = _makeGuard(_sessionId);
+    var capturedIndex = _currentIndex;
+
+    setTimeout(function () {
+      if (!guard()) return;
+      var nextIndex = capturedIndex + 1;
+      if (nextIndex < _characters.length) {
+        _startCharacterQuiz(nextIndex, guard);
+      } else {
+        _onQuizComplete(guard);
+      }
+    }, 800);
+  }
+
+  // Public: toggle outline on the current writer
+  function setOutline(show) {
+    var writer = _writers[_currentIndex];
+    if (!writer) return;
+    show ? writer.showOutline() : writer.hideOutline();
+  }
+
+  return {
+    start: start,
+    restart: restart,
+    hintCurrentStroke: hintCurrentStroke,
+    skipCurrentCharacter: skipCurrentCharacter,
+    setOutline: setOutline,
+  };
+})();
+
+// ---------------------------------------------------------------------------
+// Button wiring — registered once, here, not inside any loop
+// ---------------------------------------------------------------------------
+document.getElementById("btnPlayAudio").onclick = function () {
+  AudioManager.playAnkiAudio();
+};
+
+document.getElementById("btnReloadQuiz").onclick = function () {
+  Quiz.restart();
+};
+
+document.getElementById("btnRevealChar").onclick = function () {
+  Quiz.hintCurrentStroke();
+};
+
+document.getElementById("btnGoNextCard").onclick = function () {
+  Quiz.skipCurrentCharacter();
+};
+
+// btnSwitchRenderer is vestigial (canvas is hardcoded) but keep it harmless
+document.getElementById("btnSwitchRenderer").onclick = function () {
+  // no-op: canvas is always used
+};
+
+document.getElementById("btnShowCharacters").onclick = function () {
+  var sim = document.getElementById("char_sim");
+  if (sim) sim.style.display = sim.style.display === "none" ? "block" : "none";
+};
+
+document.getElementById("text-outline").onchange = function () {
+  Quiz.setOutline(this.checked);
+};
+
+// ---------------------------------------------------------------------------
+// Boot
+// ---------------------------------------------------------------------------
+(function init() {
+  if (!Persistence.isAvailable()) return;
+
+  function run() {
+    SideManager.init();
+    applyPrefsToUI();
+    Quiz.start();
+  }
+
+  // Desktop / AnkiMobile WebView: DOM is ready synchronously
+  if (window.ankiPlatform === "desktop" || isInWebView()) {
+    run();
+  } else {
+    window.addEventListener("load", run, false);
+  }
+})();
+
+function isInWebView() {
+  var UA = navigator.userAgent;
+  if (/iPhone|iPod|iPad/.test(UA)) {
+    if (/(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(UA)) return true;
+  }
+  if (window.location.href.includes("ankiuser.net")) return true;
+  return false;
+}
 </script>
