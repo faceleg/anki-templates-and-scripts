@@ -223,6 +223,10 @@
   justify-content: space-between;
   margin: 0 auto;
   max-width: 400px;
+  position: absolute;
+  width: 400px;
+  left: 0;
+  right: 0;
 }
 
 .header-left, .header-right {
@@ -237,6 +241,7 @@
 
 #back #char_image {
   display: block;
+  padding-top: 40px;
 }
 
 .header-left a, .header-right a {
@@ -259,14 +264,8 @@
 
 .header-wrapper {
   display: flex;
+  top: 15px;
   justify-content: space-between;
-  margin: 0 auto;
-  max-width: 400px;
-}
-
-.footer-wrapper {
-  display: flex;
-  justify-content: center;
   margin: 0 auto;
   max-width: 400px;
 }
@@ -830,7 +829,8 @@ hr {
   margin-top: 10px;
 }
 
-#listening-with-audio #char_examples .char_examples-parts-of-speech {
+#char_examples .char_examples-parts-of-speech,
+#char_examples_blank .char_examples-parts-of-speech {
   display: none;
 }
 

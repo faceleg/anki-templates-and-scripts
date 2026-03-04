@@ -26,8 +26,12 @@
             </div>
         </a>
     </div>
-    <div id="char_pinyin" style="display:none">{{Pinyin}}</div>
     <div class="header-right">
+      <a class="btn" id="btnGoNextCard">
+          <div class="icon">
+              <i class="material-icons">navigate_next</i>
+          </div>
+      </a>
         <a class="btn" id="btnReloadQuiz">
             <div class="icon">
                 <i class="material-icons">replay</i>
@@ -37,6 +41,7 @@
 </div>
 <div id="char_image">{{Image}}</div>
 <div id="char_sim" class="char-card" style="display:none">{{Simplified}}</div>
+<div id="char_pinyin" style="display:none">{{Pinyin}}</div>
 
 <div id="onfinish-character-target-div" style="z-index: 30; pointer-events: none;"></div>
 <div id="character-target-div" class="tappable"></div>
@@ -60,14 +65,6 @@
     <hr>
     {{Definitions}}
     <hr>
-</div>
-
-<div class="footer-wrapper">
-    <a class="btn" id="btnGoNextCard">
-        <div class="icon">
-            <i class="material-icons">navigate_next</i>
-        </div>
-    </a>
 </div>
 
 <div id="char_examples">{{Examples}}</div>
