@@ -13,7 +13,6 @@
     z-index:1000;
   "
 ></div>
-<div id="char_zhuyin">{{Zhuyin}}</div>
 <div class="header-wrapper">
     <div class="header-left">
         <a class="btn" id="btnPlayAudio">
@@ -26,24 +25,9 @@
                 <i class="material-icons">gesture</i>
             </div>
         </a>
-        <a class="btn" id="btnRevealCharPlaceholder" style="display:none; visibility: hidden;">
-            <div class="icon">
-                <i class="material-icons">gesture</i>
-            </div>
-        </a>
     </div>
-    <div id="char_pinyin">{{Pinyin}}</div>
+    <div id="char_pinyin" style="display:none">{{Pinyin}}</div>
     <div class="header-right">
-        <a class="btn" id="btnShowCharacters">
-            <div class="icon">
-                <i class="material-icons">translate</i>
-            </div>
-        </a>
-        <a class="btn" id="btnShowCharactersPlaceholder" style="display:none; visibility: hidden;">
-            <div class="icon">
-                <i class="material-icons">translate</i>
-            </div>
-        </a>
         <a class="btn" id="btnReloadQuiz">
             <div class="icon">
                 <i class="material-icons">replay</i>
@@ -52,376 +36,50 @@
     </div>
 </div>
 <div id="char_image">{{Image}}</div>
-<div id="char_sim" class="char-card">{{Simplified}}</div>
-<div id="char_trad" class="char-card">{{Traditional}}</div>
+<div id="char_sim" class="char-card" style="display:none">{{Simplified}}</div>
 
-<div id="onfinish-character-target-div" style="z-index: 30;" class="tappable"></div>
+<div id="onfinish-character-target-div" style="z-index: 30; pointer-events: none;"></div>
 <div id="character-target-div" class="tappable"></div>
 <div id="writing-feedback" style="display: none">
     <span id="writing-feedback-mistakes"></span>
     <span id="writing-feedback-total-strokes"></span>
+    <span id="quiz-rating-indicator" style="
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border-radius: 5px;
+        background-color: #4caf50;
+        vertical-align: middle;
+        margin-left: 10px;
+        transition: background-color 0.4s ease;
+    "></span>
 </div>
 <div id="audio" style="display: none">{{Audio}}</div>
 
 <div id="char_meaning" class="meaning-card">
-    <hr >
+    <hr>
     {{Definitions}}
-    <hr >
+    <hr>
 </div>
 
 <div class="footer-wrapper">
-    <a class="btn" id="btnShowMenu" onclick="openSidebar('sidebar')">
-        <div class="icon">
-            <i class="material-icons">menu</i>
-        </div>
-    </a>
     <a class="btn" id="btnGoNextCard">
         <div class="icon">
             <i class="material-icons">navigate_next</i>
         </div>
     </a>
-    <a class="btn" id="btnSwitchRenderer">
-        <div class="icon">
-            <i class="material-icons">draw_abstract</i>
-        </div>
-    </a>
-    <a class="btn" id="btnMoreOptions" onclick="openSidebar('more-info-sidebar')">
-        <div class="icon">
-            <i class="material-icons">more_vert</i>
-        </div>
-    </a>
 </div>
 
-<!-- Placeholder to stop crashing because I can't be bothered sorting out the show/hide JS for this section -->
-<div id="char_examples-parts-of-speech"></div>
 <div id="char_examples">{{Examples}}</div>
 <div id="char_examples_blank">{{ExamplesBlank}}</div>
 
 <div id="char_deck">
-  <div class="deck-information">
-    <span
-        id="ch_load_status"
-        style="color: #ea2322; display: none"
-    >
-        &#8226;
-    </span>
-    {{Deck}}
-    <span id="which-renderer"></span>
+    <div class="deck-information">
+        <span id="ch_load_status" style="color: #ea2322; display: none">&#8226;</span>
+        {{Deck}}
     </div>
-    <div class="card-information">
-    {{Card}}
-  </div>
+    <div class="card-information">{{Card}}</div>
 </div>
-
-<!--sidebar-->
-
-<div id="sidebar" class="sidebar">
-    <section>
-        <fieldset style="border: none">
-            <div class="fieldset-item tappable">
-                <div
-                    class="input-stack"
-                    style="text-align: center; color: var(--text2)"
-                >
-                    <label for="deck-title">
-                        <h3 class="brand-title">写汉字</h3>
-                        <div class="brand-sub-title">xiě hànzì</div>
-                    </label>
-                    <a onclick="closeSidebar('sidebar')" class="close-button">✖</a>
-                </div>
-            </div>
-        </fieldset>
-    </section>
-    <section>
-        <fieldset>
-            <div class="fieldset-item fs-item-3 practice fs-item-front-back">
-                <div
-                    id="text-front"
-                    class="input-stack front-back"
-                    onclick="setActive('text-front')"
-                >
-                    Front
-                </div>
-                <div
-                    id="text-back"
-                    class="input-stack front-back"
-                    onclick="setActive('text-back')"
-                >
-                    Back
-                </div>
-            </div>
-        </fieldset>
-    </section>
-    <section>
-        <fieldset>
-            <div class="fieldset-item fs-item-1 practice">
-                <div class="input-stack">
-                    <label for="reading-practice-select">Practice</label>
-                </div>
-                <select
-                    name="practice"
-                    id="reading-practice-select"
-                    onchange="setPrefs(this)"
-                >
-                    <option>简</option>
-                    <option>繁</option>
-                </select>
-            </div>
-        </fieldset>
-    </section>
-    <section>
-        <fieldset>
-            <div class="fieldset-item fs-item-1">
-                <div class="input-stack">
-                    <label for="text-pinyin"> Pinyin </label>
-                </div>
-                <input
-                    class="tappable"
-                    type="checkbox"
-                    id="text-pinyin"
-                    name="text-pinyin"
-                    onchange="setPrefs(this)"
-                >
-            </div>
-            <div class="fieldset-item fs-item-1">
-                <div class="input-stack">
-                    <label for="text-zhuyin"> Zhuyin </label>
-                </div>
-                <input
-                    class="tappable"
-                    type="checkbox"
-                    id="text-zhuyin"
-                    name="text-zhuyin"
-                    onchange="setPrefs(this)"
-                >
-            </div>
-            <div class="fieldset-item fs-item-1">
-                <div class="input-stack">
-                    <label for="text-examples"> Examples </label>
-                </div>
-                <input
-                    class="tappable"
-                    type="checkbox"
-                    id="text-examples"
-                    name="text-examples"
-                    onchange="setPrefs(this)"
-                >
-            </div>
-            <div class="fieldset-item fs-item-1">
-                <div class="input-stack">
-                    <label for="text-examples-parts-of-speech">
-                        Examples - Parts of Speech Headings
-                    </label>
-                </div>
-                <input
-                    class="tappable"
-                    type="checkbox"
-                    id="text-examples-parts-of-speech"
-                    name="text-examples-parts-of-speech"
-                    onchange="setPrefs(this)"
-                >
-            </div>
-            <div class="fieldset-item fs-item-1">
-                <div class="input-stack">
-                    <label for="text-meaning"> Meaning </label>
-                </div>
-                <input
-                    class="tappable"
-                    type="checkbox"
-                    id="text-meaning"
-                    name="text-meaning"
-                    onchange="setPrefs(this)"
-                >
-            </div>
-            <div class="fieldset-item fs-item-1">
-                <div class="input-stack">
-                    <label for="text-sim"> Simplified </label>
-                </div>
-                <input
-                    class="tappable"
-                    type="checkbox"
-                    id="text-sim"
-                    name="text-sim"
-                    onchange="setPrefs(this)"
-                >
-            </div>
-            <div class="fieldset-item fs-item-1">
-                <div class="input-stack">
-                    <label for="text-trad"> Traditional </label>
-                </div>
-                <input
-                    class="tappable"
-                    type="checkbox"
-                    id="text-trad"
-                    name="text-trad"
-                    onchange="setPrefs(this)"
-                >
-            </div>
-            <div class="fieldset-item fs-item-1">
-                <div class="input-stack">
-                    <label for="text-grid"> Grid </label>
-                </div>
-                <input
-                    class="tappable"
-                    type="checkbox"
-                    id="text-grid"
-                    name="text-grid"
-                    onchange="setPrefs(this)"
-                >
-            </div>
-            <div class="fieldset-item fs-item-1">
-                <div class="input-stack">
-                    <label for="text-outline"> Outline </label>
-                </div>
-                <input
-                    class="tappable"
-                    type="checkbox"
-                    id="text-outline"
-                    name="text-outline"
-                    onchange="setPrefs(this)"
-                >
-            </div>
-            <div class="fieldset-item fs-item-1">
-                <div class="input-stack">
-                    <label for="text-stroke-color"> Stroke tone color </label>
-                </div>
-                <input
-                    class="tappable"
-                    type="checkbox"
-                    id="text-stroke-color"
-                    name="text-stroke-color"
-                    onchange="setPrefs(this)"
-                >
-            </div>
-        </fieldset>
-    </section>
-    <section>
-        <fieldset>
-            <div class="fieldset-item fs-item-1">
-                <div class="input-stack">
-                    <label for="draw-size" id="text-draw-size" aria-hidden="true">
-                        <small>Grid size</small>
-                    </label>
-                </div>
-                <input
-                    class="tappable"
-                    name="draw-size"
-                    id="draw-size"
-                    aria-labelledby="draw-size"
-                    type="number"
-                    value="250"
-                    min="100"
-                    max="1000"
-                    oninput="setPrefs(this)"
-                >
-            </div>
-            <div class="fieldset-item fs-item-1">
-                <div class="input-stack">
-                    <label for="stroke-size" id="text-stroke-size" aria-hidden="true">
-                        <small>Stroke width</small>
-                    </label>
-                </div>
-                <input
-                    class="tappable"
-                    name="stroke-size"
-                    id="stroke-size"
-                    aria-labelledby="stroke-size"
-                    type="number"
-                    value="6"
-                    min="2"
-                    max="50"
-                    oninput="setPrefs(this)"
-                >
-            </div>
-            <div class="fieldset-item fs-item-1">
-                <div class="input-stack">
-                    <label for="hint-miss" id="text-hint-miss" aria-hidden="true">
-                        <small>Hint after misses</small>
-                    </label>
-                </div>
-                <input
-                    class="tappable"
-                    name="hint-miss"
-                    id="hint-miss"
-                    aria-labelledby="hint-miss"
-                    type="number"
-                    value="3"
-                    min="1"
-                    max="10"
-                    oninput="setPrefs(this)"
-                >
-            </div>
-        </fieldset>
-    </section>
-    <section>
-        <fieldset>
-            <a href="https://github.com/krmanik/Anki-xiehanzi">
-                <div class="fieldset-item tappable">
-                    <span style="font-size: 14px; text-align: center">View it on GitHub</span>
-                </div>
-            </a>
-        </fieldset>
-    </section>
-</div>
-<div id="more-info-sidebar" class="more-info-sidebar">
-    <a class="fieldset-item tappable">
-        <div class="more-side-brand">
-            <div class="brand-title">写汉字</div>
-            <div class="brand-sub-title">xiě hànzì</div>
-        </div>
-        <div
-            onclick="closeSidebar('more-info-sidebar')"
-            class="close-button close2"
-        >
-            ✖
-        </div>
-    </a>
-    <a
-        class="fieldset-item tappable"
-        id="plecoMobile"
-        href="plecoapi://x-callback-url/df?hw={{Simplified}}"
-    >
-        <img src="_pleco.png" alt="pleco">
-        <small>Pleco</small>
-    </a>
-    <a
-        class="fieldset-item tappable"
-        href="http://dict.youdao.com/search?q={{Simplified}}"
-    >
-        <img src="_youdao.png" alt="youdao">
-        <small>Youdao</small>
-    </a>
-    <a
-        class="fieldset-item tappable"
-        href="https://hanzicraft.com/character/{{Simplified}}"
-    >
-        <img src="_hanzicraft.png" alt="hanzicraft">
-        <small>HanziCraft</small>
-    </a>
-    <a
-        class="fieldset-item tappable"
-        href="https://characterpop.com/characters/{{Simplified}}"
-    >
-        <img src="_characterpop.svg" alt="characterpop">
-        <small>CharacterPop</small>
-    </a>
-    <a
-        class="fieldset-item tappable"
-        href="http://rtega.be/chmn/index.php?c={{Simplified}}"
-    >
-        <img src="_rtega.png" alt="rtenga">
-        <small>Rtega</small>
-    </a>
-    <a
-        class="fieldset-item tappable"
-        href="https://tatoeba.org/en/sentences/search?from=cmn&query={{Simplified}}&to="
-    >
-        <img src="_tatoeba.png" alt="tatoeba">
-        <small>Tatoeba</small>
-    </a>
-</div>
-
-<!-----/sidebar------>
 
 <script type="text/javascript">
   // v1.1.8 - https://github.com/SimonLammer/anki-persistence/blob/584396fea9dea0921011671a47a0fdda19265e62/script.js
@@ -437,9 +95,34 @@
 "use strict";
 
 // ---------------------------------------------------------------------------
+// Debug — set DEBUG = true to enable verbose logging in the overlay
+// ---------------------------------------------------------------------------
+var DEBUG = false;
+
+window.onerror = function (message, source, lineno, colno, error) {
+  var el = document.getElementById("debug-message-console");
+  if (!el) return;
+  el.style.display = "block";
+  el.innerHTML += "<div>" + message + " (" + (source || "") + ":" + lineno + ":" + colno + ")</div>";
+};
+
+window.addEventListener("unhandledrejection", function (event) {
+  var el = document.getElementById("debug-message-console");
+  if (!el) return;
+  el.style.display = "block";
+  el.innerHTML += "<div>Unhandled promise rejection: " + (event.reason || "") + "</div>";
+});
+
+function debugLog(msg) {
+  if (!DEBUG) return;
+  var el = document.getElementById("debug-message-console");
+  if (!el) return;
+  el.style.display = "block";
+  el.innerHTML += "<div>" + msg + "</div>";
+}
+
+// ---------------------------------------------------------------------------
 // AudioManager
-// Handles TTS. Voices are loaded lazily since speechSynthesis.getVoices() is
-// async in most browsers/WebViews and returns [] when called synchronously.
 // ---------------------------------------------------------------------------
 var AudioManager = (function () {
   var _voice = null;
@@ -447,7 +130,6 @@ var AudioManager = (function () {
 
   function _findVoice() {
     var voices = speechSynthesis.getVoices();
-    // Prefer TingTing (zh-CN), fall back to any zh voice
     return (
       voices.find(function (v) {
         return v.lang.indexOf("zh-CN") === 0 && v.name.toLowerCase() === "tingting";
@@ -459,7 +141,6 @@ var AudioManager = (function () {
     );
   }
 
-  // Load voices eagerly if already available, otherwise wait for the event.
   function _loadVoices() {
     _voice = _findVoice();
     _voicesLoaded = true;
@@ -474,9 +155,8 @@ var AudioManager = (function () {
     });
   }
 
-  function speak(phrase) {
+  function speak(phrase, onEnd) {
     if (!phrase) return;
-    // Ensure voices are resolved before speaking
     if (!_voicesLoaded) {
       _voice = _findVoice();
       _voicesLoaded = true;
@@ -487,6 +167,7 @@ var AudioManager = (function () {
     utterance.lang = "zh";
     if (_voice) utterance.voice = _voice;
     utterance.text = phrase;
+    if (onEnd) utterance.onend = onEnd;
     speechSynthesis.speak(utterance);
   }
 
@@ -502,207 +183,26 @@ var AudioManager = (function () {
 })();
 
 // ---------------------------------------------------------------------------
-// Prefs
-// Wraps anki-persistence with typed get/set and sensible defaults.
+// Hardcoded settings
 // ---------------------------------------------------------------------------
-var Prefs = (function () {
-  var KEY_PREFIX = "basic-mandarin-writing";
+var DRAW_SIZE    = 400;
+var STROKE_WIDTH = 64;
+var HINT_MISS    = 5;
 
-  var DEFAULTS = {
-    "text-pinyin": true,
-    "text-zhuyin": false,
-    "text-meaning": true,
-    "text-examples": false,
-    "text-examples-parts-of-speech": false,
-    "text-sim": false,
-    "text-trad": false,
-    "text-grid": true,
-    "text-outline": false,
-    "text-stroke-color": true,
-    "draw-size": 400,
-    "stroke-size": 64,
-    "hint-miss": 5,
-    "reading-practice-select": 0,
-    side: "front",
-  };
-
-  function _key(id) {
-    return KEY_PREFIX + get("side") + id;
-  }
-
-  function get(id) {
-    if (id === "side") {
-      var raw = Persistence.getItem(KEY_PREFIX + "side");
-      return raw !== null ? raw : DEFAULTS["side"];
-    }
-    var raw = Persistence.getItem(_key(id));
-    if (raw === null || raw === undefined) return DEFAULTS[id];
-    if (raw === "true") return true;
-    if (raw === "false") return false;
-    return raw;
-  }
-
-  function set(id, value) {
-    if (id === "side") {
-      Persistence.setItem(KEY_PREFIX + "side", value);
-      return;
-    }
-    if (value === "true") value = true;
-    else if (value === "false") value = false;
-    Persistence.setItem(_key(id), value);
-  }
-
-  return { get: get, set: set };
-})();
+var NIGHT_MODE    = document.body.classList.contains("night_mode");
+var STROKE_COLOR  = NIGHT_MODE ? "#ffffff" : "#555";
+var OUTLINE_COLOR = NIGHT_MODE ? "#5B5B5B" : "#DDD";
+var DRAWING_COLOR = NIGHT_MODE ? "#fff"    : "#333";
 
 // ---------------------------------------------------------------------------
-// UI helpers
-// ---------------------------------------------------------------------------
-function showHide(selector, isShow, style) {
-  style = style || "inline";
-  document.querySelectorAll(selector).forEach(function (el) {
-    el.style.display = isShow ? style : "none";
-  });
-}
-
-function openSidebar(id) {
-  document.getElementById(id).style.width = id === "sidebar" ? "250px" : "160px";
-}
-
-function closeSidebar(id) {
-  document.getElementById(id).style.width = "0";
-}
-
-document.addEventListener("click", function (e) {
-  var sidebar = document.getElementById("sidebar");
-  var moreSidebar = document.getElementById("more-info-sidebar");
-  var btnMenu = document.getElementById("btnShowMenu");
-  var btnMore = document.getElementById("btnMoreOptions");
-  if (!sidebar || !moreSidebar) return;
-  if (btnMenu && btnMenu.contains(e.target)) { openSidebar("sidebar"); return; }
-  if (btnMore && btnMore.contains(e.target)) { openSidebar("more-info-sidebar"); return; }
-  if (!sidebar.contains(e.target)) closeSidebar("sidebar");
-  if (!moreSidebar.contains(e.target)) closeSidebar("more-info-sidebar");
-});
-
-// ---------------------------------------------------------------------------
-// Side manager (Front / Back toggle in sidebar)
-// ---------------------------------------------------------------------------
-var SideManager = (function () {
-  function setActive(side) {
-    // side is "text-front" or "text-back"
-    var isFront = side === "text-front";
-    Prefs.set("side", isFront ? "front" : "back");
-    document.getElementById("text-front").classList.toggle("btn-active", isFront);
-    document.getElementById("text-back").classList.toggle("btn-active", !isFront);
-    applyPrefsToUI();
-  }
-
-  function init() {
-    var isBack = !!document.getElementById("back");
-    setActive(isBack ? "text-back" : "text-front");
-  }
-
-  return { setActive: setActive, init: init };
-})();
-
-// Exposed globally for onclick attributes in HTML
-function setActive(side) {
-  SideManager.setActive(side);
-}
-
-// ---------------------------------------------------------------------------
-// Preferences <-> UI sync
-// ---------------------------------------------------------------------------
-var DRAW_IDS = ["text-grid", "text-stroke-color", "text-outline"];
-var SWITCH_IDS = [
-  "text-pinyin", "text-zhuyin", "text-meaning", "text-examples",
-  "text-examples-parts-of-speech", "text-sim", "text-trad",
-  "text-grid", "text-outline", "text-stroke-color",
-];
-
-function applyPrefsToUI() {
-  SWITCH_IDS.forEach(function (id) {
-    var checked = Prefs.get(id) !== false;
-    var checkbox = document.getElementById(id);
-    if (checkbox) checkbox.checked = checked;
-
-    if (!DRAW_IDS.includes(id)) {
-      var divId = id.replace("text-", "char_");
-      var el = document.getElementById(divId);
-      if (el) el.style.display = checked ? "block" : "none";
-    }
-    _applySpecialShowHide(id, checked);
-  });
-
-  _applyTraditionalVisibility();
-
-  // Numeric prefs
-  ["draw-size", "stroke-size", "hint-miss"].forEach(function (id) {
-    var el = document.getElementById(id);
-    if (el) el.value = Prefs.get(id);
-  });
-
-  // Practice select
-  var sel = document.getElementById("reading-practice-select");
-  if (sel) sel.selectedIndex = Prefs.get("reading-practice-select");
-}
-
-function _applySpecialShowHide(id, isShow) {
-  switch (id) {
-    case "text-pinyin": showHide(".pinyin", isShow); break;
-    case "text-zhuyin": showHide(".zhuyin", isShow); break;
-    case "text-examples-parts-of-speech": showHide(".char_examples-parts-of-speech", isShow); break;
-    case "text-sim": showHide("#char-sim-id", isShow); break;
-    case "text-trad":
-      showHide("#char-trad-id", isShow);
-      showHide(".sep", isShow);
-      break;
-  }
-}
-
-function _applyTraditionalVisibility() {
-  var trad = document.getElementById("char_trad");
-  var sim = document.getElementById("char_sim");
-  if (!trad || !sim) return;
-  if (trad.innerText !== sim.innerText) {
-    if (Prefs.get("text-trad")) trad.style.display = "block";
-  } else {
-    if (Prefs.get("text-sim")) trad.style.display = "none";
-  }
-}
-
-// Called by onchange attributes in HTML
-function setPrefs(el) {
-  if (el.id === "reading-practice-select") {
-    Prefs.set("reading-practice-select", el.selectedIndex);
-    Quiz.restart();
-    return;
-  }
-  if (el.type === "checkbox") {
-    Prefs.set(el.id, el.checked);
-    if (el.id === "text-stroke-color" || el.id === "text-outline") return;
-    var divId = el.id.replace("text-", "char_");
-    var divEl = document.getElementById(divId);
-    if (divEl && !DRAW_IDS.includes(el.id)) {
-      divEl.style.display = el.checked ? "block" : "none";
-    }
-    _applySpecialShowHide(el.id, el.checked);
-  }
-  if (el.type === "number") {
-    Prefs.set(el.id, el.value);
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Pinyin / tone utilities  (shared with back template via {{FrontSide}})
+// Tone colors (always on)
 // ---------------------------------------------------------------------------
 var TONE_COLORS = {
   1: "#f44336",
   2: "#ff9800",
   3: "#4caf50",
   4: "#2196f3",
-  5: document.body.classList.contains("night_mode") ? "#fff" : "#555",
+  5: STROKE_COLOR,
 };
 
 function decodePinyin(pinyin) {
@@ -754,19 +254,18 @@ var _decodedPinyin = decodePinyin(
   (document.getElementById("char_pinyin") || {innerText: ""}).innerText
 );
 
-// ---------------------------------------------------------------------------
-// Hanzi drawing helpers
-// ---------------------------------------------------------------------------
-var NIGHT_MODE = document.body.classList.contains("night_mode");
-var STROKE_COLOR   = NIGHT_MODE ? "#ffffff" : "#555";
-var OUTLINE_COLOR  = NIGHT_MODE ? "#5B5B5B" : "#DDD";
-var DRAWING_COLOR  = NIGHT_MODE ? "#fff"    : "#333";
+function getStrokeColorForIndex(charIndex) {
+  return TONE_COLORS[_decodedPinyin[charIndex]] || STROKE_COLOR;
+}
 
+// ---------------------------------------------------------------------------
+// Grid templates
+// ---------------------------------------------------------------------------
 var GRID_OVERLAY_TPL = function (w, h) {
   return (
     "<svg xmlns='http://www.w3.org/2000/svg' width='" + w + "' height='" + h +
     "' style='position:absolute;z-index:10;pointer-events:none;top:0;left:0;' class='grid-color'>" +
-    "<g id='char_grid'>" +
+    "<g>" +
     "<line x1='0' y1='0' x2='100%' y2='100%' stroke='var(--surface1)' />" +
     "<line x1='100%' y1='0' x2='0' y2='100%' stroke='var(--surface1)' />" +
     "<line x1='50%' y1='0' x2='50%' y2='100%' stroke='var(--surface1)' />" +
@@ -776,19 +275,17 @@ var GRID_OVERLAY_TPL = function (w, h) {
 };
 
 var GRID_SMALL_TPL =
-  "<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%' class='grid-color' id='grid-background-target'>" +
-  "<g id='char_grid'>" +
+  "<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%' class='grid-color'>" +
+  "<g>" +
   "<line x1='0' y1='0' x2='100%' y2='100%' stroke='var(--surface1)' />" +
   "<line x1='100%' y1='0' x2='0' y2='100%' stroke='var(--surface1)' />" +
   "<line x1='50%' y1='0' x2='50%' y2='100%' stroke='var(--surface1)' />" +
   "<line x1='0' y1='50%' x2='100%' y2='50%' stroke='var(--surface1)' />" +
   "</g></svg>";
 
-function getStrokeColorForIndex(charIndex) {
-  if (Prefs.get("text-stroke-color") === false) return STROKE_COLOR;
-  return TONE_COLORS[_decodedPinyin[charIndex]] || STROKE_COLOR;
-}
-
+// ---------------------------------------------------------------------------
+// Char data helpers
+// ---------------------------------------------------------------------------
 function loadCharData(character, onComplete, onFailure) {
   var xhr = new XMLHttpRequest();
   xhr.open("GET", "/_" + character + ".json", true);
@@ -848,45 +345,31 @@ function stripAscii(str) {
 }
 
 function getCharactersToDraw() {
-  var sel = document.getElementById("reading-practice-select");
-  var useTraditional = sel && sel.selectedIndex === 1;
-  var src = useTraditional
-    ? document.getElementById("char_trad")
-    : document.getElementById("char_sim");
+  var src = document.getElementById("char_sim");
   return stripAscii((src || {innerText: ""}).innerText);
 }
 
 // ---------------------------------------------------------------------------
-// Quiz — the core state machine
-//
-// States: idle → running(charIndex) → complete
-//
-// Each call to Quiz.start() increments a session ID. Any closure that captured
-// an older session ID is a no-op when it fires, eliminating all race conditions
-// between restart, delayed callbacks, and onComplete handlers.
+// Quiz
 // ---------------------------------------------------------------------------
 var Quiz = (function () {
 
-  var _sessionId = 0;       // incremented on every start/restart
-  var _writers = [];        // HanziWriter instances, one per character
-  var _characters = [];     // array of character strings
-  var _currentIndex = 0;    // which character we are currently quizzing
+  var _sessionId = 0;
+  var _writers = [];
+  var _thumbnailWriters = [];
+  var _thumbnailRevealPending = [];
+  var _characters = [];
+  var _weightedMistakeScore = 0;
+  var _totalStrokeCount = 0;
+  var _currentIndex = 0;
   var _totalMistakes = 0;
   var _mistakesThisChar = 0;
   var _nextStrokeIndex = 0;
 
-  // Returns a guard function. Call it inside any async callback:
-  // if (!guard()) return;  →  safely drops stale callbacks.
   function _makeGuard(capturedId) {
     return function () { return _sessionId === capturedId; };
   }
 
-  function _getDrawSize()       { return parseInt(Prefs.get("draw-size"),   10) || 400; }
-  function _getStrokeWidth()    { return parseInt(Prefs.get("stroke-size"), 10) || 6;   }
-  function _getHintAfterMiss()  { return parseInt(Prefs.get("hint-miss"),   10) || 5;   }
-  function _showOutline()       { return Prefs.get("text-outline") === true; }
-
-  // -- Feedback display --
   function _updateFeedback() {
     var parts = [];
     if (_mistakesThisChar > 0) {
@@ -905,14 +388,33 @@ var Quiz = (function () {
     }
   }
 
-  // -- Completed-character thumbnail strip --
+  var RATING_COLORS = {
+    easy: "#4caf50",
+    good: "#2196f3",
+    hard: "#ff9800",
+    again: "#f44336",
+  };
+
+  function _getRating() {
+    if (_weightedMistakeScore === 0) return "easy";
+    var normalised = _totalStrokeCount > 0 ? _weightedMistakeScore / _totalStrokeCount : 0;
+    if (normalised <= 0.08) return "good";
+    if (normalised <= 0.25) return "hard";
+    return "again";
+  }
+
+  function _updateRatingIndicator() {
+    var el = document.getElementById("quiz-rating-indicator");
+    if (!el) return;
+    el.style.backgroundColor = RATING_COLORS[_getRating()];
+    var fb = document.getElementById("writing-feedback");
+    if (fb) fb.style.display = "block";
+  }
+
   function _revealThumbnail(charIndex) {
-    var container = document.getElementById("onfinish-character-target-div");
-    if (!container) return;
-    var children = container.children;
-    if (charIndex < children.length) {
-      children[charIndex].style.display = "unset";
-    }
+    _thumbnailRevealPending[charIndex] = true;
+    var writer = _thumbnailWriters[charIndex];
+    if (writer) writer.showCharacter({ duration: 300 });
   }
 
   function _buildThumbnails(characters) {
@@ -920,32 +422,53 @@ var Quiz = (function () {
     if (!container) return;
     container.innerHTML = "";
     container.style.cssText = "";
-    container.style.position = "absolute";
-    container.style.display = "grid";
+    container.style.position = "relative";
+    container.style.display = "flex";
+    container.style.flexDirection = "row";
+    container.style.justifyContent = "center";
+    container.style.alignItems = "center";
     container.style.zIndex = "30";
+    container.style.pointerEvents = "none";
 
     characters.split("").forEach(function (char, idx) {
       var span = document.createElement("span");
-      span.innerHTML = GRID_SMALL_TPL;
-      var svgEl = span.children[0];
-      svgEl.id = "onfinish-grid-bg-" + idx;
-      svgEl.style.margin = "2px";
-      span.style.display = "none"; // hidden until character is completed
+      span.style.display = "inline-block";
+      span.style.width = "40px";
+      span.style.height = "40px";
+      span.style.margin = "2px";
+      span.style.border = "1px solid var(--surface1)";
+      span.style.boxSizing = "border-box";
+      span.style.flexShrink = "0";
+
+      var inner = document.createElement("div");
+      inner.id = "onfinish-grid-bg-" + idx;
+      inner.style.width = "40px";
+      inner.style.height = "40px";
+      span.appendChild(inner);
       container.appendChild(span);
 
-      HanziWriter.create("onfinish-grid-bg-" + idx, char, {
+      _thumbnailWriters[idx] = HanziWriter.create("onfinish-grid-bg-" + idx, char, {
         charDataLoader: charDataLoader,
         width: 40,
         height: 40,
         padding: 5,
+        showOutline: false,
+        showCharacter: false,
         strokeColor: getStrokeColorForIndex(idx),
+        outlineColor: OUTLINE_COLOR,
         renderer: "svg",
+        onLoadCharDataSuccess: (function(i) {
+          return function() {
+            if (_thumbnailRevealPending[i]) {
+              _thumbnailWriters[i].showCharacter({ duration: 300 });
+            }
+          };
+        })(idx),
       });
     });
   }
 
   function _buildCompletedView(characters) {
-    // Full-size completed characters shown after quiz finishes
     var container = document.getElementById("onfinish-character-target-div");
     if (!container) return;
     container.innerHTML = "";
@@ -975,7 +498,6 @@ var Quiz = (function () {
     });
   }
 
-  // -- Start quiz for a single character at charIndex --
   function _startCharacterQuiz(charIndex, guard) {
     if (!guard()) return;
 
@@ -987,7 +509,6 @@ var Quiz = (function () {
     var writer = _writers[charIndex];
     if (!writer) return;
 
-    // Show only the current character's canvas, hide others
     var mainDiv = document.getElementById("character-target-div");
     if (mainDiv) {
       Array.from(mainDiv.children).forEach(function (child, i) {
@@ -995,8 +516,16 @@ var Quiz = (function () {
       });
     }
 
+    var targetDiv = document.getElementById("quiz-char-div-" + charIndex);
+    if (targetDiv) { void targetDiv.offsetWidth; }
+    writer.updateDimensions({ width: DRAW_SIZE, height: DRAW_SIZE });
+
+    if (writer._character) {
+      _totalStrokeCount += writer._character.strokes.length;
+    }
+
     writer.quiz({
-      showHintAfterMisses: _getHintAfterMiss(),
+      showHintAfterMisses: HINT_MISS,
       highlightOnComplete: true,
       highlightCompleteColor: STROKE_COLOR,
 
@@ -1004,7 +533,9 @@ var Quiz = (function () {
         if (!guard()) return;
         _mistakesThisChar = data.mistakesOnStroke;
         _totalMistakes++;
+        _weightedMistakeScore += 1 / (data.strokeNum + 1);
         _updateFeedback();
+        _updateRatingIndicator();
       },
 
       onCorrectStroke: function (data) {
@@ -1019,42 +550,51 @@ var Quiz = (function () {
         _totalMistakes += data.totalMistakes;
         _nextStrokeIndex = 0;
 
-        // Speak: current char then next char (if this is a multi-char word
-        // and not the last character)
-        if (characters.length > 1) {
-          AudioManager.speak(characters[charIndex]);
-          if (charIndex + 1 < characters.length) {
-            AudioManager.speak(characters[charIndex + 1]);
-          }
-        }
-
-        _revealThumbnail(charIndex);
-
         var nextIndex = charIndex + 1;
         if (nextIndex < characters.length) {
-          // Small delay so the highlight-complete animation is visible
+          if (characters.length > 1) {
+            AudioManager.speak(characters[charIndex]);
+            AudioManager.speak(characters[charIndex + 1]);
+          }
+          _revealThumbnail(charIndex);
           setTimeout(function () {
             if (!guard()) return;
             _startCharacterQuiz(nextIndex, guard);
           }, 1000);
         } else {
-          _onQuizComplete(guard);
+          _revealThumbnail(charIndex);
+          AudioManager.speak(characters.join(""));
+          setTimeout(function () {
+            _onQuizComplete(guard);
+          }, 1800);
         }
       },
     });
   }
 
+  function _flipToBack() {
+    if (typeof pycmd === "function") {
+      pycmd("ans");
+    } else if (typeof AnkiDroidJS !== "undefined") {
+      showAnswer();
+    } else if (typeof study !== "undefined" && typeof study.drawAnswer === "function") {
+      study.drawAnswer();
+    } else {
+      try {
+        webkit.messageHandlers.cb.postMessage(JSON.stringify({ scheme: "ankitap", msg: "midCenter" }));
+      } catch (e) {
+        document.getElementById("char_examples").style.display = "block";
+        document.getElementById("char_examples_blank").style.display = "none";
+        var feedback = document.getElementById("writing-feedback");
+        if (feedback) feedback.style.display = "none";
+      }
+    }
+  }
+
   function _onQuizComplete(guard) {
     if (!guard()) return;
-
-    document.getElementById("char_examples").style.display = "block";
-    document.getElementById("char_examples_blank").style.display = "none";
-
-    _buildCompletedView(_characters.join(""));
-
-    var feedback = document.getElementById("writing-feedback");
-    if (feedback) feedback.style.display = "none";
-
+    speechSynthesis.cancel();
+    _flipToBack();
     _updateLoadStatus(true);
   }
 
@@ -1067,126 +607,128 @@ var Quiz = (function () {
     el.style.display = "inline";
   }
 
-  // -- Public: start (or restart) the quiz --
   function start() {
-    _sessionId++;
-    var guard = _makeGuard(_sessionId);
+    try {
+      _sessionId++;
+      var guard = _makeGuard(_sessionId);
 
-    _writers = [];
-    _totalMistakes = 0;
-    _mistakesThisChar = 0;
-    _nextStrokeIndex = 0;
+      _writers = [];
+      _thumbnailWriters = [];
+      _thumbnailRevealPending = [];
+      _totalMistakes = 0;
+      _weightedMistakeScore = 0;
+      _totalStrokeCount = 0;
+      _mistakesThisChar = 0;
+      _nextStrokeIndex = 0;
 
-    var characters = getCharactersToDraw();
-    _characters = characters.split("");
+      var characters = getCharactersToDraw();
+      debugLog("Quiz.start: characters='" + characters + "' length=" + characters.length);
+      _characters = characters.split("");
 
-    var feedback = document.getElementById("writing-feedback");
-    if (feedback) feedback.style.display = "none";
+      var feedback = document.getElementById("writing-feedback");
+      if (feedback) feedback.style.display = "none";
 
-    _updateLoadStatus(null);
+      _updateLoadStatus(null);
 
-    // If we're on the back, show completed view immediately without quizzing
-    if (document.getElementById("back")) {
-      _buildCompletedView(characters);
-      document.getElementById("char_examples").style.display = "block";
-      document.getElementById("char_examples_blank").style.display = "none";
-      return;
-    }
-
-    document.getElementById("char_examples").style.display = "none";
-    document.getElementById("char_examples_blank").style.display = "block";
-
-    _buildThumbnails(characters);
-
-    var mainDiv = document.getElementById("character-target-div");
-    if (!mainDiv) return;
-    mainDiv.innerHTML = "";
-
-    var charSize = _getDrawSize();
-    var strokeWidth = _getStrokeWidth();
-    var showOutline = _showOutline();
-
-    var writersReady = 0;
-
-    _characters.forEach(function (char, idx) {
-      var div = document.createElement("div");
-      div.id = "quiz-char-div-" + idx;
-      div.style.position = "relative";
-      div.style.display = idx === 0 ? "block" : "none";
-
-      var canvasWrapper = document.createElement("div");
-      canvasWrapper.className = "grid-color";
-      canvasWrapper.style.cssText = "background-color:rgba(0,0,0,0);z-index:20;position:relative;";
-      canvasWrapper.id = "quiz-canvas-" + idx;
-      div.appendChild(canvasWrapper);
-
-      var overlay = document.createElement("div");
-      overlay.innerHTML = GRID_OVERLAY_TPL(charSize, charSize);
-      overlay.firstChild.style.pointerEvents = "none";
-      div.appendChild(overlay.firstChild);
-
-      // Per-character meaning label (multi-char words only)
-      if (_characters.length > 1) {
-        var meaningDiv = document.createElement("div");
-        meaningDiv.id = "char-meaning-" + idx;
-        meaningDiv.className = "character-meaning-div";
-        div.appendChild(meaningDiv);
-        loadCharMeaning(char, function (data) {
-          if (!guard()) return;
-          var pinyin = getPinyinWithMacron(data.pinyin);
-          meaningDiv.className = "character-meaning-div-populated";
-          meaningDiv.innerHTML = pinyin + ": " + data.definitions.join("; ");
-        });
+      if (document.getElementById("back")) {
+        _buildCompletedView(characters);
+        document.getElementById("char_examples").style.display = "block";
+        document.getElementById("char_examples_blank").style.display = "none";
+        return;
       }
 
-      mainDiv.appendChild(div);
+      document.getElementById("char_examples").style.display = "none";
+      document.getElementById("char_examples_blank").style.display = "block";
 
-      var writer = HanziWriter.create("quiz-canvas-" + idx, char, {
-        charDataLoader: charDataLoader,
-        strokeAnimationSpeed: 2,
-        delayBetweenStrokes: 125,
-        width: charSize,
-        height: charSize,
-        showCharacter: false,
-        showOutline: showOutline,
-        highlightOnComplete: true,
-        highlightCompleteColor: STROKE_COLOR,
-        drawingWidth: strokeWidth,
-        strokeColor: getStrokeColorForIndex(idx),
-        outlineColor: OUTLINE_COLOR,
-        drawingColor: DRAWING_COLOR,
-        showHintAfterMisses: _getHintAfterMiss(),
-        padding: 5,
-        renderer: "canvas",
-        onLoadCharDataSuccess: function () {
-          _updateLoadStatus(true);
-          writersReady++;
-          if (writersReady === _characters.length) {
-            // All writers loaded — start quizzing the first character
-            _startCharacterQuiz(0, guard);
-          }
-        },
-        onLoadCharDataError: function () {
-          _updateLoadStatus(false);
-        },
+      _buildThumbnails(characters);
+
+      var mainDiv = document.getElementById("character-target-div");
+      if (!mainDiv) return;
+      mainDiv.innerHTML = "";
+
+      var writersReady = 0;
+
+      _characters.forEach(function (char, idx) {
+        debugLog("Creating writer for char[" + idx + "]='" + char + "' (U+" + char.codePointAt(0).toString(16).toUpperCase() + ")");
+
+        var div = document.createElement("div");
+        div.id = "quiz-char-div-" + idx;
+        div.style.position = "relative";
+        div.style.display = idx === 0 ? "" : "none";
+
+        var canvasWrapper = document.createElement("div");
+        canvasWrapper.className = "grid-color";
+        canvasWrapper.style.cssText = "background-color:rgba(0,0,0,0);z-index:20;position:relative;";
+        canvasWrapper.id = "quiz-canvas-" + idx;
+        div.appendChild(canvasWrapper);
+
+        var overlay = document.createElement("div");
+        overlay.innerHTML = GRID_OVERLAY_TPL(DRAW_SIZE, DRAW_SIZE);
+        overlay.firstChild.style.pointerEvents = "none";
+        div.appendChild(overlay.firstChild);
+
+        if (_characters.length > 1) {
+          var meaningDiv = document.createElement("div");
+          meaningDiv.id = "char-meaning-" + idx;
+          meaningDiv.className = "character-meaning-div";
+          div.appendChild(meaningDiv);
+          loadCharMeaning(char, function (data) {
+            if (!guard()) return;
+            var pinyin = getPinyinWithMacron(data.pinyin);
+            meaningDiv.className = "character-meaning-div-populated";
+            meaningDiv.innerHTML = pinyin + ": " + data.definitions.join("; ");
+          });
+        }
+
+        mainDiv.appendChild(div);
+
+        var writer = HanziWriter.create("quiz-canvas-" + idx, char, {
+          charDataLoader: charDataLoader,
+          strokeAnimationSpeed: 2,
+          delayBetweenStrokes: 125,
+          width: DRAW_SIZE,
+          height: DRAW_SIZE,
+          showCharacter: false,
+          showOutline: false,
+          highlightOnComplete: true,
+          highlightCompleteColor: STROKE_COLOR,
+          drawingWidth: STROKE_WIDTH,
+          strokeColor: getStrokeColorForIndex(idx),
+          outlineColor: OUTLINE_COLOR,
+          drawingColor: DRAWING_COLOR,
+          showHintAfterMisses: HINT_MISS,
+          padding: 5,
+          renderer: "canvas",
+          onLoadCharDataSuccess: function () {
+            _updateLoadStatus(true);
+            writersReady++;
+            debugLog("Writer ready: " + writersReady + "/" + _characters.length);
+            if (writersReady === _characters.length) {
+              _startCharacterQuiz(0, guard);
+            }
+          },
+          onLoadCharDataError: function () {
+            debugLog("Load error for char index " + idx);
+            _updateLoadStatus(false);
+          },
+        });
+
+        _writers[idx] = writer;
       });
-
-      _writers[idx] = writer;
-    });
+    } catch (err) {
+      debugLog("Quiz.start error: " + err);
+    }
   }
 
-  // Public: restart (called by reload button and practice-select change)
   function restart() {
     start();
   }
 
-  // Public: skip/reveal the current stroke (hint button)
   function hintCurrentStroke() {
     var writer = _writers[_currentIndex];
     if (writer) writer.highlightStroke(_nextStrokeIndex);
   }
 
-  // Public: skip the current character (next-card button)
   function skipCurrentCharacter() {
     var writer = _writers[_currentIndex];
     if (!writer) return;
@@ -1208,24 +750,16 @@ var Quiz = (function () {
     }, 800);
   }
 
-  // Public: toggle outline on the current writer
-  function setOutline(show) {
-    var writer = _writers[_currentIndex];
-    if (!writer) return;
-    show ? writer.showOutline() : writer.hideOutline();
-  }
-
   return {
     start: start,
     restart: restart,
     hintCurrentStroke: hintCurrentStroke,
     skipCurrentCharacter: skipCurrentCharacter,
-    setOutline: setOutline,
   };
 })();
 
 // ---------------------------------------------------------------------------
-// Button wiring — registered once, here, not inside any loop
+// Button wiring
 // ---------------------------------------------------------------------------
 document.getElementById("btnPlayAudio").onclick = function () {
   AudioManager.playAnkiAudio();
@@ -1243,33 +777,27 @@ document.getElementById("btnGoNextCard").onclick = function () {
   Quiz.skipCurrentCharacter();
 };
 
-// btnSwitchRenderer is vestigial (canvas is hardcoded) but keep it harmless
-document.getElementById("btnSwitchRenderer").onclick = function () {
-  // no-op: canvas is always used
-};
-
-document.getElementById("btnShowCharacters").onclick = function () {
-  var sim = document.getElementById("char_sim");
-  if (sim) sim.style.display = sim.style.display === "none" ? "block" : "none";
-};
-
-document.getElementById("text-outline").onchange = function () {
-  Quiz.setOutline(this.checked);
-};
-
 // ---------------------------------------------------------------------------
 // Boot
 // ---------------------------------------------------------------------------
 (function init() {
-  if (!Persistence.isAvailable()) return;
-
-  function run() {
-    SideManager.init();
-    applyPrefsToUI();
-    Quiz.start();
+  if (!Persistence.isAvailable()) {
+    debugLog("Persistence not available");
+    return;
   }
 
-  // Desktop / AnkiMobile WebView: DOM is ready synchronously
+  function run() {
+    try {
+      // Hide characters, zhuyin and pinyin content within Definitions
+      document.querySelectorAll(".char, .zhuyin, .pinyin").forEach(function(el) {
+        el.style.display = "none";
+      });
+      Quiz.start();
+    } catch (err) {
+      debugLog("init run() error: " + err);
+    }
+  }
+
   if (window.ankiPlatform === "desktop" || isInWebView()) {
     run();
   } else {
