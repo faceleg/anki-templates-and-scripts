@@ -145,6 +145,10 @@
 .iphone .char-card {
   font-family: "KaiTi";
 }
+
+.iphone .header-wrapper {
+  top: 0;
+}
 /* Linux desktops */
 .linux:not(.android) .char-card {
   font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
