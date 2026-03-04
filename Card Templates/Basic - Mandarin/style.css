@@ -773,6 +773,10 @@ hr {
   display: block;
 }
 
+#onfinish-character-target-div {
+  margin-top: 30px;
+}
+
 #onfinish-character-target-div::-webkit-scrollbar {
   height: 0px;
   width: 0px;
