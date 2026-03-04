@@ -12,10 +12,10 @@
 - [x] Again suggested based on % of failed strokes, with failures on the first few strokes being more important. Mistake text could change colour (start green, go orange then red) when mistakes happen?
     - [x] Factor in long multi character words
     - [x] Match colours to Anki good/hard/again
-    - [ ] Blue > green > orange > red
+    - [x] Green > orange > red (blue excluded — reserved for Anki "easy" rating)
     - [ ] Add it to the back template
     - [ ] Persist mistake text to the back template
-    - [ ] Start with "no mistakes for this quiz" and blue, to prevent jarring when a mistake is made
+    - [x] Start with "no mistakes for this quiz" and green, to prevent jarring when a mistake is made
     - [ ] Character mistakes section doesn't show consistently for a given character
     - [ ] If the "show next stroke" hint button is pressed on the first stroke, immediately go red
 - [ ] Strip out Chinese characters from the single character definition portion of the multi character display
