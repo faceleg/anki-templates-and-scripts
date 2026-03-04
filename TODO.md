@@ -17,6 +17,6 @@
     - [ ] Persist mistake text to the back template
     - [x] Start with "no mistakes for this quiz" and green, to prevent jarring when a mistake is made
     - [ ] Character mistakes section doesn't show consistently for a given character
-    - [ ] If the "show next stroke" hint button is pressed on the first stroke, immediately go red
+    - [x] If the "show next stroke" hint button is pressed on the first stroke, immediately go red
 - [ ] Strip out Chinese characters from the single character definition portion of the multi character display
 - [ ] Is there a way to translate the per character hints that are loaded from json files that are in English into Chinese?
