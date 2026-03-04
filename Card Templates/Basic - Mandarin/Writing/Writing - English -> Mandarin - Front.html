@@ -724,7 +724,12 @@ var Quiz = (function () {
 
   function hintCurrentStroke() {
     var writer = _writers[_currentIndex];
-    if (writer) writer.highlightStroke(_nextStrokeIndex);
+    if (!writer) return;
+    if (_nextStrokeIndex === 0 && _currentIndex === 0) {
+      _weightedMistakeScore = _totalStrokeCount;
+      _updateRatingIndicator();
+    }
+    writer.highlightStroke(_nextStrokeIndex);
   }
 
   function skipCurrentCharacter() {
