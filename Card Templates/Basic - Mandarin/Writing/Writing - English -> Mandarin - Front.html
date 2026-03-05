@@ -362,6 +362,7 @@ var Quiz = (function () {
   var _totalMistakes = 0;
   var _mistakesThisChar = 0;
   var _nextStrokeIndex = 0;
+  var _worstRating = null;
 
   function _makeGuard(capturedId) {
     return function () { return _sessionId === capturedId; };
@@ -373,7 +374,9 @@ var Quiz = (function () {
       parts.push(_mistakesThisChar === 1 ? "1 mistake for this character"
         : _mistakesThisChar + " mistakes for this character");
     }
-    if (_totalMistakes > 0) {
+    if (_totalMistakes === 0) {
+      parts.push("no mistakes for this quiz");
+    } else {
       parts.push(_totalMistakes === 1 ? "1 mistake for the quiz"
         : _totalMistakes + " mistakes for the quiz");
     }
@@ -381,23 +384,34 @@ var Quiz = (function () {
     var mistakes = document.getElementById("writing-feedback-mistakes");
     if (fb && mistakes) {
       mistakes.innerHTML = parts.join("<br/>");
-      fb.style.display = parts.length ? "block" : "none";
+      fb.style.display = "block";
     }
   }
 
   var RATING_COLORS = {
     easy: "#4caf50",
-    good: "#2196f3",
+    good: "#4caf50",
     hard: "#ff9800",
     again: "#f44336",
   };
 
+  var RATING_ORDER = ["easy", "good", "hard", "again"];
+
   function _getRating() {
-    if (_weightedMistakeScore === 0) return "easy";
-    var normalised = _totalStrokeCount > 0 ? _weightedMistakeScore / _totalStrokeCount : 0;
-    if (normalised <= 0.08) return "good";
-    if (normalised <= 0.25) return "hard";
-    return "again";
+    var current;
+    if (_weightedMistakeScore === 0) {
+      current = "easy";
+    } else {
+      var normalised = _totalStrokeCount > 0 ? _weightedMistakeScore / _totalStrokeCount : 0;
+      if (normalised <= 0.08) current = "good";
+      else if (normalised <= 0.25) current = "hard";
+      else current = "again";
+    }
+    // Never allow rating to improve mid-session (fixes dilution across multi-char words)
+    if (_worstRating === null || RATING_ORDER.indexOf(current) > RATING_ORDER.indexOf(_worstRating)) {
+      _worstRating = current;
+    }
+    return _worstRating;
   }
 
   function _updateRatingIndicator() {
@@ -466,28 +480,29 @@ var Quiz = (function () {
   }
 
   function _buildCompletedView(characters) {
-    var container = document.getElementById("onfinish-character-target-div");
+    var overlayDiv = document.getElementById("onfinish-character-target-div");
+    if (overlayDiv) overlayDiv.innerHTML = "";
+
+    var container = document.getElementById("character-target-div");
     if (!container) return;
     container.innerHTML = "";
-    container.style.cssText = "";
-    container.style.position = "unset";
-    container.style.display = "block";
-    container.style.whiteSpace = "nowrap";
-    container.style.overflow = "scroll";
-    container.style.zIndex = "30";
+    container.style.flexDirection = "row";
+
+    var numChars = characters.length;
+    var charSize = numChars === 1 ? DRAW_SIZE : Math.floor(DRAW_SIZE / numChars);
 
     characters.split("").forEach(function (char, idx) {
       var span = document.createElement("span");
+      span.style.flexShrink = "0";
       span.innerHTML = GRID_SMALL_TPL;
       var svgEl = span.children[0];
       svgEl.id = "onfinish-full-grid-bg-" + idx;
-      svgEl.style.margin = "6px";
       container.appendChild(span);
 
       HanziWriter.create("onfinish-full-grid-bg-" + idx, char, {
         charDataLoader: charDataLoader,
-        width: 100,
-        height: 100,
+        width: charSize,
+        height: charSize,
         padding: 5,
         strokeColor: getStrokeColorForIndex(idx),
         renderer: "svg",
@@ -528,7 +543,7 @@ var Quiz = (function () {
 
       onMistake: function (data) {
         if (!guard()) return;
-        _mistakesThisChar = data.mistakesOnStroke;
+        _mistakesThisChar++;
         _totalMistakes++;
         _weightedMistakeScore += 1 / (data.strokeNum + 1);
         _updateFeedback();
@@ -537,7 +552,6 @@ var Quiz = (function () {
 
       onCorrectStroke: function (data) {
         if (!guard()) return;
-        _mistakesThisChar = data.mistakesOnStroke;
         _nextStrokeIndex = data.strokeNum + 1;
         _updateFeedback();
       },
@@ -560,7 +574,7 @@ var Quiz = (function () {
           }, 1000);
         } else {
           _revealThumbnail(charIndex);
-          AudioManager.speak(characters.join(""));
+          AudioManager.speak(characters[charIndex]);
           setTimeout(function () {
             _onQuizComplete(guard);
           }, 1800);
@@ -591,6 +605,11 @@ var Quiz = (function () {
   function _onQuizComplete(guard) {
     if (!guard()) return;
     speechSynthesis.cancel();
+    Persistence.setItem("quizResult", {
+      totalMistakes: _totalMistakes,
+      weightedMistakeScore: _weightedMistakeScore,
+      totalStrokeCount: _totalStrokeCount,
+    });
     _flipToBack();
     _updateLoadStatus(true);
   }
@@ -617,13 +636,11 @@ var Quiz = (function () {
       _totalStrokeCount = 0;
       _mistakesThisChar = 0;
       _nextStrokeIndex = 0;
+      _worstRating = null;
 
       var characters = getCharactersToDraw();
       debugLog("Quiz.start: characters='" + characters + "' length=" + characters.length);
       _characters = characters.split("");
-
-      var feedback = document.getElementById("writing-feedback");
-      if (feedback) feedback.style.display = "none";
 
       _updateLoadStatus(null);
 
@@ -631,8 +648,20 @@ var Quiz = (function () {
         _buildCompletedView(characters);
         document.getElementById("char_examples").style.display = "block";
         document.getElementById("char_examples_blank").style.display = "none";
+        var saved = Persistence.getItem("quizResult");
+        if (saved) {
+          _totalMistakes = saved.totalMistakes;
+          _weightedMistakeScore = saved.weightedMistakeScore;
+          _totalStrokeCount = saved.totalStrokeCount;
+          _updateFeedback();
+          _updateRatingIndicator();
+          document.getElementById("writing-feedback").style.display = "";
+        }
         return;
       }
+
+      _updateFeedback();
+      _updateRatingIndicator();
 
       document.getElementById("char_examples").style.display = "none";
       document.getElementById("char_examples_blank").style.display = "block";
@@ -671,9 +700,10 @@ var Quiz = (function () {
           div.appendChild(meaningDiv);
           loadCharMeaning(char, function (data) {
             if (!guard()) return;
-            var pinyin = getPinyinWithMacron(data.pinyin);
+            // Pinyin omitted here intentionally — consistent with removal from card front.
+            // To restore: meaningDiv.innerHTML = getPinyinWithMacron(data.pinyin) + ": " + data.definitions.join("; ");
             meaningDiv.className = "character-meaning-div-populated";
-            meaningDiv.innerHTML = pinyin + ": " + data.definitions.join("; ");
+            meaningDiv.innerHTML = data.definitions.join("; ");
           });
         }
 
@@ -723,7 +753,12 @@ var Quiz = (function () {
 
   function hintCurrentStroke() {
     var writer = _writers[_currentIndex];
-    if (writer) writer.highlightStroke(_nextStrokeIndex);
+    if (!writer) return;
+    if (_nextStrokeIndex === 0 && _currentIndex === 0) {
+      _weightedMistakeScore = _totalStrokeCount;
+      _updateRatingIndicator();
+    }
+    writer.highlightStroke(_nextStrokeIndex);
   }
 
   function skipCurrentCharacter() {
