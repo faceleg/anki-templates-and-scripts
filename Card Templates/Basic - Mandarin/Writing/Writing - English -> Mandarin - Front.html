@@ -687,9 +687,10 @@ var Quiz = (function () {
           div.appendChild(meaningDiv);
           loadCharMeaning(char, function (data) {
             if (!guard()) return;
-            var pinyin = getPinyinWithMacron(data.pinyin);
+            // Pinyin omitted here intentionally — consistent with removal from card front.
+            // To restore: meaningDiv.innerHTML = getPinyinWithMacron(data.pinyin) + ": " + data.definitions.join("; ");
             meaningDiv.className = "character-meaning-div-populated";
-            meaningDiv.innerHTML = pinyin + ": " + data.definitions.join("; ");
+            meaningDiv.innerHTML = data.definitions.join("; ");
           });
         }
 
