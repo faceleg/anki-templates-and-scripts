@@ -362,6 +362,7 @@ var Quiz = (function () {
   var _totalMistakes = 0;
   var _mistakesThisChar = 0;
   var _nextStrokeIndex = 0;
+  var _worstRating = null;
 
   function _makeGuard(capturedId) {
     return function () { return _sessionId === capturedId; };
@@ -394,12 +395,23 @@ var Quiz = (function () {
     again: "#f44336",
   };
 
+  var RATING_ORDER = ["easy", "good", "hard", "again"];
+
   function _getRating() {
-    if (_weightedMistakeScore === 0) return "easy";
-    var normalised = _totalStrokeCount > 0 ? _weightedMistakeScore / _totalStrokeCount : 0;
-    if (normalised <= 0.08) return "good";
-    if (normalised <= 0.25) return "hard";
-    return "again";
+    var current;
+    if (_weightedMistakeScore === 0) {
+      current = "easy";
+    } else {
+      var normalised = _totalStrokeCount > 0 ? _weightedMistakeScore / _totalStrokeCount : 0;
+      if (normalised <= 0.08) current = "good";
+      else if (normalised <= 0.25) current = "hard";
+      else current = "again";
+    }
+    // Never allow rating to improve mid-session (fixes dilution across multi-char words)
+    if (_worstRating === null || RATING_ORDER.indexOf(current) > RATING_ORDER.indexOf(_worstRating)) {
+      _worstRating = current;
+    }
+    return _worstRating;
   }
 
   function _updateRatingIndicator() {
@@ -624,6 +636,7 @@ var Quiz = (function () {
       _totalStrokeCount = 0;
       _mistakesThisChar = 0;
       _nextStrokeIndex = 0;
+      _worstRating = null;
 
       var characters = getCharactersToDraw();
       debugLog("Quiz.start: characters='" + characters + "' length=" + characters.length);
