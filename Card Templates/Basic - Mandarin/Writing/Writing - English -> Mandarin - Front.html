@@ -562,7 +562,7 @@ var Quiz = (function () {
           }, 1000);
         } else {
           _revealThumbnail(charIndex);
-          AudioManager.speak(characters.join(""));
+          AudioManager.speak(characters[charIndex]);
           setTimeout(function () {
             _onQuizComplete(guard);
           }, 1800);

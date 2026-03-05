@@ -4,7 +4,7 @@
 
 - [ ] Should we remove the pinyin from writing cards? Why/why not?
     - [ ] And from the multi character display?
-- [ ] Change the end of quiz tts to read out only the character last written
+- [x] Change the end of quiz tts to read out only the character last written
 - [x] Bit of a pause after finishing before transitioning to end state - maybe hold the view when one finishes the last character, let the audio finish then auto transition to back?
     - [x] This is instead of showing the characters they have been completed immediately. It's too jarring on completion the last character
     - [x] Move the back template character displays to the same size and position of front template
