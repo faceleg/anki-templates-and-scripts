@@ -592,6 +592,11 @@ var Quiz = (function () {
   function _onQuizComplete(guard) {
     if (!guard()) return;
     speechSynthesis.cancel();
+    Persistence.setItem("quizResult", {
+      totalMistakes: _totalMistakes,
+      weightedMistakeScore: _weightedMistakeScore,
+      totalStrokeCount: _totalStrokeCount,
+    });
     _flipToBack();
     _updateLoadStatus(true);
   }
@@ -629,6 +634,15 @@ var Quiz = (function () {
         _buildCompletedView(characters);
         document.getElementById("char_examples").style.display = "block";
         document.getElementById("char_examples_blank").style.display = "none";
+        var saved = Persistence.getItem("quizResult");
+        if (saved) {
+          _totalMistakes = saved.totalMistakes;
+          _weightedMistakeScore = saved.weightedMistakeScore;
+          _totalStrokeCount = saved.totalStrokeCount;
+          _updateFeedback();
+          _updateRatingIndicator();
+          document.getElementById("writing-feedback").style.display = "";
+        }
         return;
       }
 
