@@ -468,28 +468,29 @@ var Quiz = (function () {
   }
 
   function _buildCompletedView(characters) {
-    var container = document.getElementById("onfinish-character-target-div");
+    var overlayDiv = document.getElementById("onfinish-character-target-div");
+    if (overlayDiv) overlayDiv.innerHTML = "";
+
+    var container = document.getElementById("character-target-div");
     if (!container) return;
     container.innerHTML = "";
-    container.style.cssText = "";
-    container.style.position = "unset";
-    container.style.display = "block";
-    container.style.whiteSpace = "nowrap";
-    container.style.overflow = "scroll";
-    container.style.zIndex = "30";
+    container.style.flexDirection = "row";
+
+    var numChars = characters.length;
+    var charSize = numChars === 1 ? DRAW_SIZE : Math.floor(DRAW_SIZE / numChars);
 
     characters.split("").forEach(function (char, idx) {
       var span = document.createElement("span");
+      span.style.flexShrink = "0";
       span.innerHTML = GRID_SMALL_TPL;
       var svgEl = span.children[0];
       svgEl.id = "onfinish-full-grid-bg-" + idx;
-      svgEl.style.margin = "6px";
       container.appendChild(span);
 
       HanziWriter.create("onfinish-full-grid-bg-" + idx, char, {
         charDataLoader: charDataLoader,
-        width: 100,
-        height: 100,
+        width: charSize,
+        height: charSize,
         padding: 5,
         strokeColor: getStrokeColorForIndex(idx),
         renderer: "svg",

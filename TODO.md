@@ -7,7 +7,7 @@
 - [ ] Change the end of quiz tts to read out only the character last written
 - [x] Bit of a pause after finishing before transitioning to end state - maybe hold the view when one finishes the last character, let the audio finish then auto transition to back?
     - [x] This is instead of showing the characters they have been completed immediately. It's too jarring on completion the last character
-    - [ ] Move the back template character displays to the same size and position of front template
+    - [x] Move the back template character displays to the same size and position of front template
     - [ ] Remove the auto turn logic, it fires on subsequent cards if I turn the card myself
 - [x] Again suggested based on % of failed strokes, with failures on the first few strokes being more important. Mistake text could change colour (start green, go orange then red) when mistakes happen?
     - [x] Factor in long multi character words
