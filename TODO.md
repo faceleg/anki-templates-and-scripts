@@ -13,8 +13,8 @@
     - [x] Factor in long multi character words
     - [x] Match colours to Anki good/hard/again
     - [x] Green > orange > red (blue excluded — reserved for Anki "easy" rating)
-    - [ ] Add it to the back template
-    - [ ] Persist mistake text to the back template
+    - [x] Add it to the back template
+    - [x] Persist mistake text to the back template
     - [x] Start with "no mistakes for this quiz" and green, to prevent jarring when a mistake is made
     - [x] If the "show next stroke" hint button is pressed on the first stroke, immediately go red
 - [ ] Strip out Chinese characters from the single character definition portion of the multi character display
