@@ -1,5 +1,9 @@
 # CLAUDE.md
 
+## Pending Actions
+
+- **Merge branch `claude/create-md-file-t4UId` into main** — contains: remove pinyin from per-character hints in Writing card; fix score indicator incorrectly recovering from red to orange on multi-character words.
+
 ## Project Overview
 
 This repository contains Anki card templates and scripts for Mandarin Chinese language learning. It includes:
