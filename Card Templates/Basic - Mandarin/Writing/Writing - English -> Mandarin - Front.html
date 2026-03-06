@@ -583,25 +583,6 @@ var Quiz = (function () {
     });
   }
 
-  function _flipToBack() {
-    if (typeof pycmd === "function") {
-      pycmd("ans");
-    } else if (typeof AnkiDroidJS !== "undefined") {
-      showAnswer();
-    } else if (typeof study !== "undefined" && typeof study.drawAnswer === "function") {
-      study.drawAnswer();
-    } else {
-      try {
-        webkit.messageHandlers.cb.postMessage(JSON.stringify({ scheme: "ankitap", msg: "midCenter" }));
-      } catch (e) {
-        document.getElementById("char_examples").style.display = "block";
-        document.getElementById("char_examples_blank").style.display = "none";
-        var feedback = document.getElementById("writing-feedback");
-        if (feedback) feedback.style.display = "none";
-      }
-    }
-  }
-
   function _onQuizComplete(guard) {
     if (!guard()) return;
     speechSynthesis.cancel();
@@ -610,7 +591,6 @@ var Quiz = (function () {
       weightedMistakeScore: _weightedMistakeScore,
       totalStrokeCount: _totalStrokeCount,
     });
-    _flipToBack();
     _updateLoadStatus(true);
   }
 
