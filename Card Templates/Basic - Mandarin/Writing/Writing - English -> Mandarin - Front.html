@@ -362,6 +362,7 @@ var Quiz = (function () {
   var _totalMistakes = 0;
   var _mistakesThisChar = 0;
   var _nextStrokeIndex = 0;
+  var _hintCountThisChar = 0;
   var _worstRating = null;
 
   function _makeGuard(capturedId) {
@@ -516,6 +517,7 @@ var Quiz = (function () {
     _currentIndex = charIndex;
     _mistakesThisChar = 0;
     _nextStrokeIndex = 0;
+    _hintCountThisChar = 0;
 
     var characters = _characters;
     var writer = _writers[charIndex];
@@ -754,10 +756,16 @@ var Quiz = (function () {
   function hintCurrentStroke() {
     var writer = _writers[_currentIndex];
     if (!writer) return;
-    if (_nextStrokeIndex === 0 && _currentIndex === 0) {
-      _weightedMistakeScore = _totalStrokeCount;
-      _updateRatingIndicator();
+    _hintCountThisChar++;
+    _mistakesThisChar++;
+    _totalMistakes++;
+    if (_hintCountThisChar <= 2) {
+      _weightedMistakeScore += 1 / (_nextStrokeIndex + 1);
+    } else {
+      _weightedMistakeScore += 1;
     }
+    _updateFeedback();
+    _updateRatingIndicator();
     writer.highlightStroke(_nextStrokeIndex);
   }
 
