@@ -55,23 +55,41 @@ must verify this before pushing, not assume it.
 
 ## Stories
 
-### Story 0: Verify repo-to-Anki name mapping
+### Story 0: Discover and verify all Anki templates
 
-**Before any automated pushing**, we need to confirm that the filenames in this
-repo exactly match the card template names in Anki. A mismatch could create
-duplicate templates or silently fail to update the right one.
+**Before any automated pushing**, we need a complete picture of what exists in
+Anki and how it maps (or doesn't map) to the repo. This is the foundation for
+everything else.
 
 **Acceptance criteria:**
-- [ ] Script connects to AnkiConnect and calls `modelNames` to list all note types
+- [ ] Script connects to AnkiConnect and calls `modelNames` to list **all** note
+  types in the collection — not just the four we expect
 - [ ] For each note type, calls `modelTemplates` to get actual card template names
-- [ ] Compares against the repo file tree and reports:
-  - Exact matches
-  - Templates in Anki but missing from repo (warning — may be intentional)
-  - Templates in repo but missing from Anki (error — filename probably wrong)
-- [ ] Any mismatches are corrected (rename files in repo to match Anki, or vice
-  versa if the Anki name is wrong)
+  and `modelFieldNames` to get fields
+- [ ] Produces a full inventory report with three sections:
+  1. **Matched**: Note types/templates that exist in both Anki and the repo, with
+     exact filename-to-template-name correspondence
+  2. **In Anki, not in repo**: Note types or individual card templates that exist
+     in Anki but have no corresponding files in the repo. For each, report:
+     - Note type name
+     - Card template names
+     - Number of notes using this note type (via `findNotes`)
+     - Whether it appears to be a built-in/default type or a custom type
+  3. **In repo, not in Anki**: Files in the repo that don't match any Anki
+     template (error — filename probably wrong, or note type was deleted)
+- [ ] "In Anki, not in repo" items get triaged:
+  - **Adopt**: Pull the template from Anki into the repo (bring under version
+    control)
+  - **Ignore**: Known third-party note type, add to an ignore list
+    (`scripts/ignored-note-types.json`)
+  - **Orphan**: Note type with zero notes — candidate for deletion (manual, not
+    automated)
+- [ ] Any name mismatches in matched types are corrected (rename files in repo to
+  match Anki, or vice versa if the Anki name is wrong)
 - [ ] Output is saved as a mapping file (`scripts/template-mapping.json`) that
   the deploy script will consume
+- [ ] Inventory report is saved to `docs/anki-template-inventory.md` for
+  reference
 
 ### Story 1: Backup before deploy
 
@@ -153,12 +171,53 @@ duplicate templates or silently fail to update the right one.
   `<script>` block before pushing
 - [ ] Card behaviour is identical before and after
 
+### Story 8: Visual design audit and optimisation for learning
+
+**Improve card visual design based on SRS and language-learning research.** See
+ADR-005 for rationale and principles.
+
+**This story is intentionally broken into small, independently deployable
+increments** — each sub-task can be deployed, reviewed during real study sessions,
+and rolled back if it hurts rather than helps.
+
+**Acceptance criteria:**
+- [ ] **8a: Typography audit** — Review and optimise font sizing, line height,
+  and character spacing for readability. CJK characters should be large enough for
+  stroke detail; pinyin should be legible but secondary. Verify on both desktop
+  and AnkiDroid. Document chosen sizes and rationale.
+- [ ] **8b: Visual hierarchy** — Ensure the most important element on each card
+  (the thing being tested) has clear visual dominance. Secondary information
+  (pinyin, meaning, example sentences) should be visually subordinate. The user's
+  eye should land on the test stimulus immediately.
+- [ ] **8c: Night mode parity** — Verify night mode provides equivalent
+  readability to day mode. Current night mode overrides all exist but haven't
+  been audited for contrast ratios. All text must meet WCAG AA contrast (4.5:1
+  for body text, 3:1 for large text).
+- [ ] **8d: Reduce visual clutter** — Identify and remove or de-emphasise UI
+  elements that distract from the core study loop. Sidebars, buttons, and
+  metadata should not compete with the test stimulus. Less is more during review.
+- [ ] **8e: Tone colour refinement** — Audit the five tone colours for
+  distinctness under both day and night mode. Current colours are Material Design
+  defaults; they may not be optimal for distinguishing tones at a glance,
+  especially red (tone 1) vs orange (tone 2) for colour-deficient users.
+- [ ] **8f: Consistent spacing and rhythm** — Apply a consistent spacing scale
+  across all four note types. Current spacing tokens (xxs through xxl) are defined
+  but applied inconsistently between templates.
+- [ ] **8g: Animation and transition review** — Remove or simplify animations
+  that add latency to the review loop. Card transitions should feel instant. Any
+  animation that delays seeing content hurts review speed.
+
+**Verification for each sub-task:**
+- Before/after screenshots (desktop + mobile)
+- Side-by-side comparison reviewed during at least one real study session
+- Can be rolled back independently via restore script
+
 ---
 
 ## Story dependency graph
 
 ```
-Story 0 (verify mapping)
+Story 0 (discover + verify ALL templates)
   |
   v
 Story 1 (backup) ---> Story 2 (restore + verify)
@@ -171,6 +230,9 @@ Story 5 (normalise filenames)
   |
   v
 Story 6 (normalise CSS) + Story 7 (normalise JS)   [parallel]
+  |
+  v
+Story 8a-8g (visual optimisation)  [sequential sub-tasks, each independently deployable]
 ```
 
 ---
