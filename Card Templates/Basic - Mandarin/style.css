@@ -21,6 +21,7 @@
   width: 400px;
   left: 0;
   right: 0;
+  top: 15px;
 }
 
 .header-left, .header-right {
@@ -45,14 +46,6 @@
 .header-right a,
 .header-right a:last-child .icon {
   margin-right: 0;
-}
-
-.header-wrapper {
-  display: flex;
-  top: 15px;
-  justify-content: space-between;
-  margin: 0 auto;
-  max-width: 400px;
 }
 
 #ch_load_status {
