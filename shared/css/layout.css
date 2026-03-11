@@ -1,0 +1,256 @@
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 500;
+}
+
+main {
+  display: grid;
+  gap: var(--space-xl);
+  align-content: center;
+  justify-content: center;
+  place-content: center;
+  padding: var(--space-sm);
+}
+
+@media (min-width: 540px) {
+  main {
+    padding: var(--space-lg);
+  }
+}
+
+@media (min-width: 800px) {
+  main {
+    padding: var(--space-xl);
+  }
+}
+
+form {
+  max-width: 89vw;
+  display: grid;
+  gap: var(--space-xl) var(--space-xxl);
+  --repeat: auto-fit;
+  align-items: flex-start;
+}
+
+section {
+  display: grid;
+  gap: var(--space-md);
+  margin: 6px;
+}
+
+header {
+  display: grid;
+  gap: var(--space-xxs);
+}
+
+fieldset {
+  border: 1px solid var(--surface4);
+  background: var(--surface4);
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 1px;
+  border-radius: var(--space-sm);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+fieldset[focus-within] {
+  box-shadow: 0 5px 20px -10px hsla(0, 0%, 0%, 0.5);
+}
+
+fieldset:focus-within {
+  box-shadow: 0 5px 20px -10px hsla(0, 0%, 0%, 0.5);
+}
+
+fieldset a {
+  text-decoration: none;
+  color: var(--text1);
+}
+
+select {
+  outline: none;
+  border: none;
+  border-radius: 12px;
+  width: 34px;
+  padding-left: 6px;
+  color: white;
+  background:
+    linear-gradient(to right, transparent 40px, var(--surface1) 0),
+    var(--brand-bg-gradient) fixed;
+  transition: background 0.5s ease;
+}
+
+select > option {
+  border: none;
+  border-radius: 20px;
+  outline: none;
+  background: var(--surface3);
+  font-size: 22px;
+  color: var(--text1);
+}
+
+input[type="checkbox"] {
+  width: 40px;
+  height: 20px;
+  margin: 0;
+  outline-offset: 5px;
+  accent-color: var(--brand);
+  position: relative;
+  transform-style: preserve-3d;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--surface1);
+  border-radius: 20px;
+  transition: 0.5s;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  outline: none;
+}
+
+input:checked[type="checkbox"] {
+  background:
+    linear-gradient(to right, transparent 40px, var(--surface1) 0),
+    var(--brand-bg-gradient) fixed;
+  -webkit-transition: background 0.5s ease;
+  transition: background 0.5s ease;
+}
+
+input[type="checkbox"]:before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 20px;
+  top: 0;
+  left: 0;
+  background: white;
+  transform: scale(1.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: 0.5s;
+}
+
+input:checked[type="checkbox"]:before {
+  left: 20px;
+}
+
+input[type="number"] {
+  width: 40px;
+  height: 20px;
+  margin: 0;
+  padding: 4px;
+  position: relative;
+  cursor: text;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: 0.5s;
+  border: 1px solid var(--surface1);
+  background: var(--surface3);
+  border-radius: var(--space-sm);
+  text-align: end;
+  outline: none;
+  color: var(--text1);
+  place-self: center;
+}
+
+.fieldset-item {
+  background: var(--surface3);
+  transition: background 0.2s ease;
+  display: grid;
+  gap: var(--space-md);
+  padding-top: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  padding-left: var(--space-md);
+  padding-right: var(--space-md);
+  text-align: left;
+}
+
+.fs-item-1 {
+  grid-template-columns: 1fr var(--space-xl);
+}
+
+.fs-item-2 {
+  grid-template-columns: 56px 1fr;
+}
+
+.fs-item-3 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.fs-item-front-back {
+  padding: unset;
+  text-align: center;
+  gap: unset;
+  cursor: pointer;
+}
+
+.front-back {
+  padding: var(--space-xs);
+}
+
+.btn-active {
+  color: white;
+  background: var(--brand-bg2);
+}
+
+.fieldset-item[focus-within] {
+  background: var(--surface2);
+}
+
+.fieldset-item:focus-within {
+  background: var(--surface2);
+}
+
+.fieldset-item[focus-within] svg {
+  fill: #fff;
+}
+
+.fieldset-item:focus-within svg {
+  fill: #fff;
+}
+
+.fieldset-item[focus-within] picture {
+  -webkit-clip-path: circle(50%);
+  clip-path: circle(50%);
+  background: var(--brand-bg-gradient) fixed;
+}
+
+.fieldset-item:focus-within picture {
+  -webkit-clip-path: circle(50%);
+  clip-path: circle(50%);
+  background: var(--brand-bg-gradient) fixed;
+}
+
+.fieldset-item > :is(.input-stack, label) {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.fieldset-item > .input-stack > label {
+  display: contents;
+}
+
+.fieldset-item svg {
+  fill: var(--text2);
+  height: var(--space-md);
+}
+
+.fieldset-item > input[type="checkbox"] {
+  align-self: center;
+  justify-self: center;
+  place-self: center;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+
+@media screen and (max-height: 450px) {
+  .sidebar {
+    padding-top: 15px;
+  }
+
+  .sidebar a {
+    font-size: 16px;
+  }
+}

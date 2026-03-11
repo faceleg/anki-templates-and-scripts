@@ -1,0 +1,86 @@
+:root {
+  --tone-1: #f44336;
+  --tone-2: #ff9800;
+  --tone-3: #4caf50;
+  --tone-4: #2196f3;
+  --tone-5: #607d8b;
+  --brand-bg1: rgb(255, 117, 195);
+  --brand-bg2: rgb(157, 119, 255);
+  --brand-bg-gradient: linear-gradient(
+    to bottom,
+    var(--brand-bg2),
+    var(--brand-bg2)
+  );
+  --thumb-highlight-color: rgba(255, 255, 254, 0.2);
+  --space-xxs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --space-xxl: 6rem;
+  --isLTR: 1;
+  --isRTL: -1;
+}
+
+[dir="rtl"]:root {
+  --isLTR: -1;
+  --isRTL: 1;
+}
+
+.card {
+  --title-color: grey;
+  --time-left-color: teal;
+  --hanzi-grid: #fafafa;
+  --stroke: #555;
+  --outline: #ddd;
+  --drawing: #333;
+  --pinyin-color: #ef6c00;
+  --simplified-color: #6495ed;
+  --traditional-color: #00796b;
+  --meaning-color: #607d8b;
+  --icon-button-background: #63759d;
+  --icon-button-background-focus: #7d92c2;
+  --sidebar-color: white;
+  --sidebar-background-color: #52575d;
+  --header-color: #455a64;
+  --surface1: rgb(226, 226, 226);
+  --surface2: rgb(255, 255, 254);
+  --surface3: rgb(249, 249, 249);
+  --surface4: rgb(212, 212, 212);
+  --text1: rgb(48, 48, 48);
+  --text2: rgb(94, 94, 94);
+  --brand: rgb(47, 167, 214);
+  --thumb-highlight-color: rgba(0, 0, 0, 0.2);
+  font-size: 20px;
+  text-align: center;
+  color: black;
+  background-color: white;
+}
+
+.card.night_mode {
+  --header-color: white;
+  --title-color: #00bcd4;
+  --time-left-color: #fff;
+  --hanzi-grid: #262626;
+  --stroke: #ffffff;
+  --outline: #5b5b5b;
+  --drawing: #fff;
+  --pinyin-color: #27b46e;
+  --simplified-color: #6495ed;
+  --traditional-color: #fba910;
+  --meaning-color: #00bfa5;
+  --icon-button-background: #63759d;
+  --icon-button-background-focus: #7d92c2;
+  --sidebar-color: white;
+  --sidebar-background-color: #52575d;
+  --surface1: rgb(27, 27, 27);
+  --surface2: rgb(37, 37, 37);
+  --surface3: rgb(48, 48, 48);
+  --surface4: rgb(59, 59, 59);
+  --text1: rgb(240, 240, 240);
+  --text2: rgb(184, 184, 184);
+  --brand: rgb(118, 161, 184);
+  color: white;
+  background-color: #1f1f1f;
+}

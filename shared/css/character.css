@@ -1,0 +1,154 @@
+.char-card {
+  font-size: 3em;
+}
+
+.char {
+  font-size: 30px;
+}
+
+/* grid color for character */
+
+.grid-color {
+  margin: 6px;
+  background-color: var(--hanzi-grid);
+  padding: 2px;
+  -webkit-box-shadow: 0px 0px 10px -5px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0px 0px 10px -5px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 0px 10px -5px rgba(0, 0, 0, 0.5);
+}
+
+.stroke-color {
+  color: var(--stroke);
+}
+
+.outline-color {
+  color: var(--outline);
+}
+
+.drawing-color {
+  color: var(--drawing);
+}
+
+#character-target-div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+#character-target-div > div {
+  display: none;
+}
+
+#character-target-div > :first-child {
+  display: block;
+}
+
+#onfinish-character-target-div::-webkit-scrollbar {
+  height: 0px;
+  width: 0px;
+}
+
+.char-sim-1 {
+  margin: 2px;
+  font-size: 30px;
+}
+
+.char-trad-1 {
+  margin: 2px;
+  font-size: 30px;
+}
+
+.char-pin-1 {
+  margin: 2px;
+  line-height: 32px;
+}
+
+.char-zhy-1 {
+  margin: 2px;
+  line-height: 32px;
+}
+
+#char_image {
+  text-align: center;
+}
+
+#char_image img {
+  max-height: 200px;
+}
+
+#char_deck {
+  margin-top: 10px;
+  font-size: 10px;
+  font-style: italic;
+  line-height: 20px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
+}
+
+#char_deck #audio {
+  height: 20px;
+}
+
+#char_deck #audio .replay-button {
+  margin: 0;
+}
+
+#char_deck #audio .playImage {
+  height: 20px;
+  width: 20px;
+}
+
+/* Character font variants */
+
+#char_sim.kaiti,
+#char_sim_coloured.kaiti,
+#char_reading.kaiti {
+  font-family: KaiTi;
+}
+
+#char_sim.arial,
+#char_sim_coloured.arial,
+#char_reading.arial {
+  font-family: Arial;
+}
+
+#char_sim.roboto,
+#char_sim_coloured.roboto,
+#char_reading.roboto {
+  font-family: Roboto;
+}
+
+#char_sim.mashanzheng,
+#char_sim_coloured.mashanzheng,
+#char_reading.mashanzheng {
+  font-family: MaShanZheng;
+}
+
+#char_sim.yrdzst,
+#char_sim_coloured.yrdzst,
+#char_reading.yrdzst {
+  font-family: YRDZST;
+}
+
+#char_sim.xxx,
+#char_sim_coloured.xxx,
+#char_reading.xxx {
+  font-family: xxx;
+}
+
+#char_sim.yyy,
+#char_sim_coloured.yyy,
+#char_reading.yyy {
+  font-family: yyy;
+}
+
+/* Character meaning display for individual characters */
+.character-meaning-div-populated {
+  max-width: 400px;
+  font-size: 12px;
+  line-height: 1.44;
+}

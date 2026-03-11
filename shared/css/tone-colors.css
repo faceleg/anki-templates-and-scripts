@@ -1,0 +1,40 @@
+.tone1,
+.t1 {
+  color: #f44336;
+}
+
+.tone2,
+.t2 {
+  color: #ff9800;
+}
+
+.tone3,
+.t3 {
+  color: #4caf50;
+}
+
+.tone4,
+.t4 {
+  color: #2196f3;
+}
+
+.tone5,
+.t5 {
+  color: #607d8b;
+}
+
+.char-tone1 {
+  color: var(--tone-1);
+}
+
+.char-tone2 {
+  color: var(--tone-2);
+}
+
+.char-tone3 {
+  color: var(--tone-3);
+}
+
+.char-tone4 {
+  color: var(--tone-4);
+}

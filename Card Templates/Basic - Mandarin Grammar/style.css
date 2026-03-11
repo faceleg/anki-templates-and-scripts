@@ -6,28 +6,12 @@
 /* @inject: shared/css/character.css */
 /* @inject: shared/css/typography.css */
 /* @inject: shared/css/pinyin-ruby.css */
+/* @inject: Card Templates/Basic - Mandarin Grammar/quiz.css */
 
-/* Basic - Mandarin Sentences specific rules */
+/* Basic - Mandarin Grammar specific rules */
 
-.modal-footer1 {
-  padding-top: 15px;
-  text-align: center;
-}
-
-.modal-footer1 a {
-  display: inline-block;
-  margin: 0 8px;
-  float: none;
-}
-
-.lessonInfoHanzi {
-  font-family: SimSun;
-  font-size: 12px;
-}
-
-.lessonInfo {
+.card {
   font-family: arial;
-  font-size: 10px;
 }
 
 .char,
