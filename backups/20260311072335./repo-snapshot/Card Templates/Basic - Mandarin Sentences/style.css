@@ -1,0 +1,49 @@
+/* @inject: shared/css/base.css */
+/* @inject: shared/css/fonts.css */
+/* @inject: shared/css/layout.css */
+/* @inject: shared/css/components.css */
+/* @inject: shared/css/tone-colors.css */
+/* @inject: shared/css/character.css */
+/* @inject: shared/css/typography.css */
+/* @inject: shared/css/pinyin-ruby.css */
+
+/* Basic - Mandarin Sentences specific rules */
+
+.modal-footer1 {
+  padding-top: 15px;
+  text-align: center;
+}
+
+.modal-footer1 a {
+  display: inline-block;
+  margin: 0 8px;
+  float: none;
+}
+
+.lessonInfoHanzi {
+  font-family: SimSun;
+  font-size: 12px;
+}
+
+.lessonInfo {
+  font-family: arial;
+  font-size: 10px;
+}
+
+.char,
+#char_sim,
+#char_sim_coloured {
+  font-size: 40px;
+}
+
+#back #char_sim {
+  display: none;
+}
+
+#char_sim_coloured {
+  display: none;
+}
+
+#back #char_sim_coloured {
+  display: block;
+}

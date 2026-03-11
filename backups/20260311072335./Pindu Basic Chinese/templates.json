@@ -1,0 +1,6 @@
+{
+  "Card 1": {
+    "Front": "\n        <div class=hanzi>{{Hanzi}}</div>\n        ",
+    "Back": "\n<div class=hanzi>{{Hanzi}}</div>\n<div class=pinyin>{{Pinyin (Diacritical)}}</div>\n<div class=english>{{English}}</div>\n<div class=link><a href='{{Dict URL}}'>Link to Online Reference</a></div>\n<hr>\n<div class=example_sentence>{{Example Sentence}}</div>\n<div class=example_sentence_pinyin>{{Example Sentence (Pinyin)}}</div>\n<div class=example_sentence_english>{{Example Sentence (English)}}</div>\n<br>\n{{Audio}}\n{{Example Sentence (Audio)}}\n        "
+  }
+}

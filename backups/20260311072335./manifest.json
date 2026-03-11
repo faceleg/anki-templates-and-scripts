@@ -1,0 +1,17 @@
+{
+  "timestamp": "20260311072335.",
+  "models": [
+    "Basic - Anki-xiehanzi-offline-utility-deck",
+    "Basic - Mandarin",
+    "Basic - Mandarin From Subtitles",
+    "Basic - Mandarin Grammar",
+    "Basic - Mandarin Sentences",
+    "CGW-InvalidExample",
+    "CGW-ValidExample",
+    "Mosaic Basic Chinese",
+    "Pindu Basic Chinese",
+    "图片遮盖"
+  ],
+  "nodeVersion": "v25.8.0",
+  "gitCommit": "6d47928ae119ddae16b7c9d09394ca80e64c354e"
+}

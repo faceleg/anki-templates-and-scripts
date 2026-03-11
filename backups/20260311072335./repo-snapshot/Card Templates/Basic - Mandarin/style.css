@@ -1,0 +1,115 @@
+/* @inject: shared/css/base.css */
+/* @inject: shared/css/fonts.css */
+/* @inject: shared/css/layout.css */
+/* @inject: shared/css/components.css */
+/* @inject: shared/css/tone-colors.css */
+/* @inject: shared/css/character.css */
+/* @inject: shared/css/typography.css */
+
+/* Basic - Mandarin specific rules */
+
+.iphone .header-wrapper {
+  top: 0;
+}
+
+.header-wrapper {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+  max-width: 400px;
+  position: absolute;
+  width: 400px;
+  left: 0;
+  right: 0;
+  top: 15px;
+}
+
+.header-left, .header-right {
+  text-align: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.header-left a, .header-right a {
+  margin: 0;
+}
+
+.header-wrapper .icon {
+  margin: 1px;
+}
+
+.header-left a,
+.header-left a:first-child .icon  {
+  margin-left: 0;
+}
+
+.header-right a,
+.header-right a:last-child .icon {
+  margin-right: 0;
+}
+
+#ch_load_status {
+  padding-right: 10px;
+  font-size: 16px;
+  vertical-align: middle;
+}
+
+#char_pinyin {
+  height: 36px;
+  line-height: 36px;
+}
+
+.char_example,
+.char_examples_blank {
+  line-height: 1.8;
+}
+
+.char_example_blank {
+  letter-spacing: 2px;
+}
+
+#char_image {
+  display: none;
+}
+
+#back #char_image {
+  display: block;
+  padding-top: 40px;
+}
+
+#char_deck #audio {
+  display: block;
+  height: 20px;
+  margin-right: 5px;
+}
+
+#onfinish-character-target-div {
+  margin-top: 30px;
+}
+
+#writing-feedback {
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 1.44;
+}
+
+.reading-without-audio-spacer {
+  margin-top: 200px;
+}
+
+#back .reading-without-audio-spacer {
+  margin-top: 0;
+}
+
+.modal-footer1 {
+  margin-top: 10px;
+}
+
+#char_examples .char_examples-parts-of-speech,
+#char_examples_blank .char_examples-parts-of-speech {
+  display: none;
+}
+
+#back #listening-with-audio {
+  display: none;
+}

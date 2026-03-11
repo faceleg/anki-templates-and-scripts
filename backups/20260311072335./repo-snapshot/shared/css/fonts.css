@@ -1,0 +1,79 @@
+@font-face {
+  font-family: "KaiTi";
+  font-style: normal;
+  font-weight: 300;
+  src: url(_KaiTi.ttf);
+}
+
+@font-face {
+  font-family: "MaShanZheng";
+  font-style: normal;
+  font-weight: 300;
+  src: url(_MaShanZheng-Regular.ttf);
+}
+
+@font-face {
+  font-family: "YRDZST";
+  font-style: normal;
+  font-weight: 300;
+  src: url(_YRDZSTSemibold.ttf);
+}
+
+@font-face {
+  font-family: "xxx";
+  font-style: normal;
+  font-weight: 300;
+  src: url(_xxx.ttf);
+}
+
+@font-face {
+  font-family: "yyy";
+  font-style: normal;
+  font-weight: 300;
+  src: url(_yyy.ttf);
+}
+
+/* Material Icon Font */
+@font-face {
+  font-family: "Material Icons";
+  font-style: normal;
+  font-weight: 300;
+  src: url(_MaterialIcons-Regular.woff2);
+}
+
+.material-icons {
+  font-family: "Material Icons";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+  /* Support for IE. */
+  font-feature-settings: "liga";
+}
+
+/* Windows */
+.win .char-card {
+  font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
+}
+/* macOS */
+.mac .char-card,
+.iphone .char-card {
+  font-family: "KaiTi";
+}
+/* Linux desktops */
+.linux:not(.android) .char-card {
+  font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
+}

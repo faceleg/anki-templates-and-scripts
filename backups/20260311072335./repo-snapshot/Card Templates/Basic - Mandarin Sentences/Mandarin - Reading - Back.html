@@ -1,0 +1,33 @@
+<div id="char_image">{{Image}}</div>
+
+<div id="back">{{FrontSide}}</div>
+
+<div class="lessonInfo">
+	<div class="spacer"> </div>
+	<div>Pattern: <span class="lessonInfoHanzi">{{Grammar Construct}}</span></div>
+	Article: <a href={{Source URL}}>{{Article Title}}</a>
+</div>
+
+<div id="char_deck">
+  <div>{{Deck}}</div>
+  <div>{{Card}}</div>
+  <div>
+    font name: <span id="font-name"></span>
+</div>
+  <div id="audio">{{Audio}}</div>
+</div>	
+
+<script>
+  // Hide lesson info if there is none
+var elements = document.querySelectorAll('.lessonInfoHanzi');
+
+    elements.forEach(function(element) {
+        if (element.textContent.trim() === "") {
+          document.querySelectorAll('.lessonInfo').forEach(function(lessonInfoElement) {
+            lessonInfoElement.style.display = 'none';
+          })
+        }
+    });
+</script>
+<!-- @inject: shared/js/pinyin.js -->
+<!-- @inject: shared/js/font-rotation.js -->

@@ -1,0 +1,18 @@
+
+        .card {
+            text-align: center;
+            background-color: #fdf6e3;
+        }
+        .hanzi {
+            font-family: Kaiti;
+            font-size: 78px;
+        }
+        .pinyin {
+            font-family: Gentium Plus;
+            font-size: 22px;
+        }
+        .english{
+            font-family: Georgia;
+            font-size: 22px;
+        }
+        

@@ -1,0 +1,6 @@
+{
+  "Valid": {
+    "Front": "<div class=\"header\">Is this sentence grammatically correct?</div>\n<div class=\"spacer\"> </div>\n<div class=\"hanzi\">{{中文}}</div>",
+    "Back": "<div class=\"hanzi\">{{中文}}</div>\n\n<div class=\"english\">\n\t<div class=\"spacerMedium\"> </div>\n\t<div class=\"pinyin\">{{Pinyin}}</div>\n\t<div class=\"spacerSmall\"> </div>\n\t{{English}}\n\t<div class=\"spacerMedium\"> </div>\n\t<div class=\"correct\">Correct!</div>\n\t<div class=\"spacerMedium\"> </div>\n\t<div class=\"notes\">{{Notes}}</div>\n</div>\n\n\n<div class=\"lessonInfo\">\n<div class=\"spacer\"> </div>\n<div>Pattern: <span class=\"lessonInfoHanzi\">{{Grammar Construct}}</span></div>\nArticle: <a href={{Source URL}}>{{Article Title}}</a>\n</div>"
+  }
+}

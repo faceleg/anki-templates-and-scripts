@@ -1,0 +1,6 @@
+{
+  "图片遮盖": {
+    "Front": "{{#标题}}<div>{{标题}}</div>{{/标题}}\n<div style=\"display: none\">{{cloze:遮盖}}</div>\n<div id=\"err\"></div>\n<div id=\"image-occlusion-container\">\n    {{图片}}\n    <canvas id=\"image-occlusion-canvas\"></canvas>\n</div>\n<script>\ntry {\n    anki.imageOcclusion.setup();\n} catch (exc) {\n    document.getElementById(\"err\").innerHTML = `加载图片遮盖时候出错，请确认是使用的是否最新版本的 Anki。<br><br>${exc}`;\n}\n</script>\n",
+    "Back": "{{#标题}}<div>{{标题}}</div>{{/标题}}\n<div style=\"display: none\">{{cloze:遮盖}}</div>\n<div id=\"err\"></div>\n<div id=\"image-occlusion-container\">\n    {{图片}}\n    <canvas id=\"image-occlusion-canvas\"></canvas>\n</div>\n<script>\ntry {\n    anki.imageOcclusion.setup();\n} catch (exc) {\n    document.getElementById(\"err\").innerHTML = `加载图片遮盖时候出错，请确认是使用的是否最新版本的 Anki。<br><br>${exc}`;\n}\n</script>\n\n<div><button id=\"toggle\">切换遮罩</button></div>\n{{#背面额外}}<div>{{背面额外}}</div>{{/背面额外}}\n"
+  }
+}

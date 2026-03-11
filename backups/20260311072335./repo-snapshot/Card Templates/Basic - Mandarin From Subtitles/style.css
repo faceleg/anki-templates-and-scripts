@@ -1,0 +1,27 @@
+/* @inject: shared/css/base.css */
+/* @inject: shared/css/fonts.css */
+/* @inject: shared/css/layout.css */
+/* @inject: shared/css/components.css */
+/* @inject: shared/css/tone-colors.css */
+/* @inject: shared/css/character.css */
+/* @inject: shared/css/typography.css */
+
+/* Basic - Mandarin From Subtitles specific rules */
+
+.char,
+#char_sim,
+#char_sim_coloured {
+  font-size: 40px;
+}
+
+#back #char_sim {
+  display: none;
+}
+
+#char_sim_coloured {
+  display: none;
+}
+
+#back #char_sim_coloured {
+  display: block;
+}

@@ -1,0 +1,58 @@
+<div id="back">{{FrontSide}}</div>
+
+<script type="text/javascript">
+// Auto-play audio on reveal
+var ankiAudioDiv = document.getElementById("audio");
+if (ankiAudioDiv) {
+  var ankiAudioEls = ankiAudioDiv.getElementsByTagName("audio");
+  if (ankiAudioEls.length > 0) {
+    ankiAudioEls[0].play();
+  } else {
+    var ankiAudioAnys = ankiAudioDiv.getElementsByTagName("*");
+    if (ankiAudioAnys.length > 0) {
+      ankiAudioAnys[0].click();
+    }
+  }
+}
+</script>
+
+<script type="text/javascript">
+"use strict";
+
+document.querySelectorAll(".char_examples_blank").forEach(function (el) {
+  el.style.display = "none";
+});
+var examplesEl = document.getElementById("char_examples");
+if (examplesEl) examplesEl.style.display = "block";
+
+(function applyColorization() {
+  var pinyinEl = document.getElementById("char_pinyin");
+  if (!pinyinEl) return;
+
+  var tones = decodePinyin(pinyinEl.textContent);
+
+  function isChineseChar(ch) {
+    return /^[\u4e00-\u9fff]$/.test(ch);
+  }
+
+  function recolorCharacters(el) {
+    if (!el) return;
+    var html = el.innerHTML;
+    var out = "";
+    var wordIndex = 0;
+    for (var i = 0; i < html.length; i++) {
+      if (!isChineseChar(html[i])) {
+        out += html[i];
+      } else {
+        var color = TONE_COLORS[tones[wordIndex]] || "#555";
+        out += '<span style="color:' + color + ';">' + html[i] + "</span>";
+        wordIndex++;
+      }
+    }
+    el.innerHTML = out;
+  }
+
+  recolorCharacters(document.getElementById("char_sim"));
+  recolorCharacters(document.getElementById("char_trad"));
+})();
+</script>
