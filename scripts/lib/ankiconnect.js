@@ -1,6 +1,6 @@
 const http = require('http');
 
-const ANKICONNECT_HOST = 'localhost';
+const ANKICONNECT_HOST = '127.0.0.1';
 const ANKICONNECT_PORT = 8765;
 
 /**
@@ -23,9 +23,12 @@ function request(action, params = {}) {
       port: ANKICONNECT_PORT,
       path: '/',
       method: 'POST',
+      agent: false, // disable keep-alive pooling; AnkiConnect closes connections between requests
       headers: {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(payload),
+        'Origin': 'http://127.0.0.1',
+        'Connection': 'close',
       },
     };
 
