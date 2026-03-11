@@ -1,7 +1,6 @@
 {
   "scripts": {
-    "build": "node scripts/build.js && npm run build:css:mandarin",
-    "build:css:mandarin": "purgecss --config purgecss.mandarin.config.js --output ./dist",
+    "build": "node scripts/build.js",
     "lint": "eslint .",
     "format": "prettier --write .",
     "anki:discover": "node scripts/anki-discover.js",

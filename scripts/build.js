@@ -2,6 +2,7 @@
 
 const fs = require("fs").promises;
 const path = require("path");
+const { PurgeCSS } = require("purgecss");
 
 const repoRoot = path.resolve(__dirname, "..");
 const cardTemplatesDir = path.join(repoRoot, "Card Templates");
@@ -116,17 +117,45 @@ async function buildModel(modelName) {
   }
 }
 
+async function purgeCSSInDist() {
+  const allHTML = await findHTMLFiles(distDir);
+  const allCSS = [];
+  const modelEntries = await fs.readdir(distDir, { withFileTypes: true });
+  for (const entry of modelEntries) {
+    if (!entry.isDirectory()) continue;
+    const modelDistDir = path.join(distDir, entry.name);
+    const cssEntries = await fs.readdir(modelDistDir, { withFileTypes: true });
+    for (const e of cssEntries) {
+      if (e.isFile() && e.name.endsWith(".css")) {
+        allCSS.push(path.join(modelDistDir, e.name));
+      }
+    }
+  }
+
+  const results = await new PurgeCSS().purge({
+    content: allHTML.map((f) => ({ raw: require("fs").readFileSync(f, "utf8"), extension: "html" })),
+    css: allCSS,
+  });
+
+  for (const result of results) {
+    await fs.writeFile(result.file, result.css, "utf8");
+  }
+}
+
 async function main() {
   const entries = await fs.readdir(cardTemplatesDir, { withFileTypes: true });
   const modelDirs = entries
     .filter((e) => e.isDirectory())
     .map((e) => e.name);
 
+  await fs.rm(distDir, { recursive: true, force: true });
   await fs.mkdir(distDir, { recursive: true });
 
   for (const modelName of modelDirs) {
     await buildModel(modelName);
   }
+
+  await purgeCSSInDist();
 
   console.log(`Built ${modelDirs.length} models → dist/`);
 }

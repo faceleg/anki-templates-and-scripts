@@ -70,18 +70,6 @@
   color: black;
 }
 
-.btn-a {
-  background-color: var(--gray);
-  border: 2px solid var(--gray);
-  border-bottom: 5px solid var(--gray);
-  border-radius: 9px;
-  font-size: 2rem;
-  padding: 0.25rem 0.35rem;
-  margin: 0.2rem;
-  color: black;
-  display: inline-block;
-}
-
 .text {
   border: 1px solid green;
   padding: 10px;
@@ -170,9 +158,6 @@ button.btn-play {
 }
 
 @media screen and (max-width: 480px) {
-  .btn-a {
-    font-size: 1.5rem;
-  }
 
   .btn-q {
     font-size: 1.5rem;

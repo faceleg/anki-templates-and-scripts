@@ -23,11 +23,6 @@
   --isRTL: -1;
 }
 
-[dir="rtl"]:root {
-  --isLTR: -1;
-  --isRTL: 1;
-}
-
 .card {
   --title-color: grey;
   --time-left-color: teal;
@@ -152,21 +147,10 @@
 }
 
 /* Windows */
-.win .char-card {
-  font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
-}
 /* macOS */
-.mac .char-card,
-.iphone .char-card {
-  font-family: "KaiTi";
-}
 /* Linux desktops */
-.linux:not(.android) .char-card {
-  font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
-}
 
-h1,
-h2,
+
 h3 {
   margin: 0;
   font-weight: 500;
@@ -193,14 +177,6 @@ main {
   }
 }
 
-form {
-  max-width: 89vw;
-  display: grid;
-  gap: var(--space-xl) var(--space-xxl);
-  --repeat: auto-fit;
-  align-items: flex-start;
-}
-
 section {
   display: grid;
   gap: var(--space-md);
@@ -222,10 +198,6 @@ fieldset {
   border-radius: var(--space-sm);
   overflow: hidden;
   transition: box-shadow 0.3s ease;
-}
-
-fieldset[focus-within] {
-  box-shadow: 0 5px 20px -10px hsla(0, 0%, 0%, 0.5);
 }
 
 fieldset:focus-within {
@@ -338,10 +310,6 @@ input[type="number"] {
   grid-template-columns: 1fr var(--space-xl);
 }
 
-.fs-item-2 {
-  grid-template-columns: 56px 1fr;
-}
-
 .fs-item-3 {
   grid-template-columns: 1fr 1fr;
 }
@@ -362,32 +330,12 @@ input[type="number"] {
   background: var(--brand-bg2);
 }
 
-.fieldset-item[focus-within] {
-  background: var(--surface2);
-}
-
 .fieldset-item:focus-within {
   background: var(--surface2);
 }
 
-.fieldset-item[focus-within] svg {
-  fill: #fff;
-}
-
 .fieldset-item:focus-within svg {
   fill: #fff;
-}
-
-.fieldset-item[focus-within] picture {
-  -webkit-clip-path: circle(50%);
-  clip-path: circle(50%);
-  background: var(--brand-bg-gradient) fixed;
-}
-
-.fieldset-item:focus-within picture {
-  -webkit-clip-path: circle(50%);
-  clip-path: circle(50%);
-  background: var(--brand-bg-gradient) fixed;
 }
 
 .fieldset-item > :is(.input-stack, label) {
@@ -493,10 +441,6 @@ input[type="number"] {
   margin-right: 6px;
 }
 
-.more-info-btn {
-  text-align: center;
-}
-
 .brand-title {
   text-align: left;
   font-weight: bold;
@@ -530,82 +474,8 @@ input[type="number"] {
   line-height: 1.8;
 }
 
-.practice-ch {
-  border-radius: 6px;
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.12),
-    0 1px 2px rgba(0, 0, 0, 0.24);
-  transition: all 0.3s ease;
-  padding: 3px;
-}
-
 .header {
   color: var(--header-color);
-}
-
-.question-sub-text {
-  color: #f44336;
-  font-weight: bold;
-}
-
-.text-color1 {
-  font-size: 16px;
-  color: var(--pinyin-color);
-}
-
-.text-color2 {
-  color: var(--traditional-color);
-}
-
-.text-color3 {
-  color: var(--meaning-color);
-}
-
-.text-color4 {
-  font-size: 30px;
-  font-weight: bold;
-  color: var(--simplified-color);
-}
-
-.tone1,
-.t1 {
-  color: #f44336;
-}
-
-.tone2,
-.t2 {
-  color: #ff9800;
-}
-
-.tone3,
-.t3 {
-  color: #4caf50;
-}
-
-.tone4,
-.t4 {
-  color: #2196f3;
-}
-
-.tone5,
-.t5 {
-  color: #607d8b;
-}
-
-.char-tone1 {
-  color: var(--tone-1);
-}
-
-.char-tone2 {
-  color: var(--tone-2);
-}
-
-.char-tone3 {
-  color: var(--tone-3);
-}
-
-.char-tone4 {
-  color: var(--tone-4);
 }
 
 .char-card {
@@ -625,18 +495,6 @@ input[type="number"] {
   -webkit-box-shadow: 0px 0px 10px -5px rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 0px 0px 10px -5px rgba(0, 0, 0, 0.5);
   box-shadow: 0px 0px 10px -5px rgba(0, 0, 0, 0.5);
-}
-
-.stroke-color {
-  color: var(--stroke);
-}
-
-.outline-color {
-  color: var(--outline);
-}
-
-.drawing-color {
-  color: var(--drawing);
 }
 
 #character-target-div {
@@ -660,26 +518,6 @@ input[type="number"] {
   width: 0px;
 }
 
-.char-sim-1 {
-  margin: 2px;
-  font-size: 30px;
-}
-
-.char-trad-1 {
-  margin: 2px;
-  font-size: 30px;
-}
-
-.char-pin-1 {
-  margin: 2px;
-  line-height: 32px;
-}
-
-.char-zhy-1 {
-  margin: 2px;
-  line-height: 32px;
-}
-
 #char_image {
   text-align: center;
 }
@@ -701,15 +539,6 @@ input[type="number"] {
 
 #char_deck #audio {
   height: 20px;
-}
-
-#char_deck #audio .replay-button {
-  margin: 0;
-}
-
-#char_deck #audio .playImage {
-  height: 20px;
-  width: 20px;
 }
 
 /* Character font variants */
@@ -803,15 +632,6 @@ img {
   color: gray;
 }
 
-.zy {
-  font-size: 14px;
-  color: gray;
-}
-
-.char_example {
-  line-height: 1.8;
-}
-
 #char_pinyin,
 #char_reading {
   margin-bottom: 20px;
@@ -823,10 +643,6 @@ img {
 
 
 /* Basic - Mandarin specific rules */
-
-.iphone .header-wrapper {
-  top: 0;
-}
 
 .header-wrapper {
   display: flex;
@@ -875,13 +691,9 @@ img {
   line-height: 36px;
 }
 
-.char_example,
+
 .char_examples_blank {
   line-height: 1.8;
-}
-
-.char_example_blank {
-  letter-spacing: 2px;
 }
 
 #char_image {
