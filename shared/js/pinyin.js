@@ -106,7 +106,7 @@ function recolorCharacters(characterElement, decodedTones) {
   var wordIndex = 0;
 
   for (var i = 0; i < characterText.length; i++) {
-    if (!isChineseCharacter([characterText[i]])) {
+    if (!isChineseCharacter(characterText[i])) {
       coloredCharacters += characterText[i];
     } else {
       var color = TONE_COLORS[decodedTones[wordIndex]] || "#555"; // Default color to grey if tone is not found
