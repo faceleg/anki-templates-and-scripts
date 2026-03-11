@@ -30,14 +30,20 @@ function request(action, params = {}) {
     };
 
     const req = http.request(options, (res) => {
-      let data = '';
+      if (res.statusCode !== 200) {
+        reject(new Error(`AnkiConnect request failed with status ${res.statusCode}`));
+        return;
+      }
+
+      const chunks = [];
 
       res.on('data', (chunk) => {
-        data += chunk;
+        chunks.push(chunk);
       });
 
       res.on('end', () => {
         try {
+          const data = Buffer.concat(chunks).toString();
           const response = JSON.parse(data);
           if (response.error) {
             reject(new Error(`AnkiConnect error: ${response.error}`));
@@ -48,6 +54,10 @@ function request(action, params = {}) {
           reject(new Error(`Failed to parse AnkiConnect response: ${err.message}`));
         }
       });
+    });
+
+    req.setTimeout(5000, () => {
+      req.destroy(new Error('AnkiConnect request timed out'));
     });
 
     req.on('error', (err) => {
