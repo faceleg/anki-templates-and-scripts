@@ -15,16 +15,8 @@ var UniqueCardPersistence = {
   },
 };
 
-// Defaults management
-var switchIdList = [
-  "text-pinyin",
-  "text-zhuyin",
-  "text-meaning",
-  "text-sim",
-  "text-trad",
-  "text-examples",
-  "text-examples-parts-of-speech",
-];
+// Defaults management — derive list from template-defined preferenceDefaults
+var switchIdList = Object.keys(window.preferenceDefaults);
 
 function getPreference(defaultName, frontOrBack) {
   if (
