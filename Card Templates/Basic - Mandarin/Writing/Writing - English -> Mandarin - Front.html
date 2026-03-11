@@ -276,6 +276,7 @@ var Quiz = (function () {
   var _nextStrokeIndex = 0;
   var _hintCountThisChar = 0;
   var _worstRating = null;
+  var _isInitialLoad = true; // Anki reads the whole word on card show; skip TTS for first char on first load only
 
   function _makeGuard(capturedId) {
     return function () { return _sessionId === capturedId; };
@@ -450,7 +451,10 @@ var Quiz = (function () {
       _totalStrokeCount += writer._character.strokes.length;
     }
 
-    AudioManager.speak(characters[charIndex]);
+    if (!(charIndex === 0 && _isInitialLoad)) {
+      AudioManager.speak(characters[charIndex]);
+    }
+    _isInitialLoad = false;
 
     writer.quiz({
       showHintAfterMisses: HINT_MISS,
