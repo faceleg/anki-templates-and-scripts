@@ -1,8 +1,15 @@
 {
   "scripts": {
-    "build:css:mandarin": "purgecss --config purgecss.mandarin.config.js --output ./card-templates/mandarin/dist",
+    "build": "node scripts/build.js && npm run build:css:mandarin",
+    "build:css:mandarin": "purgecss --config purgecss.mandarin.config.js --output ./dist",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "anki:discover": "node scripts/anki-discover.js",
+    "anki:pull": "node scripts/anki-pull.js",
+    "anki:backup": "node scripts/anki-backup.js",
+    "anki:rollback": "node scripts/anki-rollback.js",
+    "anki:deploy": "node scripts/anki-deploy.js",
+    "anki:deploy:dry": "node scripts/anki-deploy.js --dry-run"
   },
   "devDependencies": {
     "@html-eslint/eslint-plugin": "^0.24.1",
