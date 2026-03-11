@@ -536,6 +536,8 @@ var Quiz = (function () {
       _totalStrokeCount += writer._character.strokes.length;
     }
 
+    AudioManager.speak(characters[charIndex]);
+
     writer.quiz({
       showHintAfterMisses: HINT_MISS,
       highlightOnComplete: true,
