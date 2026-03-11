@@ -485,7 +485,7 @@ var Quiz = (function () {
         if (nextIndex < characters.length) {
           if (characters.length > 1) {
             AudioManager.speak(characters[charIndex]);
-            AudioManager.speak(characters[charIndex + 1]);
+            // next char TTS is handled by _startCharacterQuiz(nextIndex)
           }
           _revealThumbnail(charIndex);
           setTimeout(function () {
