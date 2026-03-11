@@ -132,7 +132,7 @@ async function backup() {
     }
 
     const sharedDir = path.join(process.cwd(), 'shared');
-    if (copyDirIfExists(sharedDir, path.join(repoSnapshotDir, 'shared'))) {
+    if (await copyDirIfExists(sharedDir, path.join(repoSnapshotDir, 'shared'))) {
       console.log('  → shared/');
     }
 
