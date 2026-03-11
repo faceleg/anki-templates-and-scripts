@@ -1,0 +1,195 @@
+<!-- NOTE: 
+To turn off "undo" confirmation popup when shaking to undo card "done" state:
+Toggle "shake to undo" off in accessibility settings of ios -->
+<div
+    id="debug-message-console"
+    style="
+        display: none;
+        color: red;
+        border: 1px solid black;
+        font-size: 8px;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        padding: 2px;
+        max-width: 100%;
+    "
+></div>
+<script>
+// Debug utilities
+
+var DEBUG = false;
+
+window.onerror = function (message, source, lineno, colno, error) {
+  if (!DEBUG) return;
+  var el = document.getElementById("debug-message-console");
+  if (!el) return;
+  el.style.display = "block";
+  el.innerHTML +=
+    "<div>" +
+    message +
+    " (" +
+    (source || "") +
+    ":" +
+    lineno +
+    ":" +
+    colno +
+    ")</div>";
+};
+
+function debugLog(msg) {
+  if (!DEBUG) return;
+  var el = document.getElementById("debug-message-console");
+  if (!el) return;
+  el.style.display = "block";
+  el.innerHTML += "<div>" + msg + "</div>";
+}
+
+</script>
+
+<div id="split_sent">{{Split}}</div>
+
+<div class="spacer"></div>
+
+<div id="translation" class="translation">{{English}}</div>
+
+<div class="spacer"></div>
+
+<div id="no-touch-wrapper" class="tappable">
+
+    <div id="free_text_wrapper_id" class="free_text_wrapper">
+        <textarea id="free_text"></textarea>
+    </div>
+
+    <div id="dash" style="display:none"></div>
+
+    <div style="display:none">
+    ______
+    <div class="spacerSmall"></div>
+</div>
+<div id="container"></div>
+</div>
+<div class="spacer"></div>
+<button class="btn-check" onclick="check();">CHECK</button>
+<button class="btn-reset" onclick="reset();">RESET</button>
+<button class="btn-hint" onclick="hint();">HINT</button>
+<div class="spacer"></div>
+<div id="correct"></div>
+<div class="spacer"></div>
+<div class="spacer"></div>
+<div id="structure" style="display:none" class="structure">{{Structure}}</div>
+<div class="spacerMedium"></div>
+<div id="chinese" class="chinese" style="display:none">{{Simplified}}</div>
+<!-- <div class="spacerSmall"></div> -->
+<div id="pinyin" class="pinyin" style="display:none">{{Pinyin}}</div>
+<div class="spacerMedium"></div>
+
+<div class="spacer"></div>
+<div id="usedfor" class="notes" style="display:none">{{Used For}}</div>
+
+<script type="text/javascript">
+/**
+ * Stop skipping to next card on misclicks around buttons or interactive components
+ */ 
+(() => {
+    const noTouchWrapper = document.getElementById('no-touch-wrapper');
+
+    if (noTouchWrapper) {
+        const allowedSelectors = ['button', '#container > div', '#dash > div', '.free_text_wrapper'];
+
+        function isAllowedTarget(target) {
+            return allowedSelectors.some(selector => {
+                return target.matches(selector) || target.closest(selector);
+            });
+        }
+
+        function handleEvent(e) {
+            if (isAllowedTarget(e.target)) {
+                return;
+            }
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        }
+
+        const events = ['click', 'touchstart', 'touchmove', 'touchend', 'touchcancel'];
+
+        events.forEach(eventType => {
+            noTouchWrapper.addEventListener(eventType, handleEvent);
+        });
+    }
+})();
+</script>
+
+<script>
+(() => {
+    // Hide the original sentence element
+    const splitSentElement = document.getElementById("split_sent");
+    splitSentElement.style.display = "none";
+
+    // Process the sentence into an array of words
+    const sentence = splitSentElement.innerText.trim();
+    const sentenceArray = sentence.split(/\s+/);
+
+    // Shuffle the array
+    function shuffle(array) {
+        array.sort(() => Math.random() - 0.5);
+    }
+    shuffle(sentenceArray);
+
+    // Create buttons for each word with unique IDs
+    let buttonHTML = "";
+    sentenceArray.forEach((word, index) => {
+        // Generate a unique ID using the word and its index
+        const uniqueId = `btn${index}`;
+        buttonHTML += `<div class='btn-q' id='${uniqueId}'>${word}</div>`;
+    });
+
+    document.getElementById('container').innerHTML = buttonHTML;
+
+
+
+    // Check if the current text matches the original sentence
+    window.check = function() {
+        
+        const freeText = document.getElementById("free_text").value.replace(/\s+/g, '');
+
+        const originalText = splitSentElement.innerText
+            .replace(/\s+/g, '');
+
+
+        const isCorrect = freeText === originalText;
+
+        document.getElementById("correct").innerText = isCorrect ? "CORRECT" : "INCORRECT";
+        document.getElementById("correct").style.color = isCorrect ? "green" : "red";
+
+        if (isCorrect) {
+            ["chinese", "structure", "usedfor"].forEach(id => {
+                document.getElementById(id).style.display = "block";
+            });
+        }
+    };
+
+    let hintTapCount = 0;
+
+    // Reset the game state
+    window.reset = function() {
+        hintTapCount = 0;
+
+        document.getElementById("correct").innerText = "";
+        document.getElementById("free_text").value = "";
+
+        ["chinese", "pinyin", "structure", "usedfor"].forEach(id => {
+            document.getElementById(id).style.display = "none";
+        });
+    };
+
+    // Provide hints in stages
+    window.hint = function() {
+        const hints = ["structure", "chinese", "pinyin", "usedfor"];
+        if (hintTapCount < hints.length) {
+            document.getElementById(hints[hintTapCount]).style.display = "block";
+            hintTapCount++;
+        }
+    };
+})();
+</script>

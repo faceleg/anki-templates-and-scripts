@@ -1,3 +1,5 @@
+<!-- @inject: shared/js/debug.js -->
+
 <div id="title" class="title">{{Title}}</div>
 <div class="spacer"></div>
 <div id="structure" class="structure">{{Structure}}</div>
@@ -21,13 +23,7 @@
     <div>{{Deck}}</div>
     <div>{{Card}}</div>
 </div>	
-<script>
-    function playAudio(){
-        var audioDiv = document.getElementById('audio');
-        var audio = audioDiv.getElementsByTagName("*");
-        audio[0].click();
-    }
-</script>
+<!-- @inject: shared/js/audio.js -->
 
 
 <script>

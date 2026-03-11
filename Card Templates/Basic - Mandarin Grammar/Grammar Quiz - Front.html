@@ -15,33 +15,7 @@ Toggle "shake to undo" off in accessibility settings of ios -->
         max-width: 100%;
     "
 ></div>
-<script type="text/javascript">
-    function millisecondsSinceTimestamp(previousTimestamp) {
-        // Get the current timestamp in milliseconds
-        const currentTimestamp = Date.now();
-    
-        // Calculate the difference between current and previous timestamps
-        const differenceMilliseconds = currentTimestamp - previousTimestamp;
-    
-        return differenceMilliseconds;
-        }
-    
-        var loadStartedTimestamp = Date.now();
-    
-        // Set this to true to make the messenger appear with your messages
-        var DEBUG = true;
-        function printDebugMessage(message) {
-        var messageDiv = document.getElementById("debug-message-console");
-    
-        messageDiv.style.display = DEBUG ? "block" : "none";
-    
-        messageDiv.innerHTML +=
-            message +
-            " (" +
-            millisecondsSinceTimestamp(loadStartedTimestamp) +
-            ")<br/>";
-    }
-</script>
+<!-- @inject: shared/js/debug.js -->
 
 <div id="split_sent">{{Split}}</div>
 

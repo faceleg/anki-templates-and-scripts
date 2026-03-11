@@ -1,0 +1,57 @@
+small {
+  line-height: 1.5;
+}
+
+hr {
+  border: 0;
+  height: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+img {
+  border-radius: 10%;
+}
+
+.meaning {
+  text-align: center;
+}
+
+.meaning {
+  display: block;
+}
+
+.meaning-card {
+  text-align: center;
+  padding: 10px;
+}
+
+.pinyin {
+  font-size: 16px;
+}
+
+.zhuyin {
+  font-size: 16px;
+}
+
+.py {
+  font-size: 14px;
+  color: gray;
+}
+
+.zy {
+  font-size: 14px;
+  color: gray;
+}
+
+.char_example {
+  line-height: 1.8;
+}
+
+#char_pinyin,
+#char_reading {
+  margin-bottom: 20px;
+}
+
+.button-wrapper {
+  margin-bottom: 20px;
+}
