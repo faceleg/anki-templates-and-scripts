@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 const fs = require('fs').promises;
-const fsSync = require('fs');
 const path = require('path');
 const { checkConnection, modelNames, modelTemplates, modelStyling } = require('./lib/ankiconnect');
 
@@ -66,41 +65,58 @@ async function pull() {
     const cardTemplatesBaseDir = path.join(process.cwd(), 'Card Templates');
 
     for (const modelName of models) {
-      console.log(`Pulling model: ${modelName}`);
+      try {
+        console.log(`Pulling model: ${modelName}`);
 
-      // Create model directory
-      const sanitizedName = sanitizeFileName(modelName);
-      const modelDir = path.join(cardTemplatesBaseDir, sanitizedName);
-      await ensureDir(modelDir);
+        // Create model directory
+        const sanitizedName = sanitizeFileName(modelName);
+        const modelDir = path.join(cardTemplatesBaseDir, sanitizedName);
+        await ensureDir(modelDir);
 
-      // Get templates
-      const templates = await modelTemplates(modelName);
-      const templateNames = Object.keys(templates);
+        // Get templates
+        const templates = await modelTemplates(modelName);
+        const templateNames = Object.keys(templates);
 
-      // Write front and back templates
-      for (const templateName of templateNames) {
-        const templateData = templates[templateName];
+        // Write front and back templates
+        for (const templateName of templateNames) {
+          const templateData = templates[templateName];
 
-        // Write front template
-        const frontFileName = `${templateName} - Front.html`;
-        const frontPath = path.join(modelDir, frontFileName);
-        await fs.writeFile(frontPath, templateData.Front);
-        console.log(`  → ${frontFileName}`);
+          // Write front template
+          if (typeof templateData.Front === 'string') {
+            const frontFileName = `${templateName} - Front.html`;
+            const frontPath = path.join(modelDir, frontFileName);
+            await fs.writeFile(frontPath, templateData.Front);
+            console.log(`  → ${frontFileName}`);
+          } else {
+            console.warn(`Warning: Front template for "${templateName}" in model "${modelName}" is not a string, skipping`);
+          }
 
-        // Write back template
-        const backFileName = `${templateName} - Back.html`;
-        const backPath = path.join(modelDir, backFileName);
-        await fs.writeFile(backPath, templateData.Back);
-        console.log(`  → ${backFileName}`);
+          // Write back template
+          if (typeof templateData.Back === 'string') {
+            const backFileName = `${templateName} - Back.html`;
+            const backPath = path.join(modelDir, backFileName);
+            await fs.writeFile(backPath, templateData.Back);
+            console.log(`  → ${backFileName}`);
+          } else {
+            console.warn(`Warning: Back template for "${templateName}" in model "${modelName}" is not a string, skipping`);
+          }
+        }
+
+        // Get and write CSS
+        const styling = await modelStyling(modelName);
+        if (typeof styling.css === 'string') {
+          const stylePath = path.join(modelDir, 'style.css');
+          await fs.writeFile(stylePath, styling.css);
+          console.log(`  → style.css`);
+        } else {
+          console.warn(`Warning: CSS for model "${modelName}" is not a string, skipping`);
+        }
+
+        console.log('');
+      } catch (err) {
+        console.error(`Error processing model "${modelName}":`, err.message);
+        throw err;
       }
-
-      // Get and write CSS
-      const styling = await modelStyling(modelName);
-      const stylePath = path.join(modelDir, 'style.css');
-      await fs.writeFile(stylePath, styling.css);
-      console.log(`  → style.css`);
-
-      console.log('');
     }
 
     // Step 6: Print summary
