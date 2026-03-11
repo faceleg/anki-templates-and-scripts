@@ -117,28 +117,33 @@ async function buildModel(modelName) {
   }
 }
 
+/**
+ * Run PurgeCSS per model: each model's CSS is purged using only that model's HTML.
+ * This ensures CSS selectors from one note type don't prevent purging in another.
+ */
 async function purgeCSSInDist() {
-  const allHTML = await findHTMLFiles(distDir);
-  const allCSS = [];
   const modelEntries = await fs.readdir(distDir, { withFileTypes: true });
   for (const entry of modelEntries) {
     if (!entry.isDirectory()) continue;
     const modelDistDir = path.join(distDir, entry.name);
+
+    const htmlFiles = await findHTMLFiles(modelDistDir);
+    if (htmlFiles.length === 0) continue;
+
     const cssEntries = await fs.readdir(modelDistDir, { withFileTypes: true });
-    for (const e of cssEntries) {
-      if (e.isFile() && e.name.endsWith(".css")) {
-        allCSS.push(path.join(modelDistDir, e.name));
-      }
+    const cssFiles = cssEntries
+      .filter((e) => e.isFile() && e.name.endsWith(".css"))
+      .map((e) => path.join(modelDistDir, e.name));
+    if (cssFiles.length === 0) continue;
+
+    const results = await new PurgeCSS().purge({
+      content: htmlFiles.map((f) => ({ raw: require("fs").readFileSync(f, "utf8"), extension: "html" })),
+      css: cssFiles,
+    });
+
+    for (const result of results) {
+      await fs.writeFile(result.file, result.css, "utf8");
     }
-  }
-
-  const results = await new PurgeCSS().purge({
-    content: allHTML.map((f) => ({ raw: require("fs").readFileSync(f, "utf8"), extension: "html" })),
-    css: allCSS,
-  });
-
-  for (const result of results) {
-    await fs.writeFile(result.file, result.css, "utf8");
   }
 }
 
