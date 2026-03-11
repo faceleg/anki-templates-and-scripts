@@ -1,0 +1,9 @@
+# type(optional-scope): short description (imperative, max 72 chars)
+#
+# Types: feat, fix, refactor, chore, docs, style, test
+#
+# Examples:
+#   feat: speak character before drawing begins
+#   fix(writing): correct stroke indicator color after bad start
+#   chore: update dependencies
+#

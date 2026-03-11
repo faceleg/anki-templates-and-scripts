@@ -38,6 +38,21 @@ scripts/
   aacgain/                       # AAC audio gain utility
 ```
 
+## Commit Style
+
+Use Conventional Commits with optional scope:
+
+```
+type(optional-scope): short description (imperative, max 72 chars)
+```
+
+Types: `feat`, `fix`, `refactor`, `chore`, `docs`, `style`, `test`
+
+Examples:
+- `feat: speak character before drawing begins`
+- `fix(writing): correct stroke indicator color after bad start`
+- `chore: update dependencies`
+
 ## Card Template Notes
 
 - Templates are plain HTML files used directly inside Anki
