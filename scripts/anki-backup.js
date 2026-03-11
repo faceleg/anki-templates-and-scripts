@@ -21,14 +21,13 @@ function generateTimestamp() {
 
 /**
  * Get the current git commit hash
- * @returns {string} Git commit hash
+ * @returns {string} Git commit hash or 'unknown' if not available
  */
 function getGitCommit() {
   try {
     return execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim();
-  } catch (err) {
-    console.error('Failed to get git commit:', err.message);
-    process.exit(1);
+  } catch {
+    return 'unknown';
   }
 }
 
@@ -49,14 +48,14 @@ async function ensureDir(dirPath) {
  * Copy a directory recursively (skips if source doesn't exist)
  * @param {string} src - Source directory
  * @param {string} dest - Destination directory
- * @returns {boolean} True if copied, false if source doesn't exist
+ * @returns {Promise<boolean>} True if copied, false if source doesn't exist
  */
-function copyDirIfExists(src, dest) {
+async function copyDirIfExists(src, dest) {
   if (!fsSync.existsSync(src)) {
     return false;
   }
   try {
-    fsSync.cpSync(src, dest, { recursive: true });
+    await fs.cp(src, dest, { recursive: true });
     return true;
   } catch (err) {
     console.error(`Failed to copy ${src} to ${dest}:`, err.message);
@@ -111,16 +110,26 @@ async function backup() {
     await ensureDir(repoSnapshotDir);
 
     const scriptsDir = path.join(process.cwd(), 'scripts');
-    fsSync.cpSync(scriptsDir, path.join(repoSnapshotDir, 'scripts'), {
-      recursive: true,
-    });
-    console.log('  → scripts/');
+    try {
+      await fs.cp(scriptsDir, path.join(repoSnapshotDir, 'scripts'), {
+        recursive: true,
+      });
+      console.log('  → scripts/');
+    } catch (err) {
+      console.error(`Failed to copy scripts directory:`, err.message);
+      throw err;
+    }
 
     const cardTemplatesDir = path.join(process.cwd(), 'Card Templates');
-    fsSync.cpSync(cardTemplatesDir, path.join(repoSnapshotDir, 'Card Templates'), {
-      recursive: true,
-    });
-    console.log('  → Card Templates/');
+    try {
+      await fs.cp(cardTemplatesDir, path.join(repoSnapshotDir, 'Card Templates'), {
+        recursive: true,
+      });
+      console.log('  → Card Templates/');
+    } catch (err) {
+      console.error(`Failed to copy Card Templates directory:`, err.message);
+      throw err;
+    }
 
     const sharedDir = path.join(process.cwd(), 'shared');
     if (copyDirIfExists(sharedDir, path.join(repoSnapshotDir, 'shared'))) {
