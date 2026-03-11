@@ -1,3 +1,4 @@
+
 <div
     id="debug-message-console"
     style="
@@ -47,17 +48,7 @@
 <div id="character-target-div" class="tappable"></div>
 <div id="writing-feedback" style="display: none">
     <span id="writing-feedback-mistakes"></span>
-    <span id="writing-feedback-total-strokes"></span>
-    <span id="quiz-rating-indicator" style="
-        display: inline-block;
-        width: 18px;
-        height: 18px;
-        border-radius: 5px;
-        background-color: #4caf50;
-        vertical-align: middle;
-        margin-left: 10px;
-        transition: background-color 0.4s ease;
-    "></span>
+    <span id="quiz-rating-indicator"></span>
 </div>
 <div id="audio" style="display: none">{{Audio}}</div>
 
@@ -230,25 +221,6 @@ function loadCharMeaning(character, onComplete) {
   loadCharData(character + "_meaning", onComplete, null);
 }
 
-function getPinyinWithMacron(pinyin) {
-  var toneMap = {
-    1: ["ā","ē","ī","ō","ū","ǖ"],
-    2: ["á","é","í","ó","ú","ǘ"],
-    3: ["ǎ","ě","ǐ","ǒ","ǔ","ǚ"],
-    4: ["à","è","ì","ò","ù","ǜ"],
-  };
-  var vowels = "aeiouü";
-  var tone = parseInt(pinyin[pinyin.length - 1]);
-  if (isNaN(tone) || tone < 1 || tone > 4) return pinyin;
-  var base = pinyin.slice(0, -1);
-  for (var i = base.length - 1; i >= 0; i--) {
-    if (vowels.includes(base[i])) {
-      return base.slice(0, i) + toneMap[tone][vowels.indexOf(base[i])] + base.slice(i + 1);
-    }
-  }
-  return pinyin;
-}
-
 function stripAscii(str) {
   return str.replace(/[A-Za-z0-9]/g, "");
 }
@@ -264,6 +236,7 @@ function getCharactersToDraw() {
 var Quiz = (function () {
 
   var _sessionId = 0;
+  var _persistenceKey = "quizResult";
   var _writers = [];
   var _thumbnailWriters = [];
   var _thumbnailRevealPending = [];
@@ -282,31 +255,31 @@ var Quiz = (function () {
     return function () { return _sessionId === capturedId; };
   }
 
+  function _pad(n) {
+    return n < 10 ? "\u00a0" + n : "" + n;
+  }
+
   function _updateFeedback() {
-    var parts = [];
-    if (_mistakesThisChar > 0) {
-      parts.push(_mistakesThisChar === 1 ? "1 mistake for this character"
-        : _mistakesThisChar + " mistakes for this character");
-    }
-    if (_totalMistakes === 0) {
-      parts.push("no mistakes for this quiz");
-    } else {
-      parts.push(_totalMistakes === 1 ? "1 mistake for the quiz"
-        : _totalMistakes + " mistakes for the quiz");
-    }
     var fb = document.getElementById("writing-feedback");
     var mistakes = document.getElementById("writing-feedback-mistakes");
     if (fb && mistakes) {
-      mistakes.innerHTML = parts.join("<br/>");
+      mistakes.innerHTML = "char " + _pad(_mistakesThisChar) + "  \u00b7  quiz " + _pad(_totalMistakes);
       fb.style.display = "block";
     }
   }
 
   var RATING_COLORS = {
-    easy: "#4caf50",
-    good: "#4caf50",
-    hard: "#ff9800",
+    easy:  "#4caf50",
+    good:  "#4caf50",
+    hard:  "#ff9800",
     again: "#f44336",
+  };
+
+  var RATING_LABELS = {
+    easy:  "good",
+    good:  "good",
+    hard:  "hard",
+    again: "again",
   };
 
   var RATING_ORDER = ["easy", "good", "hard", "again"];
@@ -331,9 +304,14 @@ var Quiz = (function () {
   function _updateRatingIndicator() {
     var el = document.getElementById("quiz-rating-indicator");
     if (!el) return;
-    el.style.backgroundColor = RATING_COLORS[_getRating()];
-    var fb = document.getElementById("writing-feedback");
-    if (fb) fb.style.display = "block";
+    if (_totalStrokeCount === 0) {
+      el.innerHTML = "  \u00b7  <span>not started</span>";
+      el.querySelector("span").style.color = "";
+    } else {
+      var rating = _getRating();
+      el.innerHTML = "  \u00b7  <span>" + RATING_LABELS[rating] + "</span>";
+      el.querySelector("span").style.color = RATING_COLORS[rating];
+    }
   }
 
   function _revealThumbnail(charIndex) {
@@ -474,11 +452,11 @@ var Quiz = (function () {
         if (!guard()) return;
         _nextStrokeIndex = data.strokeNum + 1;
         _updateFeedback();
+        _updateRatingIndicator();
       },
 
       onComplete: function (data) {
         if (!guard()) return;
-        _totalMistakes += data.totalMistakes;
         _nextStrokeIndex = 0;
 
         var nextIndex = charIndex + 1;
@@ -503,34 +481,13 @@ var Quiz = (function () {
     });
   }
 
-  function _flipToBack() {
-    if (typeof pycmd === "function") {
-      pycmd("ans");
-    } else if (typeof AnkiDroidJS !== "undefined") {
-      showAnswer();
-    } else if (typeof study !== "undefined" && typeof study.drawAnswer === "function") {
-      study.drawAnswer();
-    } else {
-      try {
-        webkit.messageHandlers.cb.postMessage(JSON.stringify({ scheme: "ankitap", msg: "midCenter" }));
-      } catch (e) {
-        document.getElementById("char_examples").style.display = "block";
-        document.getElementById("char_examples_blank").style.display = "none";
-        var feedback = document.getElementById("writing-feedback");
-        if (feedback) feedback.style.display = "none";
-      }
-    }
-  }
-
   function _onQuizComplete(guard) {
     if (!guard()) return;
-    speechSynthesis.cancel();
-    Persistence.setItem("quizResult", {
+    Persistence.setItem(_persistenceKey, {
       totalMistakes: _totalMistakes,
       weightedMistakeScore: _weightedMistakeScore,
       totalStrokeCount: _totalStrokeCount,
     });
-    _flipToBack();
     _updateLoadStatus(true);
   }
 
@@ -559,6 +516,7 @@ var Quiz = (function () {
       _worstRating = null;
 
       var characters = getCharactersToDraw();
+      _persistenceKey = "quizResult-" + characters;
       debugLog("Quiz.start: characters='" + characters + "' length=" + characters.length);
       _characters = characters.split("");
 
@@ -568,7 +526,7 @@ var Quiz = (function () {
         _buildCompletedView(characters);
         document.getElementById("char_examples").style.display = "block";
         document.getElementById("char_examples_blank").style.display = "none";
-        var saved = Persistence.getItem("quizResult");
+        var saved = Persistence.getItem(_persistenceKey);
         if (saved) {
           _totalMistakes = saved.totalMistakes;
           _weightedMistakeScore = saved.weightedMistakeScore;
@@ -772,3 +730,4 @@ function isInWebView() {
   return false;
 }
 </script>
+
