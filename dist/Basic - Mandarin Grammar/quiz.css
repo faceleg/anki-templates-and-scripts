@@ -10,7 +10,7 @@
 }
 
 .structure {
-  color: #E64A19;
+  color: var(--structure-color);
 }
 
 .title {
@@ -29,7 +29,7 @@
 
 .translation {
   font-size: 1.5rem;
-  color: #29b6f6;
+  color: var(--translation-color);
 }
 
 .notes {

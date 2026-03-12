@@ -11,9 +11,6 @@
 <div id="char_deck">
   <div>{{Deck}}</div>
   <div>{{Card}}</div>
-  <div>
-    font name: <span id="font-name"></span>
-</div>
   <div id="audio">{{Audio}}</div>
 </div>	
 <!-- Empty div to allow the setPrefs function to work (it expects a div with an id, and will then show/hide based on classes) -->
@@ -178,7 +175,7 @@ function assignClassBasedOnTime() {
   var seconds = now.getSeconds();
   var segment = Math.floor((minutes * 60 + seconds) / 180); // 3-minute segments
 
-  var classes = ["kaiti", "arial", "roboto", "mashanzheng", "yrdzst", "xxx", "yyy"];
+  var classes = ["kaiti", "songti", "heiti", "mashanzheng", "yrdzst", "xxx", "yyy"];
   var cls = classes[segment % classes.length];
 
   if (charSimElement) charSimElement.className = "char-card " + cls;

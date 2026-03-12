@@ -10,7 +10,7 @@
     <div id="char_sim_coloured">{{Color}}</div>
     <br >
 
-    <div class="button-wrapper">
+    <div class="modal-footer1">
         <a class="btn" id="btnShowPinyin">
             <div class="icon">
                 <i class="material-icons">text_increase</i>
@@ -21,7 +21,6 @@
                 <i class="material-icons">text_rotation_none</i>
             </div>
         </a>
-        
     </div>
     
     <div id="char_pinyin" style="display:none;">
@@ -85,7 +84,7 @@ function assignClassBasedOnTime() {
   var seconds = now.getSeconds();
   var segment = Math.floor((minutes * 60 + seconds) / 180); // 3-minute segments
 
-  var classes = ["kaiti", "arial", "roboto", "mashanzheng", "yrdzst", "xxx", "yyy"];
+  var classes = ["kaiti", "songti", "heiti", "mashanzheng", "yrdzst", "xxx", "yyy"];
   var cls = classes[segment % classes.length];
 
   if (charSimElement) charSimElement.className = "char-card " + cls;

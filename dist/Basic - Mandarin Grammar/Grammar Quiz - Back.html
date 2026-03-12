@@ -105,6 +105,11 @@ var AudioManager = (function () {
       _voice = _findVoice();
       _voicesLoaded = true;
     }
+    // Defensive: if the queue is stuck (pending but nothing playing), reset it.
+    // This guards against a WKWebView bug where utterances queue silently.
+    if (speechSynthesis.pending && !speechSynthesis.speaking) {
+      speechSynthesis.cancel();
+    }
     var utterance = new SpeechSynthesisUtterance();
     utterance.rate = 0.5;
     utterance.volume = 0.75;
