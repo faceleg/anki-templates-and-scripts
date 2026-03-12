@@ -9,7 +9,7 @@
     <div id="char_sim_coloured">{{Color}}</div>
     <br >
 
-    <div class="button-wrapper">
+    <div class="modal-footer1">
         <a class="btn" id="btnShowPinyin">
             <div class="icon">
                 <i class="material-icons">text_increase</i>
@@ -20,7 +20,11 @@
                 <i class="material-icons">text_rotation_none</i>
             </div>
         </a>
-        
+        <a class="btn" id="btnPlayAudio">
+            <div class="icon">
+                <i class="material-icons">play_arrow</i>
+            </div>
+        </a>
     </div>
     
     <div id="char_pinyin" style="display:none;">
@@ -69,6 +73,9 @@
         const display = document.getElementById('char_reading').style.display;
         document.getElementById('char_reading').style.display = display === "block" ? "none" : "block";
     }
+
+    document.getElementById('btnPlayAudio').onclick = function() { playAudio(); };
 </script>
+<!-- @inject: shared/js/audio.js -->
 <!-- @inject: shared/js/font-rotation.js -->
-  
+

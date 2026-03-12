@@ -8,10 +8,6 @@
 
 /* Basic - Mandarin specific rules */
 
-.iphone .header-wrapper {
-  top: 8px;
-}
-
 .header-wrapper {
   display: flex;
   justify-content: space-between;
@@ -21,7 +17,7 @@
   width: 400px;
   left: 0;
   right: 0;
-  top: 15px;
+  top: 0;
 }
 
 .header-left, .header-right {
@@ -32,20 +28,6 @@
 
 .header-left a, .header-right a {
   margin: 0;
-}
-
-.header-wrapper .icon {
-  margin: 1px;
-}
-
-.header-left a,
-.header-left a:first-child .icon  {
-  margin-left: 0;
-}
-
-.header-right a,
-.header-right a:last-child .icon {
-  margin-right: 0;
 }
 
 #ch_load_status {
@@ -84,13 +66,14 @@
 }
 
 #onfinish-character-target-div {
-  margin-top: 30px;
+  height: calc(2.75rem + 6px);
 }
 
 #writing-feedback {
   margin-top: 5px;
   font-size: 12px;
   line-height: 1.44;
+  font-variant-numeric: tabular-nums;
 }
 
 .reading-without-audio-spacer {

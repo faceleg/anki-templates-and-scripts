@@ -11,7 +11,7 @@ function assignClassBasedOnTime() {
   var seconds = now.getSeconds();
   var segment = Math.floor((minutes * 60 + seconds) / 180); // 3-minute segments
 
-  var classes = ["kaiti", "arial", "roboto", "mashanzheng", "yrdzst", "xxx", "yyy"];
+  var classes = ["kaiti", "songti", "heiti", "mashanzheng", "yrdzst", "xxx", "yyy"];
   var cls = classes[segment % classes.length];
 
   if (charSimElement) charSimElement.className = "char-card " + cls;

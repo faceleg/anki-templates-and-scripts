@@ -8,6 +8,10 @@
 
 /* Basic - Mandarin From Subtitles specific rules */
 
+.modal-footer1 {
+  margin-top: 10px;
+}
+
 .char,
 #char_sim,
 #char_sim_coloured {

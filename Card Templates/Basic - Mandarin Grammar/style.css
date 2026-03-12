@@ -10,6 +10,10 @@
 
 /* Basic - Mandarin Grammar specific rules */
 
+.modal-footer1 {
+  margin-top: 10px;
+}
+
 .card {
   font-family: arial;
 }

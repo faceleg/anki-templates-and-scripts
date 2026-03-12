@@ -139,6 +139,11 @@ async function purgeCSSInDist() {
     const results = await new PurgeCSS().purge({
       content: htmlFiles.map((f) => ({ raw: require("fs").readFileSync(f, "utf8"), extension: "html" })),
       css: cssFiles,
+      // Anki adds these classes at runtime — never in the template HTML
+      safelist: {
+        standard: ["card", "night_mode", "iphone", "mobile", "back", "replay-button"],
+        deep: [/^card/, /^night_mode/],
+      },
     });
 
     for (const result of results) {

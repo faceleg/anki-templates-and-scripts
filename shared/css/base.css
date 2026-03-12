@@ -44,6 +44,8 @@
   --sidebar-color: white;
   --sidebar-background-color: #52575d;
   --header-color: #455a64;
+  --structure-color: #E64A19;
+  --translation-color: #29b6f6;
   --surface1: rgb(226, 226, 226);
   --surface2: rgb(255, 255, 254);
   --surface3: rgb(249, 249, 249);
@@ -74,6 +76,8 @@
   --icon-button-background-focus: #7d92c2;
   --sidebar-color: white;
   --sidebar-background-color: #52575d;
+  --structure-color: #ff7043;
+  --translation-color: #4fc3f7;
   --surface1: rgb(27, 27, 27);
   --surface2: rgb(37, 37, 37);
   --surface3: rgb(48, 48, 48);

@@ -6,8 +6,8 @@
   display: inline-block;
   color: white;
   background-color: var(--icon-button-background);
-  width: 2rem;
-  height: 2rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: 8px;
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.12),
@@ -18,8 +18,8 @@
 .icon .material-icons {
   font-size: 1rem;
   position: absolute;
-  left: 0.5rem;
-  top: 0.5rem;
+  left: 0.875rem;
+  top: 0.875rem;
   transition: all 0.3s ease;
 }
 

@@ -3,7 +3,7 @@
 }
 
 .char {
-  font-size: 30px;
+  font-size: 1.875rem;
 }
 
 /* grid color for character */
@@ -52,12 +52,12 @@
 
 .char-sim-1 {
   margin: 2px;
-  font-size: 30px;
+  font-size: 1.875rem;
 }
 
 .char-trad-1 {
   margin: 2px;
-  font-size: 30px;
+  font-size: 1.875rem;
 }
 
 .char-pin-1 {
@@ -80,7 +80,7 @@
 
 #char_deck {
   margin-top: 10px;
-  font-size: 10px;
+  font-size: 0.625rem;
   font-style: italic;
   line-height: 20px;
   display: flex;
@@ -110,16 +110,16 @@
   font-family: KaiTi;
 }
 
-#char_sim.arial,
-#char_sim_coloured.arial,
-#char_reading.arial {
-  font-family: Arial;
+#char_sim.songti,
+#char_sim_coloured.songti,
+#char_reading.songti {
+  font-family: "Songti SC", STSong, serif;
 }
 
-#char_sim.roboto,
-#char_sim_coloured.roboto,
-#char_reading.roboto {
-  font-family: Roboto;
+#char_sim.heiti,
+#char_sim_coloured.heiti,
+#char_reading.heiti {
+  font-family: "PingFang SC", "Heiti SC", sans-serif;
 }
 
 #char_sim.mashanzheng,
@@ -149,6 +149,6 @@
 /* Character meaning display for individual characters */
 .character-meaning-div-populated {
   max-width: 400px;
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.44;
 }

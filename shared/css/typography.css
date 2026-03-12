@@ -26,20 +26,20 @@ img {
 }
 
 .pinyin {
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .zhuyin {
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .py {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: gray;
 }
 
 .zy {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: gray;
 }
 
