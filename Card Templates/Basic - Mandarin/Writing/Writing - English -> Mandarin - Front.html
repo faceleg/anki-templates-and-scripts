@@ -158,6 +158,7 @@ var AudioManager = (function () {
       _voice = _findVoice();
       _voicesLoaded = true;
     }
+    speechSynthesis.cancel();
     var utterance = new SpeechSynthesisUtterance();
     utterance.rate = 0.5;
     utterance.volume = 0.75;
@@ -567,7 +568,6 @@ var Quiz = (function () {
         if (nextIndex < characters.length) {
           if (characters.length > 1) {
             AudioManager.speak(characters[charIndex]);
-            AudioManager.speak(characters[charIndex + 1]);
           }
           _revealThumbnail(charIndex);
           setTimeout(function () {
