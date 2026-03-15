@@ -73,6 +73,7 @@ function playAudio() {
 var AudioManager = (function () {
   var _voice = null;
   var _voicesLoaded = false;
+  var _pendingPhrase = null;
 
   function _findVoice() {
     var voices = speechSynthesis.getVoices();
@@ -110,18 +111,31 @@ var AudioManager = (function () {
       _voice = _findVoice();
       _voicesLoaded = true;
     }
-    // Defensive: if the queue is stuck (pending but nothing playing), reset it.
-    // This guards against a WKWebView bug where utterances queue silently.
-    if (speechSynthesis.pending && !speechSynthesis.speaking) {
-      speechSynthesis.cancel();
+
+    if (speechSynthesis.speaking) {
+      _pendingPhrase = { phrase: phrase, onEnd: onEnd };
+      return;
     }
+
+    _pendingPhrase = null;
+    _doSpeak(phrase, onEnd);
+  }
+
+  function _doSpeak(phrase, onEnd) {
     var utterance = new SpeechSynthesisUtterance();
     utterance.rate = 0.5;
     utterance.volume = 0.75;
     utterance.lang = "zh";
     if (_voice) utterance.voice = _voice;
     utterance.text = phrase;
-    if (onEnd) utterance.onend = onEnd;
+    utterance.onend = function () {
+      if (onEnd) onEnd();
+      if (_pendingPhrase) {
+        var next = _pendingPhrase;
+        _pendingPhrase = null;
+        _doSpeak(next.phrase, next.onEnd);
+      }
+    };
     speechSynthesis.speak(utterance);
   }
 
