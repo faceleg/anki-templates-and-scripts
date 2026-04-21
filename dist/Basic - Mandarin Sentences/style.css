@@ -127,29 +127,6 @@
   src: url(_MaterialIcons-Regular.woff2);
 }
 
-.material-icons {
-  font-family: "Material Icons";
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px;
-  /* Preferred icon size */
-  display: inline-block;
-  line-height: 1;
-  text-transform: none;
-  letter-spacing: normal;
-  word-wrap: normal;
-  white-space: nowrap;
-  direction: ltr;
-  /* Support for all WebKit browsers. */
-  -webkit-font-smoothing: antialiased;
-  /* Support for Safari and Chrome. */
-  text-rendering: optimizeLegibility;
-  /* Support for Firefox. */
-  -moz-osx-font-smoothing: grayscale;
-  /* Support for IE. */
-  font-feature-settings: "liga";
-}
-
 /* Windows */
 /* macOS */
 
@@ -158,324 +135,9 @@
 }
 /* Linux desktops */
 
-
-h3 {
-  margin: 0;
-  font-weight: 500;
-}
-
-main {
-  display: grid;
-  gap: var(--space-xl);
-  align-content: center;
-  justify-content: center;
-  place-content: center;
-  padding: var(--space-sm);
-}
-
-@media (min-width: 540px) {
-  main {
-    padding: var(--space-lg);
-  }
-}
-
-@media (min-width: 800px) {
-  main {
-    padding: var(--space-xl);
-  }
-}
-
-section {
-  display: grid;
-  gap: var(--space-md);
-  margin: 6px;
-}
-
-fieldset {
-  border: 1px solid var(--surface4);
-  background: var(--surface4);
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 1px;
-  border-radius: var(--space-sm);
-  overflow: hidden;
-  transition: box-shadow 0.3s ease;
-}
-
-fieldset:focus-within {
-  box-shadow: 0 5px 20px -10px hsla(0, 0%, 0%, 0.5);
-}
-
-fieldset a {
-  text-decoration: none;
-  color: var(--text1);
-}
-
-select {
-  outline: none;
-  border: none;
-  border-radius: 12px;
-  width: 34px;
-  padding-left: 6px;
-  color: white;
-  background:
-    linear-gradient(to right, transparent 40px, var(--surface1) 0),
-    var(--brand-bg-gradient) fixed;
-  transition: background 0.5s ease;
-}
-
-select > option {
-  border: none;
-  border-radius: 20px;
-  outline: none;
-  background: var(--surface3);
-  font-size: 22px;
-  color: var(--text1);
-}
-
-input[type="checkbox"] {
-  width: 40px;
-  height: 20px;
-  margin: 0;
-  outline-offset: 5px;
-  accent-color: var(--brand);
-  position: relative;
-  transform-style: preserve-3d;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  background: var(--surface1);
-  border-radius: 20px;
-  transition: 0.5s;
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-  outline: none;
-}
-
-input:checked[type="checkbox"] {
-  background:
-    linear-gradient(to right, transparent 40px, var(--surface1) 0),
-    var(--brand-bg-gradient) fixed;
-  -webkit-transition: background 0.5s ease;
-  transition: background 0.5s ease;
-}
-
-input[type="checkbox"]:before {
-  content: "";
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-radius: 20px;
-  top: 0;
-  left: 0;
-  background: white;
-  transform: scale(1.1);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  transition: 0.5s;
-}
-
-input:checked[type="checkbox"]:before {
-  left: 20px;
-}
-
-input[type="number"] {
-  width: 40px;
-  height: 20px;
-  margin: 0;
-  padding: 4px;
-  position: relative;
-  cursor: text;
-  appearance: none;
-  -webkit-appearance: none;
-  transition: 0.5s;
-  border: 1px solid var(--surface1);
-  background: var(--surface3);
-  border-radius: var(--space-sm);
-  text-align: end;
-  outline: none;
-  color: var(--text1);
-  place-self: center;
-}
-
-.fieldset-item {
-  background: var(--surface3);
-  transition: background 0.2s ease;
-  display: grid;
-  gap: var(--space-md);
-  padding-top: var(--space-sm);
-  padding-bottom: var(--space-sm);
-  padding-left: var(--space-md);
-  padding-right: var(--space-md);
-  text-align: left;
-}
-
-.fs-item-1 {
-  grid-template-columns: 1fr var(--space-xl);
-}
-
-.fs-item-3 {
-  grid-template-columns: 1fr 1fr;
-}
-
-.fs-item-front-back {
-  padding: unset;
-  text-align: center;
-  gap: unset;
-  cursor: pointer;
-}
-
-.front-back {
-  padding: var(--space-xs);
-}
-
-.btn-active {
-  color: white;
-  background: var(--brand-bg2);
-}
-
-.fieldset-item:focus-within {
-  background: var(--surface2);
-}
-
-.fieldset-item:focus-within svg {
-  fill: #fff;
-}
-
-.fieldset-item > :is(.input-stack, label) {
-  display: grid;
-  gap: var(--space-xs);
-}
-
-.fieldset-item > .input-stack > label {
-  display: contents;
-}
-
-.fieldset-item svg {
-  fill: var(--text2);
-  height: var(--space-md);
-}
-
-.fieldset-item > input[type="checkbox"] {
-  align-self: center;
-  justify-self: center;
-  place-self: center;
-}
-
 /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
 
-@media screen and (max-height: 450px) {
-  .sidebar {
-    padding-top: 15px;
-  }
-
-  .sidebar a {
-    font-size: 16px;
-  }
-}
-
 /* Material Icon Button */
-
-.icon {
-  margin: 3px;
-  position: relative;
-  display: inline-block;
-  color: white;
-  background-color: var(--icon-button-background);
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: 8px;
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.12),
-    0 1px 2px rgba(0, 0, 0, 0.24);
-  transition: all 0.3s ease;
-}
-
-.icon .material-icons {
-  font-size: 1rem;
-  position: absolute;
-  left: 0.875rem;
-  top: 0.875rem;
-  transition: all 0.3s ease;
-}
-
-.icon:hover,
-.icon:focus {
-  background-color: var(--icon-button-background-focus);
-}
-
-.sidebar {
-  height: 100%;
-  width: 0;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  background-color: var(--surface1);
-  overflow-x: hidden;
-  transition: 0.5s;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.more-info-sidebar {
-  height: 100%;
-  width: 0;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  right: 0;
-  background-color: var(--surface1);
-  overflow-x: hidden;
-  transition: 0.5s;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.more-info-sidebar a {
-  display: flex;
-  margin-bottom: 6px;
-  padding: 2px;
-  margin: 3px;
-  border-radius: 3px;
-  text-decoration: none;
-  color: var(--text1);
-}
-
-.more-info-sidebar img {
-  width: 28px;
-  margin-right: 6px;
-}
-
-.brand-title {
-  text-align: left;
-  font-weight: bold;
-  font-size: 18px;
-}
-
-.brand-sub-title {
-  text-align: left;
-  font-size: 12px;
-}
-
-.more-side-brand {
-  padding: 8px;
-}
-
-.close-button {
-  position: absolute;
-  right: 16px;
-  width: 30px;
-  height: 30px;
-  background: red;
-  border-radius: 24px;
-  align-self: center;
-  color: white;
-  line-height: 1.5;
-}
-
-.close2 {
-  font-size: 16px;
-  text-align: center;
-  line-height: 1.8;
-}
 
 .char-card {
   font-size: 3em;
@@ -489,10 +151,6 @@ input[type="number"] {
 
 #char_image {
   text-align: center;
-}
-
-#char_image img {
-  max-height: 200px;
 }
 
 #char_deck {
@@ -560,18 +218,10 @@ input[type="number"] {
 
 /* Character meaning display for individual characters */
 
-small {
-  line-height: 1.5;
-}
-
 hr {
   border: 0;
   height: 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-img {
-  border-radius: 10%;
 }
 
 .meaning-card {
@@ -585,11 +235,6 @@ img {
 
 .zhuyin {
   font-size: 1rem;
-}
-
-.py {
-  font-size: 0.875rem;
-  color: gray;
 }
 
 #char_pinyin,
@@ -615,17 +260,6 @@ img {
 
 /* Basic - Mandarin Sentences specific rules */
 
-.modal-footer1 {
-  padding-top: 15px;
-  text-align: center;
-}
-
-.modal-footer1 a {
-  display: inline-block;
-  margin: 0 8px;
-  float: none;
-}
-
 .lessonInfoHanzi {
   font-family: SimSun;
   font-size: 12px;
@@ -637,19 +271,6 @@ img {
 }
 
 .char,
-#char_sim,
-#char_sim_coloured {
+#char_sim {
   font-size: 40px;
-}
-
-#back #char_sim {
-  display: none;
-}
-
-#char_sim_coloured {
-  display: none;
-}
-
-#back #char_sim_coloured {
-  display: block;
 }

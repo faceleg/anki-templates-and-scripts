@@ -9,17 +9,6 @@
 
 /* Basic - Mandarin Sentences specific rules */
 
-.modal-footer1 {
-  padding-top: 15px;
-  text-align: center;
-}
-
-.modal-footer1 a {
-  display: inline-block;
-  margin: 0 8px;
-  float: none;
-}
-
 .lessonInfoHanzi {
   font-family: SimSun;
   font-size: 12px;
@@ -31,19 +20,6 @@
 }
 
 .char,
-#char_sim,
-#char_sim_coloured {
+#char_sim {
   font-size: 40px;
-}
-
-#back #char_sim {
-  display: none;
-}
-
-#char_sim_coloured {
-  display: none;
-}
-
-#back #char_sim_coloured {
-  display: block;
 }
