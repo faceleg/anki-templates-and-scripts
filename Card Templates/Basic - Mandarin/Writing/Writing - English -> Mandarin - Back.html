@@ -14,3 +14,35 @@
   }
 })();
 </script>
+<div id="char-parts" class="char-parts"></div>
+<script type="text/javascript">
+// Character components + etymology (Make Me a Hanzi data in media _hanzi_parts.json)
+(function () {
+  var box = document.getElementById("char-parts");
+  var src = document.getElementById("char_sim");
+  if (!box || !src) return;
+  var chars = (src.innerText.match(/\p{Script=Han}/gu) || []).filter(function (c, i, a) { return a.indexOf(c) === i; });
+  if (!chars.length) return;
+  function comp(x, role) {
+    return '<span class="cp-part">' + x.c + "</span> " + (x.p ? x.p + " " : "") + "<i>" + (x.m || "") + "</i>" + (role ? ' <span class="cp-role">' + role + "</span>" : "");
+  }
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", "/_hanzi_parts.json", true);
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState !== XMLHttpRequest.DONE || xhr.status !== 200) return;
+    var data = JSON.parse(xhr.responseText), rows = [];
+    chars.forEach(function (c) {
+      var d = data[c];
+      if (!d) return;
+      var bits = [];
+      if (d.s) bits.push(comp(d.s, "meaning"));
+      if (d.f) bits.push(comp(d.f, "sound"));
+      if (!d.s && d.parts) d.parts.forEach(function (p) { bits.push(comp(p)); });
+      var hint = d.h && !(d.s && d.h === d.s.m) ? ' <span class="cp-hint">— ' + d.h + "</span>" : "";
+      if (bits.length || hint) rows.push('<div><span class="cp-char">' + c + "</span> = " + bits.join(" + ") + hint + "</div>");
+    });
+    box.innerHTML = rows.join("");
+  };
+  xhr.send();
+})();
+</script>

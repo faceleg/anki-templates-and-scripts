@@ -146,3 +146,21 @@
   font-size: 0.75rem;
   line-height: 1.44;
 }
+
+/* Writing back: character components (#char-parts) */
+.char-parts {
+  max-width: 400px;
+  margin: 12px auto;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  text-align: left;
+}
+.char-parts .cp-char,
+.char-parts .cp-part {
+  font-size: 1.15rem;
+}
+.char-parts .cp-role,
+.char-parts .cp-hint {
+  color: var(--text2);
+  font-size: 0.75rem;
+}

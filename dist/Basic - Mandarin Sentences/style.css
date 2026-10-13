@@ -256,6 +256,8 @@
 
 /* Character meaning display for individual characters */
 
+/* Writing back: character components (#char-parts) */
+
 hr {
   border: 0;
   height: 0;
