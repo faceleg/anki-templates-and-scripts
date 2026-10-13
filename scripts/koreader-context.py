@@ -11,14 +11,14 @@ For every looked-up word:
     usual xiehanzi -> import pipeline.
 Without --write it only reports. Don't delete lookups in KOReader any more; re-runs are safe.
 """
-import json, re, sqlite3, sys, urllib.request
+import json, os, re, sqlite3, sys, urllib.request
 
 SENT_END = "。！？!?…\n"
 HDR = '<div class="char_examples-parts-of-speech">Book</div>'
 
 
 def ac(action, **params):
-    req = urllib.request.Request("http://localhost:8765", json.dumps({"action": action, "version": 6, "params": params}).encode())
+    req = urllib.request.Request(os.environ.get("ANKICONNECT_URL", "http://localhost:8766"), json.dumps({"action": action, "version": 6, "params": params}).encode())
     r = json.load(urllib.request.urlopen(req))
     if r["error"]:
         raise RuntimeError(r["error"])

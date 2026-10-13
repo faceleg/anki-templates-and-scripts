@@ -1,9 +1,9 @@
 const http = require('http');
 
 // ANKICONNECT_URL overrides the endpoint (used by tests against a stub server)
-const endpoint = new URL(process.env.ANKICONNECT_URL || 'http://127.0.0.1:8765');
+const endpoint = new URL(process.env.ANKICONNECT_URL || 'http://127.0.0.1:8766');
 const ANKICONNECT_HOST = endpoint.hostname;
-const ANKICONNECT_PORT = Number(endpoint.port) || 8765;
+const ANKICONNECT_PORT = Number(endpoint.port) || 8766;
 
 /**
  * Make a request to the AnkiConnect API

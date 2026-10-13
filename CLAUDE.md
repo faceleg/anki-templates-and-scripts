@@ -26,7 +26,7 @@ PurgeCSS only sees template HTML. Classes that live in **note field HTML** (tone
 colours `t0-5`/`tone*`/`char-tone*`, `char_example*`, `pinyin`, `zhuyin`, …) must be
 in the safelist in `scripts/build.js`, or they are silently stripped.
 
-### AnkiConnect Workflow (requires Anki open with AnkiConnect add-on)
+### AnkiConnect Workflow (requires Anki open with AnkiConnect add-on, port 8766 — set in AnkiConnect config; override with ANKICONNECT_URL)
 ```bash
 npm run anki:discover    # Compare Anki note types vs repo
 npm run anki:backup      # Snapshot all note types to backups/<YYYYMMDD-HHMMSS>/ (gitignored)
