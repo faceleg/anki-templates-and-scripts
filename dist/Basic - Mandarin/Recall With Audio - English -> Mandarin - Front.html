@@ -1,4 +1,59 @@
 <div id="char_meaning" class="meaning-card">{{Definitions}}</div>
+<script>
+// Strip Chinese from #char_meaning on prompt sides (English -> Mandarin), so
+// definitions like "variant of 夜[ye4]" or "abbr. for 家庭暴力[jia1 ting2 ...]"
+// don't give the answer away. Skipped inside #back (Writing's back is
+// {{FrontSide}}), and the hidden .char/.pinyin/.zhuyin block is left alone.
+// data-keep-cl on #char_meaning keeps "CL:个[ge4]" measure words (Writing).
+(function () {
+  var root = document.getElementById("char_meaning");
+  if (!root || root.closest("#back")) return;
+  var keepCL = root.hasAttribute("data-keep-cl");
+
+  // Remove the last "CL:..." segment (and a "◆" separator before it).
+  function removeCL(s) {
+    var clIndex = s.lastIndexOf("CL:");
+    if (clIndex === -1) return s;
+    var markerIndex = s.lastIndexOf("◆", clIndex);
+    var endIndex = markerIndex !== -1 ? markerIndex - 1 : clIndex;
+    var closingBracketIndex = s.indexOf("]", clIndex);
+    if (closingBracketIndex === -1) return s.substring(0, endIndex);
+    return s.substring(0, endIndex) + s.substring(closingBracketIndex + 1);
+  }
+
+  var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  var nodes = [];
+  var node;
+  while ((node = walker.nextNode())) {
+    if (!node.parentElement.closest(".char, .pinyin, .zhuyin"))
+      nodes.push(node);
+  }
+  nodes.forEach(function (n) {
+    var text = n.nodeValue;
+    var cl = "";
+    var clIndex = keepCL ? text.indexOf("CL:") : -1;
+    if (clIndex !== -1) {
+      cl = text.substring(clIndex);
+      text = text.substring(0, clIndex);
+    }
+    text = text
+      // 個|个[ge4] / 家庭暴力[jia1 ting2 bao4 li4]: drop hanzi and its pinyin together
+      .replace(/[一-鿿|·]+\[[^\]]*\]/g, "")
+      .replace(/\[([一-鿿]+)\]/g, "[X]")
+      .replace(/\(([一-鿿]+)\)/g, "(X)")
+      .replace(/[一-鿿]/g, "");
+    if (!keepCL && /CL/.test(text)) text = removeCL(text);
+    n.nodeValue = (text + cl).trim();
+  });
+
+  // Drop list items / elements left empty.
+  root.querySelectorAll("li, span, div").forEach(function (el) {
+    if (!el.closest(".char, .pinyin, .zhuyin") && !el.textContent.trim())
+      el.remove();
+  });
+})();
+
+</script>
 <div id="char_examples_blank" class="recall-example">{{ExamplesBlank}}</div>
 
 <script type="text/javascript">
@@ -14,89 +69,5 @@
   }
 
   showHide([".char", ".pinyin", ".zhuyin"]);
-
-  function removeCLStringSegments(inputString) {
-    // Find the position of "CL" in the string
-    const clIndex = inputString.lastIndexOf("CL:");
-    if (clIndex === -1) {
-      // "CL" not found, return the original string
-      return inputString;
-    }
-
-    // Find the position of "◆" before "CL" (if it exists)
-    const markerIndex = inputString.lastIndexOf("◆", clIndex);
-
-    // Define the end position for removal
-    let endIndex = clIndex;
-    if (markerIndex !== -1) {
-      // If "◆" exists before "CL", set endIndex to the position before "◆"
-      endIndex = markerIndex - 1;
-    }
-
-    // Find the position of "]" after "CL"
-    const closingBracketIndex = inputString.indexOf("]", clIndex);
-
-    // If closing bracket found, remove the substring from endIndex to closingBracketIndex
-    if (closingBracketIndex !== -1) {
-      const removedString =
-        inputString.substring(0, endIndex) +
-        inputString.substring(closingBracketIndex + 1);
-      return removedString;
-    }
-
-    // If no closing bracket found, remove from "CL" to end of string
-    return inputString.substring(0, endIndex);
-  }
-
-  function clearNonEnglishContent(selector) {
-    const elements = document.querySelectorAll(selector);
-
-    elements.forEach((element) => {
-      clearNonEnglishContentRecursive(element);
-    });
-  }
-
-  function clearNonEnglishContentRecursive(element) {
-    const childNodes = element.childNodes;
-
-    // Iterate backwards to safely remove nodes while iterating
-    for (let i = childNodes.length - 1; i >= 0; i--) {
-      const childNode = childNodes[i];
-
-      if (childNode.nodeType === Node.ELEMENT_NODE) {
-        // Recursively call clearCLContentRecursive on the child element
-        clearNonEnglishContentRecursive(childNode);
-
-        // Remove the element if it has no child nodes or text content
-        if (!childNode.firstChild && !childNode.textContent.trim()) {
-          childNode.remove();
-        }
-      } else if (childNode.nodeType === Node.TEXT_NODE) {
-        // Remove any characters and surrounding parentheses or brackets containing Chinese characters
-        let textContent = childNode.textContent
-          .trim()
-          // Replace chinese wrapped in []
-          .replace(/\[([\u4E00-\u9FFF]+)\]/g, "[X]")
-          // Replace chinese wrapped in ()
-          .replace(/\(([\u4E00-\u9FFF]+)\)/g, "(X)")
-          // Replace any remaining chinese
-          .replace(/[\u4E00-\u9FFF]/g, "");
-
-        if (/CL/.test(textContent)) {
-          textContent = removeCLStringSegments(textContent);
-        }
-
-        // Clear the content of the text node
-        childNode.textContent = textContent.trim();
-
-        // Remove the text node if it's empty after clearing content
-        if (!childNode.textContent.trim()) {
-          childNode.remove();
-        }
-      }
-    }
-  }
-
-  clearNonEnglishContent("#char_meaning .meaning");
 })();
 </script>

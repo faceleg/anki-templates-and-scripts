@@ -60,6 +60,7 @@ shared/
     audio.js          — AudioManager, playAudio()
     pinyin.js         — decodePinyin(), TONE_COLORS (night-mode aware) — the only copy
     strip-lrm.js      — removes U+200E from rendered text nodes (keeps tone spans)
+    strip-meaning-hanzi.js — strips Chinese from #char_meaning on prompt fronts (data-keep-cl keeps measure words)
     debug.js          — DEBUG=false, window.onerror, debugLog()
     font-rotation.js  — 3-minute font rotation + #font-name label on backs
 
