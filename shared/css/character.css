@@ -55,11 +55,6 @@
   font-size: 1.875rem;
 }
 
-.char-trad-1 {
-  margin: 2px;
-  font-size: 1.875rem;
-}
-
 .char-pin-1 {
   margin: 2px;
   line-height: 32px;
@@ -122,28 +117,27 @@
   font-family: "PingFang SC", "Heiti SC", sans-serif;
 }
 
-#char_sim.mashanzheng,
-#char_sim_coloured.mashanzheng,
-#char_reading.mashanzheng {
-  font-family: MaShanZheng;
+#char_sim.jason,
+#char_sim_coloured.jason,
+#char_reading.jason {
+  font-family: jason, KaiTi;
 }
 
-#char_sim.yrdzst,
-#char_sim_coloured.yrdzst,
-#char_reading.yrdzst {
-  font-family: YRDZST;
+#char_sim.muyao,
+#char_sim_coloured.muyao,
+#char_reading.muyao {
+  font-family: muyao, KaiTi;
 }
 
-#char_sim.xxx,
-#char_sim_coloured.xxx,
-#char_reading.xxx {
-  font-family: xxx;
+#char_sim.wenkai,
+#char_sim_coloured.wenkai,
+#char_reading.wenkai {
+  font-family: LXGWWenKai, KaiTi;
 }
 
-#char_sim.yyy,
-#char_sim_coloured.yyy,
-#char_reading.yyy {
-  font-family: yyy;
+/* Current rotation font: sits in #char_deck above the play button, same style as deck/card */
+#font-name:empty {
+  display: none;
 }
 
 /* Character meaning display for individual characters */

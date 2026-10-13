@@ -1,12 +1,11 @@
 <div id="char_meaning" class="meaning-card">{{Definitions}}</div>
+<div id="char_examples_blank" class="recall-example">{{ExamplesBlank}}</div>
 
 <script type="text/javascript">
+(function () {
   function showHide(selectors) {
     for (const selector of selectors) {
       const elements = document.querySelectorAll(selector);
-      if (elements.length === 0) {
-        return;
-      }
 
       for (const element of elements) {
         element.style.display = "none";
@@ -99,4 +98,5 @@
   }
 
   clearNonEnglishContent("#char_meaning .meaning");
+})();
 </script>

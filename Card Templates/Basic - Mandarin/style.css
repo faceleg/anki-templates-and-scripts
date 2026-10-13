@@ -1,6 +1,5 @@
 /* @inject: shared/css/base.css */
 /* @inject: shared/css/fonts.css */
-/* @inject: shared/css/layout.css */
 /* @inject: shared/css/components.css */
 /* @inject: shared/css/tone-colors.css */
 /* @inject: shared/css/character.css */
@@ -34,11 +33,6 @@
   padding-right: 10px;
   font-size: 16px;
   vertical-align: middle;
-}
-
-#char_pinyin {
-  height: 36px;
-  line-height: 36px;
 }
 
 .char_example,
@@ -94,5 +88,54 @@
 }
 
 #back #listening-with-audio {
+  display: none;
+}
+
+/* Answer-only content: hidden on the front from first paint, shown on the back
+   (backs wrap {{FrontSide}} / their content in #back) */
+.answer-only {
+  display: none;
+}
+
+#back .answer-only {
+  display: block;
+}
+
+/* Fixed display (Simplified only, no pinyin/zhuyin). #char_pinyin stays in the
+   DOM as the tone source for pinyin.js. In Definitions, .sep + span is the
+   traditional form: <span id="char-sim-id"/><span class="sep">〔</span><span id="char-trad-id"/>… */
+#char_pinyin,
+.pinyin,
+.zhuyin,
+.char .sep,
+.char .sep + span {
+  display: none;
+}
+
+/* Writing: hide answer bits on the front; the back (#back > FrontSide) reveals */
+.writing-card #char_meaning .char,
+.writing-card #char_meaning .pinyin,
+.writing-card #char_meaning .zhuyin,
+.writing-card #char_examples {
+  display: none;
+}
+
+#back .writing-card #char_meaning .char,
+#back .writing-card #char_examples {
+  display: block;
+}
+
+#back .writing-card #char_examples_blank {
+  display: none;
+}
+
+#writing-error {
+  margin-top: 5px;
+  font-size: 12px;
+  color: #ea2322;
+}
+
+/* Recall front: one blanked example sentence (the field holds several) */
+.recall-example .char_examples_blank ~ .char_examples_blank {
   display: none;
 }

@@ -8,11 +8,18 @@
     "anki:backup": "node scripts/anki-backup.js",
     "anki:rollback": "node scripts/anki-rollback.js",
     "anki:deploy": "node scripts/anki-deploy.js",
-    "anki:deploy:dry": "node scripts/anki-deploy.js --dry-run"
+    "anki:deploy:dry": "node scripts/anki-deploy.js --dry-run",
+    "anki:ship": "npm run build && node scripts/anki-deploy.js",
+    "check": "node scripts/check.js",
+    "test": "node --test scripts/test/deploy.test.js"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "devDependencies": {
     "@html-eslint/eslint-plugin": "^0.24.1",
     "@html-eslint/parser": "^0.24.1",
+    "eslint": "^9.39.5",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
     "prettier": "3.2.5",

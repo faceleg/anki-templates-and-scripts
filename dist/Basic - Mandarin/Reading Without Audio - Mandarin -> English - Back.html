@@ -131,16 +131,10 @@ function applyColorization() {
   var decodedTones = decodePinyin(pinyinElement.textContent);
   recolorPinyin(pinyinElement, decodedTones);
 
-  var hanziElement = document.getElementById("char_sim");
-  if (hanziElement) {
-    recolorCharacters(hanziElement, decodedTones);
-  }
-
-  var traditionalElement = document.getElementById("char_trad");
-  var hanziElement = document.getElementById("char_sim");
-  if (hanziElement) {
-    recolorCharacters(traditionalElement, decodedTones);
-  }
+  ["char_sim", "char_sim_coloured", "chinese"].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) recolorCharacters(el, decodedTones);
+  });
 }
 
 applyColorization();

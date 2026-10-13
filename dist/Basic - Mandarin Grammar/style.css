@@ -91,32 +91,26 @@
   src: url(_KaiTi.ttf);
 }
 
+/* Handwriting fonts: media filenames are historical (_xxx = Muyao, _yyy = Jason) */
 @font-face {
-  font-family: "MaShanZheng";
-  font-style: normal;
-  font-weight: 300;
-  src: url(_MaShanZheng-Regular.ttf);
-}
-
-@font-face {
-  font-family: "YRDZST";
-  font-style: normal;
-  font-weight: 300;
-  src: url(_YRDZSTSemibold.ttf);
-}
-
-@font-face {
-  font-family: "xxx";
+  font-family: "muyao";
   font-style: normal;
   font-weight: 300;
   src: url(_xxx.ttf);
 }
 
 @font-face {
-  font-family: "yyy";
+  font-family: "jason";
   font-style: normal;
   font-weight: 300;
   src: url(_yyy.ttf);
+}
+
+@font-face {
+  font-family: "LXGWWenKai";
+  font-style: normal;
+  font-weight: 400;
+  src: url(_LXGWWenKai-Regular.ttf);
 }
 
 /* Material Icon Font */
@@ -151,14 +145,18 @@
 }
 
 /* Windows */
+.win .char-card {
+  font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
+}
 /* macOS */
-
+.mac .char-card,
 .iphone .char-card {
   font-family: "KaiTi";
 }
 /* Linux desktops */
-
-/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+.linux:not(.android) .char-card {
+  font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
+}
 
 /* Material Icon Button */
 
@@ -188,6 +186,47 @@
 .icon:hover,
 .icon:focus {
   background-color: var(--icon-button-background-focus);
+}
+
+.tone1,
+.t1 {
+  color: #f44336;
+}
+
+.tone2,
+.t2 {
+  color: #ff9800;
+}
+
+.tone3,
+.t3 {
+  color: #4caf50;
+}
+
+.tone4,
+.t4 {
+  color: #2196f3;
+}
+
+.tone5,
+.t5 {
+  color: #607d8b;
+}
+
+.char-tone1 {
+  color: var(--tone-1);
+}
+
+.char-tone2 {
+  color: var(--tone-2);
+}
+
+.char-tone3 {
+  color: var(--tone-3);
+}
+
+.char-tone4 {
+  color: var(--tone-4);
 }
 
 .char-card {
@@ -239,28 +278,27 @@
   font-family: "PingFang SC", "Heiti SC", sans-serif;
 }
 
-#char_sim.mashanzheng,
-#char_sim_coloured.mashanzheng,
-#char_reading.mashanzheng {
-  font-family: MaShanZheng;
+#char_sim.jason,
+#char_sim_coloured.jason,
+#char_reading.jason {
+  font-family: jason, KaiTi;
 }
 
-#char_sim.yrdzst,
-#char_sim_coloured.yrdzst,
-#char_reading.yrdzst {
-  font-family: YRDZST;
+#char_sim.muyao,
+#char_sim_coloured.muyao,
+#char_reading.muyao {
+  font-family: muyao, KaiTi;
 }
 
-#char_sim.xxx,
-#char_sim_coloured.xxx,
-#char_reading.xxx {
-  font-family: xxx;
+#char_sim.wenkai,
+#char_sim_coloured.wenkai,
+#char_reading.wenkai {
+  font-family: LXGWWenKai, KaiTi;
 }
 
-#char_sim.yyy,
-#char_sim_coloured.yyy,
-#char_reading.yyy {
-  font-family: yyy;
+/* Current rotation font: sits in #char_deck above the play button, same style as deck/card */
+#font-name:empty {
+  display: none;
 }
 
 /* Character meaning display for individual characters */
@@ -271,8 +309,24 @@ hr {
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
+.meaning {
+  text-align: center;
+}
+
+.meaning {
+  display: block;
+}
+
 .pinyin {
   font-size: 1rem;
+}
+
+.zhuyin {
+  font-size: 1rem;
+}
+
+.char_example {
+  line-height: 1.8;
 }
 
 #char_pinyin,
@@ -280,31 +334,7 @@ hr {
   margin-bottom: 20px;
 }
 
-/*
- * Pinyin ruby annotations (Grammar + Sentences note types only)
- *
- * Grammar and Sentences cards use HTML <ruby>/<rt> tags for pinyin annotation,
- * rendered via CSS. Basic - Mandarin and From Subtitles use div+JS colorization
- * instead (see shared/js/pinyin.js). Unifying these approaches would require
- * changing note field storage format — out of scope.
- */
-
-/* Pinyin ruby styling */
-
-/* Characters */
-
-/* Pinyin */
-
-.free_text_wrapper textarea {
-  font-size: 2.2rem;
-  padding: 10px;
-  width: 95%;
-}
-
-/* Force a minimum height for the answer container to prevent misclicking as the UI jumps around */
-#dash {
-  min-height: 56px;
-}
+/* Near-synonym contrast note (Contrast field), shown with the meaning */
 
 .structure {
   color: var(--structure-color);
@@ -334,6 +364,18 @@ hr {
   color: #263238;
 }
 
+.night_mode .notes {
+  color: var(--text2);
+}
+
+.night_mode .notes a {
+  color: var(--brand);
+}
+
+#split_sent {
+  display: none;
+}
+
 .spacer {
   height: 20px;
 }
@@ -349,10 +391,6 @@ hr {
 /*https://codepen.io/danielkvist/pen/xMLKJN*/
 :root {
   --gray: #ddd;
-  --white: #fdfdfd;
-  --blue: hsla(199, 82%, 52%, 1);
-  --blue-bkg: hsla(199, 82%, 70%, 0.35);
-  --blue-font: hsla(199, 82%, 35%, 1);
 }
 
 .btn-q {
@@ -367,77 +405,17 @@ hr {
   color: black;
 }
 
-.text {
-  border: 1px solid green;
-  padding: 10px;
-}
-
-/*https://codepen.io/guerrav/pen/oXZLjd*/
-button.btn-check,
-button.btn-hint,
-button.btn-reset,
-button.btn-play {
-  font-size: 15px;
-  width: 85px;
-  height: 60px!important;
-  margin: 5px;
-}
-
-.btn-check {
-  border: none;
-  color: white;
-  border-radius: 7px;
-  transition: all 0.2s;
-  border-bottom: 4px solid #00796B;
-  background: #009688;
-}
-
-.btn-check:active {
-  transform: scaleX(0.9) translateY(4px);
-}
-
-.btn-check:focus {
-  outline-style: none;
-}
-
-.btn-reset {
-  border-radius: 10px;
-  border: none;
-  color: white;
-  border-radius: 7px;
-  transition: all 0.2s;
-  border-bottom: 4px solid #c62828;
-  background: #e53935;
-}
-
-.btn-reset:active {
-  transform: scaleX(0.9) translateY(4px);
-}
-
-.btn-reset:focus {
-  outline-style: none;
-}
-
-.btn-hint {
-  border-radius: 10px;
-  border: none;
-  color: white;
-  border-radius: 7px;
-  transition: all 0.2s;
-  border-bottom: 4px solid #43A047;
-  background: #4CAF50;
-}
-
-.btn-hint:focus {
-  outline-style: none;
-}
-
-.btn-hint:active {
-  transform: scaleX(0.9) translateY(4px);
+.night_mode .btn-q {
+  background-color: var(--surface3);
+  border-color: var(--surface4);
+  color: var(--text1);
 }
 
 .btn-play {
-  border-radius: 10px;
+  font-size: 15px;
+  width: 85px;
+  height: 60px !important;
+  margin: 5px;
   border: none;
   color: white;
   border-radius: 7px;
@@ -455,7 +433,6 @@ button.btn-play {
 }
 
 @media screen and (max-width: 480px) {
-
   .btn-q {
     font-size: 1.5rem;
   }

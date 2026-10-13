@@ -16,20 +16,21 @@
 <div id="char_deck">
   <div>{{Deck}}</div>
   <div>{{Card}}</div>
+  <div id="font-name"></div>
   <div id="audio">{{Audio}}</div>
 </div>
 
 <script>
+(function () {
   // Hide lesson info if there is none
-var elements = document.querySelectorAll('.lessonInfoHanzi');
-
-    elements.forEach(function(element) {
-        if (element.textContent.trim() === "") {
-          document.querySelectorAll('.lessonInfo').forEach(function(lessonInfoElement) {
-            lessonInfoElement.style.display = 'none';
-          })
-        }
-    });
+  document.querySelectorAll(".lessonInfoHanzi").forEach(function (element) {
+    if (element.textContent.trim() === "") {
+      document.querySelectorAll(".lessonInfo").forEach(function (info) {
+        info.style.display = "none";
+      });
+    }
+  });
+})();
 </script>
 <!-- @inject: shared/js/pinyin.js -->
 <!-- @inject: shared/js/font-rotation.js -->

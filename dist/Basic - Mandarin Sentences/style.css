@@ -91,32 +91,26 @@
   src: url(_KaiTi.ttf);
 }
 
+/* Handwriting fonts: media filenames are historical (_xxx = Muyao, _yyy = Jason) */
 @font-face {
-  font-family: "MaShanZheng";
-  font-style: normal;
-  font-weight: 300;
-  src: url(_MaShanZheng-Regular.ttf);
-}
-
-@font-face {
-  font-family: "YRDZST";
-  font-style: normal;
-  font-weight: 300;
-  src: url(_YRDZSTSemibold.ttf);
-}
-
-@font-face {
-  font-family: "xxx";
+  font-family: "muyao";
   font-style: normal;
   font-weight: 300;
   src: url(_xxx.ttf);
 }
 
 @font-face {
-  font-family: "yyy";
+  font-family: "jason";
   font-style: normal;
   font-weight: 300;
   src: url(_yyy.ttf);
+}
+
+@font-face {
+  font-family: "LXGWWenKai";
+  font-style: normal;
+  font-weight: 400;
+  src: url(_LXGWWenKai-Regular.ttf);
 }
 
 /* Material Icon Font */
@@ -128,16 +122,61 @@
 }
 
 /* Windows */
+.win .char-card {
+  font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
+}
 /* macOS */
-
+.mac .char-card,
 .iphone .char-card {
   font-family: "KaiTi";
 }
 /* Linux desktops */
-
-/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+.linux:not(.android) .char-card {
+  font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
+}
 
 /* Material Icon Button */
+
+.tone1,
+.t1 {
+  color: #f44336;
+}
+
+.tone2,
+.t2 {
+  color: #ff9800;
+}
+
+.tone3,
+.t3 {
+  color: #4caf50;
+}
+
+.tone4,
+.t4 {
+  color: #2196f3;
+}
+
+.tone5,
+.t5 {
+  color: #607d8b;
+}
+
+.char-tone1 {
+  color: var(--tone-1);
+}
+
+.char-tone2 {
+  color: var(--tone-2);
+}
+
+.char-tone3 {
+  color: var(--tone-3);
+}
+
+.char-tone4 {
+  color: var(--tone-4);
+}
 
 .char-card {
   font-size: 3em;
@@ -192,28 +231,27 @@
   font-family: "PingFang SC", "Heiti SC", sans-serif;
 }
 
-#char_sim.mashanzheng,
-#char_sim_coloured.mashanzheng,
-#char_reading.mashanzheng {
-  font-family: MaShanZheng;
+#char_sim.jason,
+#char_sim_coloured.jason,
+#char_reading.jason {
+  font-family: jason, KaiTi;
 }
 
-#char_sim.yrdzst,
-#char_sim_coloured.yrdzst,
-#char_reading.yrdzst {
-  font-family: YRDZST;
+#char_sim.muyao,
+#char_sim_coloured.muyao,
+#char_reading.muyao {
+  font-family: muyao, KaiTi;
 }
 
-#char_sim.xxx,
-#char_sim_coloured.xxx,
-#char_reading.xxx {
-  font-family: xxx;
+#char_sim.wenkai,
+#char_sim_coloured.wenkai,
+#char_reading.wenkai {
+  font-family: LXGWWenKai, KaiTi;
 }
 
-#char_sim.yyy,
-#char_sim_coloured.yyy,
-#char_reading.yyy {
-  font-family: yyy;
+/* Current rotation font: sits in #char_deck above the play button, same style as deck/card */
+#font-name:empty {
+  display: none;
 }
 
 /* Character meaning display for individual characters */
@@ -222,6 +260,14 @@ hr {
   border: 0;
   height: 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.meaning {
+  text-align: center;
+}
+
+.meaning {
+  display: block;
 }
 
 .meaning-card {
@@ -237,25 +283,16 @@ hr {
   font-size: 1rem;
 }
 
+.char_example {
+  line-height: 1.8;
+}
+
 #char_pinyin,
 #char_reading {
   margin-bottom: 20px;
 }
 
-/*
- * Pinyin ruby annotations (Grammar + Sentences note types only)
- *
- * Grammar and Sentences cards use HTML <ruby>/<rt> tags for pinyin annotation,
- * rendered via CSS. Basic - Mandarin and From Subtitles use div+JS colorization
- * instead (see shared/js/pinyin.js). Unifying these approaches would require
- * changing note field storage format — out of scope.
- */
-
-/* Pinyin ruby styling */
-
-/* Characters */
-
-/* Pinyin */
+/* Near-synonym contrast note (Contrast field), shown with the meaning */
 
 
 /* Basic - Mandarin Sentences specific rules */
@@ -273,4 +310,10 @@ hr {
 .char,
 #char_sim {
   font-size: 40px;
+}
+
+/* Simplified only: hide the traditional form in Definitions (.sep + span) */
+.char .sep,
+.char .sep + span {
+  display: none;
 }

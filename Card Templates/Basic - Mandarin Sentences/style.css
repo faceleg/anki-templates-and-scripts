@@ -1,11 +1,9 @@
 /* @inject: shared/css/base.css */
 /* @inject: shared/css/fonts.css */
-/* @inject: shared/css/layout.css */
 /* @inject: shared/css/components.css */
 /* @inject: shared/css/tone-colors.css */
 /* @inject: shared/css/character.css */
 /* @inject: shared/css/typography.css */
-/* @inject: shared/css/pinyin-ruby.css */
 
 /* Basic - Mandarin Sentences specific rules */
 
@@ -22,4 +20,10 @@
 .char,
 #char_sim {
   font-size: 40px;
+}
+
+/* Simplified only: hide the traditional form in Definitions (.sep + span) */
+.char .sep,
+.char .sep + span {
+  display: none;
 }

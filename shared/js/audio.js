@@ -1,15 +1,6 @@
-// Audio playback utilities
-
-function playAudio() {
-  var audioDiv = document.getElementById("audio");
-  if (!audioDiv) return;
-  var audio = audioDiv.getElementsByTagName("*");
-  if (!audio.length) return;
-  audio[0].tagName == "AUDIO" ? audio[0].play() : audio[0].click();
-}
-
-// AudioManager — speech synthesis and Anki audio playback
-var AudioManager = (function () {
+// AudioManager — speech synthesis (Writing) and playback of the card's
+// Audio field inside #audio. Created once: AnkiMobile may reuse the page across cards.
+window.AudioManager = window.AudioManager || (function () {
   var _voice = null;
   var _voicesLoaded = false;
   var _pendingPhrase = null;

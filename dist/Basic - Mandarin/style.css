@@ -91,32 +91,26 @@
   src: url(_KaiTi.ttf);
 }
 
+/* Handwriting fonts: media filenames are historical (_xxx = Muyao, _yyy = Jason) */
 @font-face {
-  font-family: "MaShanZheng";
-  font-style: normal;
-  font-weight: 300;
-  src: url(_MaShanZheng-Regular.ttf);
-}
-
-@font-face {
-  font-family: "YRDZST";
-  font-style: normal;
-  font-weight: 300;
-  src: url(_YRDZSTSemibold.ttf);
-}
-
-@font-face {
-  font-family: "xxx";
+  font-family: "muyao";
   font-style: normal;
   font-weight: 300;
   src: url(_xxx.ttf);
 }
 
 @font-face {
-  font-family: "yyy";
+  font-family: "jason";
   font-style: normal;
   font-weight: 300;
   src: url(_yyy.ttf);
+}
+
+@font-face {
+  font-family: "LXGWWenKai";
+  font-style: normal;
+  font-weight: 400;
+  src: url(_LXGWWenKai-Regular.ttf);
 }
 
 /* Material Icon Font */
@@ -151,226 +145,17 @@
 }
 
 /* Windows */
+.win .char-card {
+  font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
+}
 /* macOS */
-
+.mac .char-card,
 .iphone .char-card {
   font-family: "KaiTi";
 }
 /* Linux desktops */
-
-
-h3 {
-  margin: 0;
-  font-weight: 500;
-}
-
-main {
-  display: grid;
-  gap: var(--space-xl);
-  align-content: center;
-  justify-content: center;
-  place-content: center;
-  padding: var(--space-sm);
-}
-
-@media (min-width: 540px) {
-  main {
-    padding: var(--space-lg);
-  }
-}
-
-@media (min-width: 800px) {
-  main {
-    padding: var(--space-xl);
-  }
-}
-
-section {
-  display: grid;
-  gap: var(--space-md);
-  margin: 6px;
-}
-
-fieldset {
-  border: 1px solid var(--surface4);
-  background: var(--surface4);
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 1px;
-  border-radius: var(--space-sm);
-  overflow: hidden;
-  transition: box-shadow 0.3s ease;
-}
-
-fieldset:focus-within {
-  box-shadow: 0 5px 20px -10px hsla(0, 0%, 0%, 0.5);
-}
-
-fieldset a {
-  text-decoration: none;
-  color: var(--text1);
-}
-
-select {
-  outline: none;
-  border: none;
-  border-radius: 12px;
-  width: 34px;
-  padding-left: 6px;
-  color: white;
-  background:
-    linear-gradient(to right, transparent 40px, var(--surface1) 0),
-    var(--brand-bg-gradient) fixed;
-  transition: background 0.5s ease;
-}
-
-select > option {
-  border: none;
-  border-radius: 20px;
-  outline: none;
-  background: var(--surface3);
-  font-size: 22px;
-  color: var(--text1);
-}
-
-input[type="checkbox"] {
-  width: 40px;
-  height: 20px;
-  margin: 0;
-  outline-offset: 5px;
-  accent-color: var(--brand);
-  position: relative;
-  transform-style: preserve-3d;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  background: var(--surface1);
-  border-radius: 20px;
-  transition: 0.5s;
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-  outline: none;
-}
-
-input:checked[type="checkbox"] {
-  background:
-    linear-gradient(to right, transparent 40px, var(--surface1) 0),
-    var(--brand-bg-gradient) fixed;
-  -webkit-transition: background 0.5s ease;
-  transition: background 0.5s ease;
-}
-
-input[type="checkbox"]:before {
-  content: "";
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-radius: 20px;
-  top: 0;
-  left: 0;
-  background: white;
-  transform: scale(1.1);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  transition: 0.5s;
-}
-
-input:checked[type="checkbox"]:before {
-  left: 20px;
-}
-
-input[type="number"] {
-  width: 40px;
-  height: 20px;
-  margin: 0;
-  padding: 4px;
-  position: relative;
-  cursor: text;
-  appearance: none;
-  -webkit-appearance: none;
-  transition: 0.5s;
-  border: 1px solid var(--surface1);
-  background: var(--surface3);
-  border-radius: var(--space-sm);
-  text-align: end;
-  outline: none;
-  color: var(--text1);
-  place-self: center;
-}
-
-.fieldset-item {
-  background: var(--surface3);
-  transition: background 0.2s ease;
-  display: grid;
-  gap: var(--space-md);
-  padding-top: var(--space-sm);
-  padding-bottom: var(--space-sm);
-  padding-left: var(--space-md);
-  padding-right: var(--space-md);
-  text-align: left;
-}
-
-.fs-item-1 {
-  grid-template-columns: 1fr var(--space-xl);
-}
-
-.fs-item-3 {
-  grid-template-columns: 1fr 1fr;
-}
-
-.fs-item-front-back {
-  padding: unset;
-  text-align: center;
-  gap: unset;
-  cursor: pointer;
-}
-
-.front-back {
-  padding: var(--space-xs);
-}
-
-.btn-active {
-  color: white;
-  background: var(--brand-bg2);
-}
-
-.fieldset-item:focus-within {
-  background: var(--surface2);
-}
-
-.fieldset-item:focus-within svg {
-  fill: #fff;
-}
-
-.fieldset-item > :is(.input-stack, label) {
-  display: grid;
-  gap: var(--space-xs);
-}
-
-.fieldset-item > .input-stack > label {
-  display: contents;
-}
-
-.fieldset-item svg {
-  fill: var(--text2);
-  height: var(--space-md);
-}
-
-.fieldset-item > input[type="checkbox"] {
-  align-self: center;
-  justify-self: center;
-  place-self: center;
-}
-
-/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
-
-@media screen and (max-height: 450px) {
-  .sidebar {
-    padding-top: 15px;
-  }
-
-  .sidebar a {
-    font-size: 16px;
-  }
+.linux:not(.android) .char-card {
+  font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
 }
 
 /* Material Icon Button */
@@ -403,19 +188,6 @@ input[type="number"] {
   background-color: var(--icon-button-background-focus);
 }
 
-.sidebar {
-  height: 100%;
-  width: 0;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  background-color: var(--surface1);
-  overflow-x: hidden;
-  transition: 0.5s;
-  -webkit-tap-highlight-color: transparent;
-}
-
 .more-info-sidebar {
   height: 100%;
   width: 0;
@@ -427,6 +199,10 @@ input[type="number"] {
   overflow-x: hidden;
   transition: 0.5s;
   -webkit-tap-highlight-color: transparent;
+}
+
+.more-info-sidebar.open {
+  width: 160px;
 }
 
 .more-info-sidebar a {
@@ -475,6 +251,56 @@ input[type="number"] {
   font-size: 16px;
   text-align: center;
   line-height: 1.8;
+}
+
+.fieldset-item {
+  background: var(--surface3);
+  transition: background 0.2s ease;
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  text-align: left;
+}
+
+.tone1,
+.t1 {
+  color: #f44336;
+}
+
+.tone2,
+.t2 {
+  color: #ff9800;
+}
+
+.tone3,
+.t3 {
+  color: #4caf50;
+}
+
+.tone4,
+.t4 {
+  color: #2196f3;
+}
+
+.tone5,
+.t5 {
+  color: #607d8b;
+}
+
+.char-tone1 {
+  color: var(--tone-1);
+}
+
+.char-tone2 {
+  color: var(--tone-2);
+}
+
+.char-tone3 {
+  color: var(--tone-3);
+}
+
+.char-tone4 {
+  color: var(--tone-4);
 }
 
 .char-card {
@@ -546,6 +372,8 @@ input[type="number"] {
 
 /* Character font variants */
 
+/* Current rotation font: sits in #char_deck above the play button, same style as deck/card */
+
 /* Character meaning display for individual characters */
 .character-meaning-div-populated {
   max-width: 400px;
@@ -593,8 +421,24 @@ img {
   color: gray;
 }
 
+.char_example {
+  line-height: 1.8;
+}
+
 #char_pinyin {
   margin-bottom: 20px;
+}
+
+/* Near-synonym contrast note (Contrast field), shown with the meaning */
+.contrast {
+  max-width: 400px;
+  margin: 8px auto;
+  padding: 6px 10px;
+  border-left: 3px solid var(--text2);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  text-align: left;
+  opacity: 0.9;
 }
 
 
@@ -628,14 +472,13 @@ img {
   vertical-align: middle;
 }
 
-#char_pinyin {
-  height: 36px;
-  line-height: 36px;
-}
-
-
+.char_example,
 .char_examples_blank {
   line-height: 1.8;
+}
+
+.char_example_blank {
+  letter-spacing: 2px;
 }
 
 #char_image {
@@ -682,5 +525,54 @@ img {
 }
 
 #back #listening-with-audio {
+  display: none;
+}
+
+/* Answer-only content: hidden on the front from first paint, shown on the back
+   (backs wrap {{FrontSide}} / their content in #back) */
+.answer-only {
+  display: none;
+}
+
+#back .answer-only {
+  display: block;
+}
+
+/* Fixed display (Simplified only, no pinyin/zhuyin). #char_pinyin stays in the
+   DOM as the tone source for pinyin.js. In Definitions, .sep + span is the
+   traditional form: <span id="char-sim-id"/><span class="sep">〔</span><span id="char-trad-id"/>… */
+#char_pinyin,
+.pinyin,
+.zhuyin,
+.char .sep,
+.char .sep + span {
+  display: none;
+}
+
+/* Writing: hide answer bits on the front; the back (#back > FrontSide) reveals */
+.writing-card #char_meaning .char,
+.writing-card #char_meaning .pinyin,
+.writing-card #char_meaning .zhuyin,
+.writing-card #char_examples {
+  display: none;
+}
+
+#back .writing-card #char_meaning .char,
+#back .writing-card #char_examples {
+  display: block;
+}
+
+#back .writing-card #char_examples_blank {
+  display: none;
+}
+
+#writing-error {
+  margin-top: 5px;
+  font-size: 12px;
+  color: #ea2322;
+}
+
+/* Recall front: one blanked example sentence (the field holds several) */
+.recall-example .char_examples_blank ~ .char_examples_blank {
   display: none;
 }
