@@ -30,6 +30,10 @@
   color: var(--text2);
 }
 
+.night_mode .notes a {
+  color: var(--brand);
+}
+
 #split_sent {
   display: none;
 }

@@ -8,14 +8,14 @@
     <br >
 
     <div class="modal-footer1">
-        <a class="btn" id="btnShowPinyin">
+        <a class="btn" id="btnShowPinyin" onclick="var el = document.getElementById('char_pinyin'); el.hidden = !el.hidden">
             <div class="icon">
                 <i class="material-icons">text_increase</i>
             </div>
         </a>
     </div>
     
-    <div id="char_pinyin" style="display:none;">
+    <div id="char_pinyin" hidden>
         {{Pinyin}}
     </div>
 
@@ -28,14 +28,6 @@
 </div>
 
 <!-- @inject: shared/js/strip-lrm.js -->
-<script type="text/javascript">
-    // Show pinyin
-    var btnShowPinyin = document.getElementById('btnShowPinyin');
-    btnShowPinyin.onclick = function(event) {
-        const display = document.getElementById('char_pinyin').style.display;
-        document.getElementById('char_pinyin').style.display = display === "block" ? "none" : "block";
-    }
-</script>
 <!-- @inject: shared/js/font-rotation.js -->
 
 

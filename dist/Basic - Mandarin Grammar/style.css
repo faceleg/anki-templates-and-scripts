@@ -341,21 +341,6 @@ hr {
   margin-bottom: 20px;
 }
 
-/*
- * Pinyin ruby annotations (Grammar + Sentences note types only)
- *
- * Grammar and Sentences cards use HTML <ruby>/<rt> tags for pinyin annotation,
- * rendered via CSS. Basic - Mandarin and From Subtitles use div+JS colorization
- * instead (see shared/js/pinyin.js). Unifying these approaches would require
- * changing note field storage format — out of scope.
- */
-
-/* Pinyin ruby styling */
-
-/* Characters */
-
-/* Pinyin */
-
 .structure {
   color: var(--structure-color);
 }
@@ -386,6 +371,10 @@ hr {
 
 .night_mode .notes {
   color: var(--text2);
+}
+
+.night_mode .notes a {
+  color: var(--brand);
 }
 
 #split_sent {

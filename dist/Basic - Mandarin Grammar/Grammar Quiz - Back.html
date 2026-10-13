@@ -1,35 +1,3 @@
-<script>
-// Debug utilities
-
-var DEBUG = false;
-
-window.onerror = function (message, source, lineno, colno, error) {
-  if (!DEBUG) return;
-  var el = document.getElementById("debug-message-console");
-  if (!el) return;
-  el.style.display = "block";
-  el.innerHTML +=
-    "<div>" +
-    message +
-    " (" +
-    (source || "") +
-    ":" +
-    lineno +
-    ":" +
-    colno +
-    ")</div>";
-};
-
-function debugLog(msg) {
-  if (!DEBUG) return;
-  var el = document.getElementById("debug-message-console");
-  if (!el) return;
-  el.style.display = "block";
-  el.innerHTML += "<div>" + msg + "</div>";
-}
-
-</script>
-
 <div id="title" class="title">{{Title}}</div>
 <div class="spacer"></div>
 <div id="structure" class="structure">{{Structure}}</div>
@@ -39,7 +7,7 @@ function debugLog(msg) {
 <div id="translation" class="translation">{{English}}</div>
 <div class="spacerMedium"></div>
 <div id="audio" style="display:none">{{Sound}}</div>
-<button class="btn-play" onclick="playAudio();">PLAY</button>
+<button class="btn-play" onclick="AudioManager.playAnkiAudio()">PLAY</button>
 <div class="spacerMedium"></div>
 <div id="usedfor" class="notes">{{Used For}}</div>
 <div id="char_pinyin" style="display:none">{{Pinyin}}</div>
@@ -54,18 +22,9 @@ function debugLog(msg) {
     <div>{{Card}}</div>
 </div>	
 <script>
-// Audio playback utilities
-
-function playAudio() {
-  var audioDiv = document.getElementById("audio");
-  if (!audioDiv) return;
-  var audio = audioDiv.getElementsByTagName("*");
-  if (!audio.length) return;
-  audio[0].tagName == "AUDIO" ? audio[0].play() : audio[0].click();
-}
-
-// AudioManager — speech synthesis and Anki audio playback
-var AudioManager = (function () {
+// AudioManager — speech synthesis (Writing) and playback of the card's
+// {{Audio}} inside #audio. Created once: AnkiMobile may reuse the page across cards.
+window.AudioManager = window.AudioManager || (function () {
   var _voice = null;
   var _voicesLoaded = false;
   var _pendingPhrase = null;

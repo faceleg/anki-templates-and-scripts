@@ -1,6 +1,7 @@
 <div id="char_meaning" class="meaning-card">{{Definitions}}</div>
 
 <script>
+(function () {
   function showHide(selectors) {
     for (const selector of selectors) {
       const elements = document.querySelectorAll(selector);
@@ -31,4 +32,5 @@
   }
 
   stripNonASCII(["#char_meaning"]);
+})();
 </script>

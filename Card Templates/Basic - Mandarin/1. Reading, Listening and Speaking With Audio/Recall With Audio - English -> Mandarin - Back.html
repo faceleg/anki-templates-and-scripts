@@ -15,7 +15,7 @@
       <div id="audio" style="display: none">{{Audio}}</div>
   
       <div class="modal-footer1">
-          <a class="btn" id="btnPlayAudio">
+          <a class="btn" id="btnPlayAudio" onclick="AudioManager.playAnkiAudio()">
               <div class="icon">
                   <i class="material-icons">play_arrow</i>
               </div>
@@ -89,10 +89,5 @@
   </div>
   
   <!-- @inject: shared/js/audio.js -->
-  <script>
-    document.getElementById("btnPlayAudio").onclick = function () {
-      playAudio();
-    };
-  </script>
   <!-- @inject: shared/js/pinyin.js -->
   

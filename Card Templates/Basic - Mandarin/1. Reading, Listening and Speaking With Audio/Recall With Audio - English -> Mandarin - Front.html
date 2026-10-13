@@ -2,6 +2,7 @@
 <div id="char_examples_blank" class="recall-example">{{ExamplesBlank}}</div>
 
 <script type="text/javascript">
+(function () {
   function showHide(selectors) {
     for (const selector of selectors) {
       const elements = document.querySelectorAll(selector);
@@ -97,4 +98,5 @@
   }
 
   clearNonEnglishContent("#char_meaning .meaning");
+})();
 </script>

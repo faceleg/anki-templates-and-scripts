@@ -84,6 +84,7 @@
 <!-- @inject: shared/js/audio.js -->
 <!-- @inject: shared/js/pinyin.js -->
 <script type="text/javascript">
+(function () {
 "use strict";
 
 // ---------------------------------------------------------------------------
@@ -322,7 +323,10 @@ var Quiz = (function () {
   function _revealThumbnail(charIndex) {
     _thumbnailRevealPending[charIndex] = true;
     var writer = _thumbnailWriters[charIndex];
-    if (writer) writer.showCharacter({ duration: 300 });
+    // showCharacter throws if this thumbnail's data failed; its text fallback is already shown
+    try {
+      if (writer) writer.showCharacter({ duration: 300 });
+    } catch (e) {}
   }
 
   function _buildThumbnails(characters) {
@@ -762,5 +766,5 @@ function isInWebView() {
   if (window.location.href.includes("ankiuser.net")) return true;
   return false;
 }
+})();
 </script>
-

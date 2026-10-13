@@ -117,18 +117,9 @@ function debugLog(msg) {
 
 </script>
 <script>
-// Audio playback utilities
-
-function playAudio() {
-  var audioDiv = document.getElementById("audio");
-  if (!audioDiv) return;
-  var audio = audioDiv.getElementsByTagName("*");
-  if (!audio.length) return;
-  audio[0].tagName == "AUDIO" ? audio[0].play() : audio[0].click();
-}
-
-// AudioManager — speech synthesis and Anki audio playback
-var AudioManager = (function () {
+// AudioManager — speech synthesis (Writing) and playback of the card's
+// {{Audio}} inside #audio. Created once: AnkiMobile may reuse the page across cards.
+window.AudioManager = window.AudioManager || (function () {
   var _voice = null;
   var _voicesLoaded = false;
   var _pendingPhrase = null;
@@ -349,6 +340,7 @@ applyColorization();
 
 </script>
 <script type="text/javascript">
+(function () {
 "use strict";
 
 // ---------------------------------------------------------------------------
@@ -587,7 +579,10 @@ var Quiz = (function () {
   function _revealThumbnail(charIndex) {
     _thumbnailRevealPending[charIndex] = true;
     var writer = _thumbnailWriters[charIndex];
-    if (writer) writer.showCharacter({ duration: 300 });
+    // showCharacter throws if this thumbnail's data failed; its text fallback is already shown
+    try {
+      if (writer) writer.showCharacter({ duration: 300 });
+    } catch (e) {}
   }
 
   function _buildThumbnails(characters) {
@@ -1027,5 +1022,5 @@ function isInWebView() {
   if (window.location.href.includes("ankiuser.net")) return true;
   return false;
 }
+})();
 </script>
-

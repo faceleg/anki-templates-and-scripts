@@ -8,19 +8,19 @@
     <br >
 
     <div class="modal-footer1">
-        <a class="btn" id="btnShowPinyin">
+        <a class="btn" id="btnShowPinyin" onclick="var el = document.getElementById('char_pinyin'); el.hidden = !el.hidden">
             <div class="icon">
                 <i class="material-icons">text_increase</i>
             </div>
         </a>
-        <a class="btn" id="btnPlayAudio">
+        <a class="btn" id="btnPlayAudio" onclick="AudioManager.playAnkiAudio()">
             <div class="icon">
                 <i class="material-icons">play_arrow</i>
             </div>
         </a>
     </div>
     
-    <div id="char_pinyin" style="display:none;">
+    <div id="char_pinyin" hidden>
         {{Pinyin}}
     </div>
 
@@ -33,16 +33,6 @@
 </div>
 
 <!-- @inject: shared/js/strip-lrm.js -->
-<script type="text/javascript">
-    // Show pinyin
-    var btnShowPinyin = document.getElementById('btnShowPinyin');
-    btnShowPinyin.onclick = function(event) {
-        const display = document.getElementById('char_pinyin').style.display;
-        document.getElementById('char_pinyin').style.display = display === "block" ? "none" : "block";
-    }
-
-    document.getElementById('btnPlayAudio').onclick = function() { playAudio(); };
-</script>
 <!-- @inject: shared/js/audio.js -->
 <!-- @inject: shared/js/font-rotation.js -->
   

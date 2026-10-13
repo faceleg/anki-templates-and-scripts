@@ -1,17 +1,3 @@
-<div
-    id="debug-message-console"
-    style="
-    display: none;
-    color: red;
-    border: 1px solid black;
-    font-size: 8px;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    padding: 2px;
-    max-width: 100%;
-  "
-></div>
 <div id="char_image">{{Image}}</div>
 <div id="char_pinyin">{{Pinyin}}</div>
 <div id="char_sim" class="char-card">{{Simplified}}</div>
@@ -89,35 +75,3 @@
         <small>Tatoeba</small>
     </a>
 </div>
-
-<script>
-// Debug utilities
-
-var DEBUG = false;
-
-window.onerror = function (message, source, lineno, colno, error) {
-  if (!DEBUG) return;
-  var el = document.getElementById("debug-message-console");
-  if (!el) return;
-  el.style.display = "block";
-  el.innerHTML +=
-    "<div>" +
-    message +
-    " (" +
-    (source || "") +
-    ":" +
-    lineno +
-    ":" +
-    colno +
-    ")</div>";
-};
-
-function debugLog(msg) {
-  if (!DEBUG) return;
-  var el = document.getElementById("debug-message-console");
-  if (!el) return;
-  el.style.display = "block";
-  el.innerHTML += "<div>" + msg + "</div>";
-}
-
-</script>

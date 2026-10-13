@@ -13,7 +13,7 @@
   </div>
   <div id="char_examples">{{Examples}}</div>
   <div class="modal-footer1">
-    <a class="btn" id="btnPlayAudio">
+    <a class="btn" id="btnPlayAudio" onclick="AudioManager.playAnkiAudio()">
       <div class="icon"><i class="material-icons">play_arrow</i></div>
     </a>
     <a class="btn" id="btnMoreOptions" onclick="document.getElementById('more-info-sidebar').classList.add('open')">
@@ -84,9 +84,4 @@
   </div>
   
   <!-- @inject: shared/js/audio.js -->
-  <script>
-    document.getElementById("btnPlayAudio").onclick = function () {
-      playAudio();
-    };
-  </script>
   
