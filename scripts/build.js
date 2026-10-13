@@ -135,7 +135,7 @@ async function purgeCSSInDist() {
         standard: [
           "card", "night_mode", "iphone", "mobile", "back", "replay-button",
           "win", "mac", "linux", "android",
-          "zhuyin", "meaning", "pinyin", "pinYinWrapper", "char", "sep",
+          "zhuyin", "meaning", "pinyin", "pinYinWrapper", "char", "sep", "am-unknown",
           /^t[0-5]$/, /^tone[0-5]$/, /^char-tone[0-5]$/, /^char_example/,
         ],
         deep: [/^card/, /^night_mode/],

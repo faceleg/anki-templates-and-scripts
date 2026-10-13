@@ -67,3 +67,10 @@ img {
   text-align: left;
   opacity: 0.9;
 }
+
+/* AnkiMorphs: the unknown word in a sentence (set by morph-highlight.js) */
+.am-unknown {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.25em;
+}
