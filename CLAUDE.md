@@ -68,8 +68,6 @@ Card Templates/           — source templates (edit these)
   Basic - Mandarin From Subtitles/
   Basic - Mandarin Grammar/
   Basic - Mandarin Sentences/
-  CGW-InvalidExample/
-  CGW-ValidExample/
 
 dist/                 — built output (committed to git; do not edit directly)
 backups/              — gitignored, local only; Anki snapshots + git commit id
