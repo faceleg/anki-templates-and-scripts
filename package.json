@@ -8,7 +8,8 @@
     "anki:backup": "node scripts/anki-backup.js",
     "anki:rollback": "node scripts/anki-rollback.js",
     "anki:deploy": "node scripts/anki-deploy.js",
-    "anki:deploy:dry": "node scripts/anki-deploy.js --dry-run"
+    "anki:deploy:dry": "node scripts/anki-deploy.js --dry-run",
+    "test": "node --test scripts/test/deploy.test.js"
   },
   "devDependencies": {
     "@html-eslint/eslint-plugin": "^0.24.1",
