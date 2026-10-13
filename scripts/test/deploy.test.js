@@ -112,6 +112,12 @@ test('deploy: hard errors write nothing', async () => {
   fs.writeFileSync(distFile('T1 - Back.html'), '  ');
   r = await run('anki-deploy.js', ['--no-confirm']);
   assert.match(r.out, /empty Back/);
+
+  // Unknown field reference, even inside a JS comment, is rejected by Anki
+  fs.writeFileSync(distFile('T1 - Back.html'), '{{Front}} {{text:Front}} {{#Tags}}x{{/Tags}} <script>// {{Audio}}</script>');
+  r = await run('anki-deploy.js', ['--no-confirm']);
+  assert.match(r.out, /unknown field \{\{Audio\}\}/);
+  assert.doesNotMatch(r.out, /unknown field \{\{(Front|Tags)\}\}/);
   assert.strictEqual(writes.length, 0);
 });
 

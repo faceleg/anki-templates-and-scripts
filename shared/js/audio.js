@@ -1,5 +1,5 @@
 // AudioManager — speech synthesis (Writing) and playback of the card's
-// {{Audio}} inside #audio. Created once: AnkiMobile may reuse the page across cards.
+// Audio field inside #audio. Created once: AnkiMobile may reuse the page across cards.
 window.AudioManager = window.AudioManager || (function () {
   var _voice = null;
   var _voicesLoaded = false;

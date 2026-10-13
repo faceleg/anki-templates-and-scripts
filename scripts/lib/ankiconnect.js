@@ -95,6 +95,10 @@ async function modelNames() {
   return request('modelNames');
 }
 
+async function modelFieldNames(modelName) {
+  return request('modelFieldNames', { modelName });
+}
+
 /**
  * Get the templates for a note type
  * @param {string} modelName - The name of the note type
@@ -146,6 +150,7 @@ async function updateModelStyling(modelName, css) {
 module.exports = {
   checkConnection,
   modelNames,
+  modelFieldNames,
   modelTemplates,
   modelStyling,
   updateModelTemplates,

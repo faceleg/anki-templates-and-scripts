@@ -12,6 +12,7 @@ const crypto = require('crypto');
 const {
   checkConnection,
   modelNames,
+  modelFieldNames,
   modelTemplates,
   modelStyling,
   updateModelTemplates,
@@ -19,6 +20,19 @@ const {
 } = require('./lib/ankiconnect');
 const { snapshotModels } = require('./lib/snapshot');
 const { paths, promptConfirm, parseCli } = require('./lib/util');
+
+// Anki parses every {{...}} in a template (even inside JS comments) as a field
+// reference and rejects the whole note type if one is unknown.
+const SPECIAL_FIELDS = ['FrontSide', 'Tags', 'Type', 'Deck', 'Subdeck', 'Card', 'CardFlag', 'CardID'];
+function fieldRefs(html) {
+  const refs = new Set();
+  for (const [, raw] of html.matchAll(/\{\{([^}]+)\}\}/g)) {
+    const ref = raw.trim().replace(/^[#^/]\s*/, '');
+    if (ref.startsWith('tts ')) continue;
+    refs.add(ref.split(':').pop().trim()); // drop filters like text:, type:, cloze:
+  }
+  return refs;
+}
 
 const sha = (s) => crypto.createHash('sha256').update(s).digest('hex');
 
@@ -121,6 +135,7 @@ async function deploy() {
     if (!css.trim()) errors.push(`${modelName}: dist style.css is missing or empty (refusing to send empty CSS)`);
     const ankiTemplates = await modelTemplates(modelName);
     current[modelName] = { templates: ankiTemplates, css: (await modelStyling(modelName)).css || '' };
+    const fields = await modelFieldNames(modelName);
     const valid = Object.keys(ankiTemplates);
     if (Object.keys(templates).length === 0) errors.push(`${modelName}: no templates found in dist`);
     for (const [name, { Front, Back }] of Object.entries(templates)) {
@@ -130,6 +145,13 @@ async function deploy() {
       }
       if (!Front.trim()) errors.push(`${modelName}: template "${name}" has an empty Front`);
       if (!Back.trim()) errors.push(`${modelName}: template "${name}" has an empty Back`);
+      for (const [side, html] of [['Front', Front], ['Back', Back]]) {
+        for (const ref of fieldRefs(html)) {
+          if (!fields.includes(ref) && !SPECIAL_FIELDS.includes(ref)) {
+            errors.push(`${modelName}: template "${name}" ${side} references unknown field {{${ref}}}. Fields: ${fields.join(', ')}`);
+          }
+        }
+      }
     }
   }
   if (errors.length) fail(`Refusing to deploy:\n  - ${errors.join('\n  - ')}`);
