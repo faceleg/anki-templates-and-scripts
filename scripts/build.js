@@ -139,9 +139,15 @@ async function purgeCSSInDist() {
     const results = await new PurgeCSS().purge({
       content: htmlFiles.map((f) => ({ raw: require("fs").readFileSync(f, "utf8"), extension: "html" })),
       css: cssFiles,
-      // Anki adds these classes at runtime — never in the template HTML
+      // Anki adds some of these at runtime; the rest live in note field HTML
+      // (xiehanzi Pinyin/Definitions/Examples), never in the template HTML
       safelist: {
-        standard: ["card", "night_mode", "iphone", "mobile", "back", "replay-button"],
+        standard: [
+          "card", "night_mode", "iphone", "mobile", "back", "replay-button",
+          "win", "mac", "linux", "android",
+          "zhuyin", "meaning", "pinyin", "pinYinWrapper", "char", "sep",
+          /^t[0-5]$/, /^tone[0-5]$/, /^char-tone[0-5]$/, /^char_example/,
+        ],
         deep: [/^card/, /^night_mode/],
       },
     });

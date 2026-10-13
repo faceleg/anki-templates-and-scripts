@@ -151,12 +151,18 @@
 }
 
 /* Windows */
+.win .char-card {
+  font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
+}
 /* macOS */
-
+.mac .char-card,
 .iphone .char-card {
   font-family: "KaiTi";
 }
 /* Linux desktops */
+.linux:not(.android) .char-card {
+  font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
+}
 
 
 h3 {
@@ -477,6 +483,47 @@ input[type="number"] {
   line-height: 1.8;
 }
 
+.tone1,
+.t1 {
+  color: #f44336;
+}
+
+.tone2,
+.t2 {
+  color: #ff9800;
+}
+
+.tone3,
+.t3 {
+  color: #4caf50;
+}
+
+.tone4,
+.t4 {
+  color: #2196f3;
+}
+
+.tone5,
+.t5 {
+  color: #607d8b;
+}
+
+.char-tone1 {
+  color: var(--tone-1);
+}
+
+.char-tone2 {
+  color: var(--tone-2);
+}
+
+.char-tone3 {
+  color: var(--tone-3);
+}
+
+.char-tone4 {
+  color: var(--tone-4);
+}
+
 .char-card {
   font-size: 3em;
 }
@@ -593,6 +640,10 @@ img {
   color: gray;
 }
 
+.char_example {
+  line-height: 1.8;
+}
+
 #char_pinyin {
   margin-bottom: 20px;
 }
@@ -633,9 +684,13 @@ img {
   line-height: 36px;
 }
 
-
+.char_example,
 .char_examples_blank {
   line-height: 1.8;
+}
+
+.char_example_blank {
+  letter-spacing: 2px;
 }
 
 #char_image {
