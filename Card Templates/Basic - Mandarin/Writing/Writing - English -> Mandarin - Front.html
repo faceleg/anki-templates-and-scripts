@@ -241,8 +241,10 @@ var Quiz = (function () {
   var _thumbnailWriters = [];
   var _thumbnailRevealPending = [];
   var _characters = [];
-  var _weightedMistakeScore = 0;
+  var _scoreThisChar = 0;    // weighted mistakes on the current character only
+  var _strokesThisChar = 0;  // stroke count of the current character
   var _totalStrokeCount = 0;
+  var _finished = false;
   var _currentIndex = 0;
   var _totalMistakes = 0;
   var _mistakesThisChar = 0;
@@ -286,10 +288,13 @@ var Quiz = (function () {
 
   function _getRating() {
     var current;
-    if (_weightedMistakeScore === 0) {
+    // Each character is judged against its own stroke count, so one bad character
+    // in a long word isn't diluted by the others and simple characters aren't
+    // punished harder than complex ones.
+    if (_scoreThisChar === 0) {
       current = "easy";
     } else {
-      var normalised = _totalStrokeCount > 0 ? _weightedMistakeScore / _totalStrokeCount : 0;
+      var normalised = _strokesThisChar > 0 ? _scoreThisChar / _strokesThisChar : 1;
       if (normalised <= 0.08) current = "good";
       else if (normalised <= 0.25) current = "hard";
       else current = "again";
@@ -312,6 +317,23 @@ var Quiz = (function () {
       el.innerHTML = "  \u00b7  <span>" + RATING_LABELS[rating] + "</span>";
       el.querySelector("span").style.color = RATING_COLORS[rating];
     }
+    _save();
+  }
+
+  function _forceAgain() {
+    _worstRating = "again";
+  }
+
+  // Saved on every change (not just at the end) so flipping early still shows
+  // an up-to-date rating on the back.
+  function _save() {
+    if (document.getElementById("back")) return;
+    Persistence.setItem(_persistenceKey, {
+      totalMistakes: _totalMistakes,
+      totalStrokeCount: _totalStrokeCount,
+      rating: _worstRating,
+      finished: _finished,
+    });
   }
 
   function _revealThumbnail(charIndex) {
@@ -409,6 +431,8 @@ var Quiz = (function () {
     _mistakesThisChar = 0;
     _nextStrokeIndex = 0;
     _hintCountThisChar = 0;
+    _scoreThisChar = 0;
+    _strokesThisChar = 0;
 
     var characters = _characters;
     var writer = _writers[charIndex];
@@ -425,15 +449,14 @@ var Quiz = (function () {
     if (targetDiv) { void targetDiv.offsetWidth; }
     writer.updateDimensions({ width: DRAW_SIZE, height: DRAW_SIZE });
 
-    if (writer._character) {
-      _totalStrokeCount += writer._character.strokes.length;
-    }
-
     if (!(charIndex === 0 && _isInitialLoad)) {
       AudioManager.speak(characters[charIndex]);
     }
     _isInitialLoad = false;
 
+    // writer._character is set asynchronously by HanziWriter one microtask after
+    // onLoadCharDataSuccess fires, so we cannot read strokes.length here.
+    // Instead, chain .then() on writer.quiz() — by that point _character is set.
     writer.quiz({
       showHintAfterMisses: HINT_MISS,
       highlightOnComplete: true,
@@ -443,7 +466,7 @@ var Quiz = (function () {
         if (!guard()) return;
         _mistakesThisChar++;
         _totalMistakes++;
-        _weightedMistakeScore += 1 / (data.strokeNum + 1);
+        _scoreThisChar += 1 / (data.strokeNum + 1);
         _updateFeedback();
         _updateRatingIndicator();
       },
@@ -471,6 +494,8 @@ var Quiz = (function () {
             _startCharacterQuiz(nextIndex, guard);
           }, 1000);
         } else {
+          _finished = true;
+          _save();
           _revealThumbnail(charIndex);
           AudioManager.speak(characters[charIndex]);
           setTimeout(function () {
@@ -478,16 +503,20 @@ var Quiz = (function () {
           }, 1800);
         }
       },
+    }).then(function () {
+      if (!guard()) return;
+      if (writer._character) {
+        _strokesThisChar = writer._character.strokes.length;
+        _totalStrokeCount += _strokesThisChar;
+        _updateRatingIndicator();
+      }
     });
   }
 
   function _onQuizComplete(guard) {
     if (!guard()) return;
-    Persistence.setItem(_persistenceKey, {
-      totalMistakes: _totalMistakes,
-      weightedMistakeScore: _weightedMistakeScore,
-      totalStrokeCount: _totalStrokeCount,
-    });
+    _finished = true;
+    _save();
     _updateLoadStatus(true);
   }
 
@@ -509,11 +538,13 @@ var Quiz = (function () {
       _thumbnailWriters = [];
       _thumbnailRevealPending = [];
       _totalMistakes = 0;
-      _weightedMistakeScore = 0;
+      _scoreThisChar = 0;
+      _strokesThisChar = 0;
       _totalStrokeCount = 0;
       _mistakesThisChar = 0;
       _nextStrokeIndex = 0;
       _worstRating = null;
+      _finished = false;
 
       var characters = getCharactersToDraw();
       _persistenceKey = "quizResult-" + characters;
@@ -529,8 +560,9 @@ var Quiz = (function () {
         var saved = Persistence.getItem(_persistenceKey);
         if (saved) {
           _totalMistakes = saved.totalMistakes;
-          _weightedMistakeScore = saved.weightedMistakeScore;
           _totalStrokeCount = saved.totalStrokeCount;
+          // Flipped before finishing = didn't produce the word
+          _worstRating = saved.finished ? saved.rating : "again";
           _updateFeedback();
           _updateRatingIndicator();
           document.getElementById("writing-feedback").style.display = "";
@@ -538,6 +570,8 @@ var Quiz = (function () {
         return;
       }
 
+      // Clear the previous attempt (e.g. same word re-shown after Again)
+      Persistence.removeItem(_persistenceKey);
       _updateFeedback();
       _updateRatingIndicator();
 
@@ -635,10 +669,11 @@ var Quiz = (function () {
     _hintCountThisChar++;
     _mistakesThisChar++;
     _totalMistakes++;
-    if (_hintCountThisChar <= 2) {
-      _weightedMistakeScore += 1 / (_nextStrokeIndex + 1);
+    if (_nextStrokeIndex === 0 || _hintCountThisChar > 2) {
+      // Needed a hint to even start, or leaned on hints heavily
+      _forceAgain();
     } else {
-      _weightedMistakeScore += 1;
+      _scoreThisChar += 1 / (_nextStrokeIndex + 1);
     }
     _updateFeedback();
     _updateRatingIndicator();
@@ -651,6 +686,8 @@ var Quiz = (function () {
     writer.showOutline();
     writer.showCharacter();
     _revealThumbnail(_currentIndex);
+    _forceAgain();
+    _updateRatingIndicator();
 
     var guard = _makeGuard(_sessionId);
     var capturedIndex = _currentIndex;
