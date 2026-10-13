@@ -14,6 +14,7 @@
     z-index:1000;
   "
 ></div>
+<div class="writing-card">
 <div class="header-wrapper">
     <div class="header-left">
         <a class="btn" id="btnPlayAudio">
@@ -50,6 +51,7 @@
     <span id="writing-feedback-mistakes"></span>
     <span id="quiz-rating-indicator"></span>
 </div>
+<div id="writing-error" hidden></div>
 <div id="audio" style="display: none">{{Audio}}</div>
 
 <div id="char_meaning" class="meaning-card">
@@ -68,6 +70,7 @@
     </div>
     <div class="card-information">{{Card}}</div>
 </div>
+</div>
 
 <!-- @inject: shared/js/persistence.js -->
 <script type="text/javascript">
@@ -79,6 +82,7 @@
 
 <!-- @inject: shared/js/debug.js -->
 <!-- @inject: shared/js/audio.js -->
+<!-- @inject: shared/js/pinyin.js -->
 <script type="text/javascript">
 "use strict";
 
@@ -94,62 +98,7 @@ var STROKE_COLOR  = NIGHT_MODE ? "#ffffff" : "#555";
 var OUTLINE_COLOR = NIGHT_MODE ? "#5B5B5B" : "#DDD";
 var DRAWING_COLOR = NIGHT_MODE ? "#fff"    : "#333";
 
-// ---------------------------------------------------------------------------
-// Tone colors (always on)
-// ---------------------------------------------------------------------------
-var TONE_COLORS = {
-  1: "#f44336",
-  2: "#ff9800",
-  3: "#4caf50",
-  4: "#2196f3",
-  5: STROKE_COLOR,
-};
-
-function decodePinyin(pinyin) {
-  var coreVowels = ["a", "e", "i", "o", "u", "ü", "v"];
-  var tonesArr = [];
-  var buffer = [];
-
-  function isCore(char, charPrevTwo, charNext) {
-    if (char === "r" && (charNext === " " || charNext === "") &&
-        charPrevTwo !== " " && charPrevTwo !== "") {
-      return [true, true];
-    }
-    var normalized = char.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    for (var i = 0; i < coreVowels.length; i++) {
-      if (normalized === coreVowels[i]) return [true, false];
-    }
-    return [false, false];
-  }
-
-  function getTone(str) {
-    var pure = str.replace(/a|e|i|o|u|ü|r/g, "");
-    if (pure === "") return 5;
-    if (["ā","ē","ī","ō","ū","ǖ","v̄"].indexOf(pure) !== -1) return 1;
-    if (["á","é","í","ó","ú","ǘ","v́"].indexOf(pure) !== -1) return 2;
-    if (["ǎ","ě","ǐ","ǒ","ǔ","ǚ","v̌"].indexOf(pure) !== -1) return 3;
-    if (["à","è","ì","ò","ù","ǜ","v̀"].indexOf(pure) !== -1) return 4;
-    return 4;
-  }
-
-  function flush() {
-    if (buffer.length > 0) {
-      tonesArr.push(getTone(buffer.join("")));
-      buffer = [];
-    }
-  }
-
-  for (var i = 0; i < pinyin.length; i++) {
-    var result = isCore(pinyin[i], pinyin[i - 2], pinyin[i + 1]);
-    if (result[1]) flush();
-    if (result[0]) buffer.push(pinyin[i]);
-    else flush();
-  }
-  if (buffer.length > 0) tonesArr.push(getTone(buffer.join("")));
-
-  return tonesArr;
-}
-
+// Tone colours: decodePinyin() + TONE_COLORS come from shared/js/pinyin.js
 var _decodedPinyin = decodePinyin(
   (document.getElementById("char_pinyin") || {innerText: ""}).innerText
 );
@@ -200,7 +149,8 @@ function loadCharData(character, onComplete, onFailure) {
   xhr.send();
 }
 
-function charDataLoader(character, onComplete) {
+// Local media first, then CDN; onError (HanziWriter's reject) fires if both fail.
+function charDataLoader(character, onComplete, onError) {
   loadCharData(
     character,
     onComplete,
@@ -208,9 +158,9 @@ function charDataLoader(character, onComplete) {
       var fallback = new XMLHttpRequest();
       fallback.open("GET", "https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0/" + character + ".json", true);
       fallback.onreadystatechange = function () {
-        if (fallback.readyState === XMLHttpRequest.DONE && fallback.status === 200) {
-          onComplete(JSON.parse(fallback.responseText));
-        }
+        if (fallback.readyState !== XMLHttpRequest.DONE) return;
+        if (fallback.status === 200) onComplete(JSON.parse(fallback.responseText));
+        else if (onError) onError(fallback);
       };
       fallback.send();
     }
@@ -221,13 +171,10 @@ function loadCharMeaning(character, onComplete) {
   loadCharData(character + "_meaning", onComplete, null);
 }
 
-function stripAscii(str) {
-  return str.replace(/[A-Za-z0-9]/g, "");
-}
-
+// Han characters only (drops punctuation, Latin, digits, spaces)
 function getCharactersToDraw() {
   var src = document.getElementById("char_sim");
-  return stripAscii((src || {innerText: ""}).innerText);
+  return ((src ? src.innerText : "").match(/\p{Script=Han}/gu) || []).join("");
 }
 
 // ---------------------------------------------------------------------------
@@ -235,12 +182,12 @@ function getCharactersToDraw() {
 // ---------------------------------------------------------------------------
 var Quiz = (function () {
 
-  var _sessionId = 0;
   var _persistenceKey = "quizResult";
   var _writers = [];
   var _thumbnailWriters = [];
   var _thumbnailRevealPending = [];
   var _characters = [];
+  var _failed = [];          // _failed[i] = true when stroke data for char i could not be loaded
   var _scoreThisChar = 0;    // weighted mistakes on the current character only
   var _strokesThisChar = 0;  // stroke count of the current character
   var _totalStrokeCount = 0;
@@ -253,8 +200,44 @@ var Quiz = (function () {
   var _worstRating = null;
   var _isInitialLoad = true; // Anki reads the whole word on card show; skip TTS for first char on first load only
 
+  // The session counter lives on window: AnkiMobile may reuse one page across
+  // cards, and this Quiz object is rebuilt per card, so timers scheduled by a
+  // previous card must be invalidated by a global counter (and by its DOM being gone).
   function _makeGuard(capturedId) {
-    return function () { return _sessionId === capturedId; };
+    var mainDiv = document.getElementById("character-target-div");
+    return function () {
+      return window.__writingQuizSession === capturedId && document.body.contains(mainDiv);
+    };
+  }
+
+  function _nextQuizIndex(from) {
+    for (var i = from; i < _characters.length; i++) {
+      if (!_failed[i]) return i;
+    }
+    return -1;
+  }
+
+  // Fallback when stroke data is missing: show the character as plain text.
+  function _showPlainChar(el, char, size, color) {
+    if (!el) return;
+    el.innerHTML = "";
+    el.textContent = char;
+    el.style.display = "inline-block";
+    el.style.width = size + "px";
+    el.style.height = size + "px";
+    el.style.lineHeight = size + "px";
+    el.style.fontSize = Math.round(size * 0.8) + "px";
+    el.style.textAlign = "center";
+    el.style.color = color;
+  }
+
+  function _showLoadError() {
+    var el = document.getElementById("writing-error");
+    if (!el) return;
+    var names = _characters.filter(function (c, i) { return _failed[i]; });
+    el.textContent = "No stroke data for " + names.join(" ") +
+      (_nextQuizIndex(0) === -1 ? " \u2014 nothing to quiz" : " \u2014 skipped");
+    el.hidden = false;
   }
 
   function _pad(n) {
@@ -355,7 +338,7 @@ var Quiz = (function () {
     container.style.zIndex = "30";
     container.style.pointerEvents = "none";
 
-    characters.split("").forEach(function (char, idx) {
+    characters.forEach(function (char, idx) {
       var span = document.createElement("span");
       span.style.display = "inline-block";
       span.style.width = "40px";
@@ -389,6 +372,9 @@ var Quiz = (function () {
             }
           };
         })(idx),
+        onLoadCharDataError: function () {
+          _showPlainChar(inner, char, 38, getStrokeColorForIndex(idx));
+        },
       });
     });
   }
@@ -405,7 +391,7 @@ var Quiz = (function () {
     var numChars = characters.length;
     var charSize = numChars === 1 ? DRAW_SIZE : Math.floor(DRAW_SIZE / numChars);
 
-    characters.split("").forEach(function (char, idx) {
+    characters.forEach(function (char, idx) {
       var span = document.createElement("span");
       span.style.flexShrink = "0";
       span.innerHTML = GRID_SMALL_TPL;
@@ -420,6 +406,9 @@ var Quiz = (function () {
         padding: 5,
         strokeColor: getStrokeColorForIndex(idx),
         renderer: "svg",
+        onLoadCharDataError: function () {
+          _showPlainChar(span, char, charSize, getStrokeColorForIndex(idx));
+        },
       });
     });
   }
@@ -449,7 +438,7 @@ var Quiz = (function () {
     if (targetDiv) { void targetDiv.offsetWidth; }
     writer.updateDimensions({ width: DRAW_SIZE, height: DRAW_SIZE });
 
-    if (!(charIndex === 0 && _isInitialLoad)) {
+    if (!(charIndex === _nextQuizIndex(0) && _isInitialLoad)) {
       AudioManager.speak(characters[charIndex]);
     }
     _isInitialLoad = false;
@@ -482,8 +471,8 @@ var Quiz = (function () {
         if (!guard()) return;
         _nextStrokeIndex = 0;
 
-        var nextIndex = charIndex + 1;
-        if (nextIndex < characters.length) {
+        var nextIndex = _nextQuizIndex(charIndex + 1);
+        if (nextIndex !== -1) {
           if (characters.length > 1) {
             AudioManager.speak(characters[charIndex]);
             // next char TTS is handled by _startCharacterQuiz(nextIndex)
@@ -531,8 +520,8 @@ var Quiz = (function () {
 
   function start() {
     try {
-      _sessionId++;
-      var guard = _makeGuard(_sessionId);
+      window.__writingQuizSession = (window.__writingQuizSession || 0) + 1;
+      var guard = _makeGuard(window.__writingQuizSession);
 
       _writers = [];
       _thumbnailWriters = [];
@@ -545,18 +534,19 @@ var Quiz = (function () {
       _nextStrokeIndex = 0;
       _worstRating = null;
       _finished = false;
+      _failed = [];
+      var errorEl = document.getElementById("writing-error");
+      if (errorEl) errorEl.hidden = true;
 
       var characters = getCharactersToDraw();
       _persistenceKey = "quizResult-" + characters;
       debugLog("Quiz.start: characters='" + characters + "' length=" + characters.length);
-      _characters = characters.split("");
+      _characters = Array.from(characters);
 
       _updateLoadStatus(null);
 
       if (document.getElementById("back")) {
-        _buildCompletedView(characters);
-        document.getElementById("char_examples").style.display = "block";
-        document.getElementById("char_examples_blank").style.display = "none";
+        _buildCompletedView(_characters);
         var saved = Persistence.getItem(_persistenceKey);
         if (saved) {
           _totalMistakes = saved.totalMistakes;
@@ -570,21 +560,29 @@ var Quiz = (function () {
         return;
       }
 
+      // Stop TTS left over from a previous card
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+
       // Clear the previous attempt (e.g. same word re-shown after Again)
       Persistence.removeItem(_persistenceKey);
       _updateFeedback();
       _updateRatingIndicator();
 
-      document.getElementById("char_examples").style.display = "none";
-      document.getElementById("char_examples_blank").style.display = "block";
-
-      _buildThumbnails(characters);
+      _buildThumbnails(_characters);
 
       var mainDiv = document.getElementById("character-target-div");
       if (!mainDiv) return;
       mainDiv.innerHTML = "";
 
-      var writersReady = 0;
+      var writersSettled = 0; // loaded or failed
+
+      function onWriterSettled() {
+        writersSettled++;
+        debugLog("Writer settled: " + writersSettled + "/" + _characters.length);
+        if (writersSettled !== _characters.length || !guard()) return;
+        var first = _nextQuizIndex(0);
+        if (first !== -1) _startCharacterQuiz(first, guard);
+      }
 
       _characters.forEach(function (char, idx) {
         debugLog("Creating writer for char[" + idx + "]='" + char + "' (U+" + char.codePointAt(0).toString(16).toUpperCase() + ")");
@@ -639,16 +637,18 @@ var Quiz = (function () {
           padding: 5,
           renderer: "canvas",
           onLoadCharDataSuccess: function () {
-            _updateLoadStatus(true);
-            writersReady++;
-            debugLog("Writer ready: " + writersReady + "/" + _characters.length);
-            if (writersReady === _characters.length) {
-              _startCharacterQuiz(0, guard);
-            }
+            if (!guard()) return;
+            if (_failed.indexOf(true) === -1) _updateLoadStatus(true);
+            onWriterSettled();
           },
           onLoadCharDataError: function () {
+            if (!guard()) return;
             debugLog("Load error for char index " + idx);
+            _failed[idx] = true;
             _updateLoadStatus(false);
+            _revealThumbnail(idx);
+            _showLoadError();
+            onWriterSettled();
           },
         });
 
@@ -689,13 +689,13 @@ var Quiz = (function () {
     _forceAgain();
     _updateRatingIndicator();
 
-    var guard = _makeGuard(_sessionId);
+    var guard = _makeGuard(window.__writingQuizSession);
     var capturedIndex = _currentIndex;
 
     setTimeout(function () {
       if (!guard()) return;
-      var nextIndex = capturedIndex + 1;
-      if (nextIndex < _characters.length) {
+      var nextIndex = _nextQuizIndex(capturedIndex + 1);
+      if (nextIndex !== -1) {
         _startCharacterQuiz(nextIndex, guard);
       } else {
         _onQuizComplete(guard);
@@ -741,10 +741,6 @@ document.getElementById("btnGoNextCard").onclick = function () {
 
   function run() {
     try {
-      // Hide characters, zhuyin and pinyin content within Definitions
-      document.querySelectorAll(".char, .zhuyin, .pinyin").forEach(function(el) {
-        el.style.display = "none";
-      });
       Quiz.start();
     } catch (err) {
       debugLog("init run() error: " + err);
