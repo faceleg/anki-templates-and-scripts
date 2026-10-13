@@ -91,32 +91,26 @@
   src: url(_KaiTi.ttf);
 }
 
+/* Handwriting fonts: media filenames are historical (_xxx = Muyao, _yyy = Jason) */
 @font-face {
-  font-family: "MaShanZheng";
-  font-style: normal;
-  font-weight: 300;
-  src: url(_MaShanZheng-Regular.ttf);
-}
-
-@font-face {
-  font-family: "YRDZST";
-  font-style: normal;
-  font-weight: 300;
-  src: url(_YRDZSTSemibold.ttf);
-}
-
-@font-face {
-  font-family: "xxx";
+  font-family: "muyao";
   font-style: normal;
   font-weight: 300;
   src: url(_xxx.ttf);
 }
 
 @font-face {
-  font-family: "yyy";
+  font-family: "jason";
   font-style: normal;
   font-weight: 300;
   src: url(_yyy.ttf);
+}
+
+@font-face {
+  font-family: "LXGWWenKai";
+  font-style: normal;
+  font-weight: 400;
+  src: url(_LXGWWenKai-Regular.ttf);
 }
 
 /* Material Icon Font */
@@ -377,6 +371,8 @@
 }
 
 /* Character font variants */
+
+/* Current rotation font, small label in the corner of the back */
 
 /* Character meaning display for individual characters */
 .character-meaning-div-populated {

@@ -41,9 +41,7 @@
     <div id="char_deck">
         <div>{{Deck}}</div>
         <div>{{Card}}</div>
-        <div>
-            font name: <span id="font-name"></span>
-        </div>
+        <div id="font-name"></div>
         <div id="audio">{{Audio}}</div>
     </div>	
 </div>
@@ -174,30 +172,31 @@ var AudioManager = (function () {
 
 </script>
 <script>
-// Font rotation — assigns a class to Chinese character elements based on time
-// to rotate through fonts every 3 minutes, helping readers learn multiple fonts.
+// Font rotation: every 3 minutes the Chinese text switches typeface so the reader
+// learns several fonts. Class names are spelled out here so PurgeCSS keeps the
+// matching rules in character.css. #font-name (on backs) shows the current font.
+(function () {
+  var FONTS = [
+    ["heiti", "Heiti"],
+    ["songti", "Songti"],
+    ["kaiti", "KaiTi"],
+    ["heiti", "Heiti"],
+    ["songti", "Songti"],
+    ["jason", "Jason Handwriting"],
+    ["muyao", "Muyao Handwriting"],
+    ["wenkai", "LXGW WenKai"],
+  ];
+  var font = FONTS[Math.floor(Date.now() / 180000) % FONTS.length];
 
-function assignClassBasedOnTime() {
-  var charSimElement = document.getElementById("char_sim");
-  var charSimColorElement = document.getElementById("char_sim_coloured");
-  var charReadingElement = document.getElementById("char_reading");
+  ["char_sim", "char_sim_coloured", "char_reading"].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    FONTS.forEach(function (f) { el.classList.remove(f[0]); });
+    el.classList.add("char-card", font[0]);
+  });
 
-  var now = new Date();
-  var minutes = now.getMinutes();
-  var seconds = now.getSeconds();
-  var segment = Math.floor((minutes * 60 + seconds) / 180); // 3-minute segments
-
-  var classes = ["kaiti", "songti", "heiti", "mashanzheng", "yrdzst", "xxx", "yyy"];
-  var cls = classes[segment % classes.length];
-
-  if (charSimElement) charSimElement.className = "char-card " + cls;
-  if (charSimColorElement) charSimColorElement.className = "char-card " + cls;
-  if (charReadingElement) charReadingElement.className = "char-card " + cls;
-
-  var fontNameEl = document.getElementById("font-name");
-  if (fontNameEl) fontNameEl.innerHTML = cls;
-}
-
-assignClassBasedOnTime();
+  var label = document.getElementById("font-name");
+  if (label) label.textContent = font[1];
+})();
 
 </script>
