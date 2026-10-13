@@ -1,253 +1,249 @@
 #!/usr/bin/env node
 
-const fs = require('fs').promises;
-const fsSync = require('fs');
+// Usage: node scripts/anki-deploy.js [--model=NAME] [--dry-run] [--no-confirm] [--force]
+//
+// Safety (ADR-003): validates dist/ before writing, refuses to overwrite edits made
+// directly in Anki (unless --force), snapshots current Anki state first, verifies
+// after write, and records hashes of what was deployed in .deploy-state.json.
+
+const fs = require('fs');
 const path = require('path');
-const readline = require('readline');
+const crypto = require('crypto');
 const {
   checkConnection,
+  modelNames,
   modelTemplates,
   modelStyling,
   updateModelTemplates,
   updateModelStyling,
 } = require('./lib/ankiconnect');
+const { snapshotModels } = require('./lib/snapshot');
+const { paths, promptConfirm, parseCli } = require('./lib/util');
 
-/**
- * Parse CLI arguments
- * @returns {{ dryRun: boolean, noConfirm: boolean, model: string|null }}
- */
-function parseArgs() {
-  const args = process.argv.slice(2);
-  const dryRun = args.includes('--dry-run');
-  const noConfirm = args.includes('--no-confirm');
-  const modelIdx = args.indexOf('--model');
-  const model = modelIdx !== -1 && args[modelIdx + 1] ? args[modelIdx + 1] : null;
-  return { dryRun, noConfirm, model };
+const sha = (s) => crypto.createHash('sha256').update(s).digest('hex');
+
+/** Flat { "<template> / Front": sha, ..., "style.css": sha } for comparison/recording. */
+function fingerprint(templates, css) {
+  const out = { 'style.css': sha(css || '') };
+  for (const [name, { Front, Back }] of Object.entries(templates)) {
+    out[`${name} / Front`] = sha(Front || '');
+    out[`${name} / Back`] = sha(Back || '');
+  }
+  return out;
 }
 
-/**
- * Count lines in a string
- * @param {string} text
- * @returns {number}
- */
-function countLines(text) {
-  if (!text) return 0;
-  return text.split('\n').length;
+/** Restrict Anki templates to the names we manage (dist), so extra Anki templates don't count. */
+const pick = (templates, names) => Object.fromEntries(names.map((n) => [n, templates[n] || {}]));
+
+function differingKeys(a, b) {
+  return [...new Set([...Object.keys(a), ...Object.keys(b)])].filter((k) => a[k] !== b[k]);
 }
 
-/**
- * Compute a simple line-count diff summary
- * @param {string} current
- * @param {string} next
- * @returns {{ added: number, removed: number, changed: boolean }}
- */
+function loadState() {
+  try {
+    return JSON.parse(fs.readFileSync(paths.state, 'utf8'));
+  } catch {
+    return {};
+  }
+}
+
+function lineCount(text) {
+  return text ? text.split('\n').length : 0;
+}
+
 function diffStats(current, next) {
-  const currentLines = countLines(current);
-  const nextLines = countLines(next);
-  const changed = current !== next;
-  const added = Math.max(0, nextLines - currentLines);
-  const removed = Math.max(0, currentLines - nextLines);
-  return { added, removed, changed };
+  const c = lineCount(current);
+  const n = lineCount(next);
+  return { added: Math.max(0, n - c), removed: Math.max(0, c - n), changed: current !== next };
 }
 
-/**
- * Prompt user for confirmation via stdin
- * @param {string} question
- * @returns {Promise<boolean>}
- */
-function promptConfirm(question) {
-  return new Promise((resolve) => {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-    rl.question(question, (answer) => {
-      rl.close();
-      resolve(answer.trim().toLowerCase() === 'y');
-    });
+/** Read dist/<model>/ dirs. Throws on hard errors (collected into a list by caller). */
+function readDistModels(filterModel) {
+  const names = fs
+    .readdirSync(paths.dist, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && (!filterModel || e.name === filterModel))
+    .map((e) => e.name);
+
+  return names.map((modelName) => {
+    const modelDir = path.join(paths.dist, modelName);
+    const cssPath = path.join(modelDir, 'style.css');
+    const css = fs.existsSync(cssPath) ? fs.readFileSync(cssPath, 'utf8') : '';
+    const templates = {};
+    for (const file of fs.readdirSync(modelDir).filter((f) => f.endsWith('.html'))) {
+      const m = file.match(/^(.+) - (Front|Back)\.html$/);
+      if (!m) {
+        console.error(`Warning: Unexpected HTML file name: ${modelName}/${file}`);
+        continue;
+      }
+      templates[m[1]] ||= { Front: '', Back: '' };
+      templates[m[1]][m[2]] = fs.readFileSync(path.join(modelDir, file), 'utf8');
+    }
+    return { modelName, css, templates };
   });
 }
 
-/**
- * Read all model data from dist/ directory
- * @param {string} distDir
- * @param {string|null} filterModel
- * @returns {Promise<Array<{ modelName: string, css: string, templates: object }>>}
- */
-async function readDistModels(distDir, filterModel) {
-  const entries = await fs.readdir(distDir, { withFileTypes: true });
-  const modelDirs = entries
-    .filter((e) => e.isDirectory())
-    .map((e) => e.name)
-    .filter((name) => !filterModel || name === filterModel);
-
-  const models = [];
-  for (const modelName of modelDirs) {
-    const modelDir = path.join(distDir, modelName);
-
-    // Read style.css
-    const cssPath = path.join(modelDir, 'style.css');
-    let css = '';
-    try {
-      css = await fs.readFile(cssPath, 'utf8');
-    } catch {
-      console.error(`Warning: No style.css found in dist/${modelName}`);
-    }
-
-    // Read all *.html files and group into templates
-    const htmlEntries = await fs.readdir(modelDir, { withFileTypes: true });
-    const htmlFiles = htmlEntries.filter((e) => e.isFile() && e.name.endsWith('.html'));
-
-    const templates = {};
-    for (const htmlFile of htmlFiles) {
-      // Match pattern: "<TemplateName> - Front.html" or "<TemplateName> - Back.html"
-      const match = htmlFile.name.match(/^(.+) - (Front|Back)\.html$/);
-      if (!match) {
-        console.error(`Warning: Unexpected HTML file name: ${htmlFile.name}`);
-        continue;
-      }
-      const [, templateName, side] = match;
-      if (!templates[templateName]) {
-        templates[templateName] = { Front: '', Back: '' };
-      }
-      const content = await fs.readFile(path.join(modelDir, htmlFile.name), 'utf8');
-      templates[templateName][side] = content;
-    }
-
-    models.push({ modelName, css, templates });
-  }
-
-  return models;
+function fail(msg) {
+  console.error(msg);
+  process.exit(1);
 }
 
-/**
- * Main deploy function
- */
 async function deploy() {
-  const { dryRun, noConfirm, model: filterModel } = parseArgs();
+  const { values } = parseCli({
+    model: { type: 'string' },
+    'dry-run': { type: 'boolean' },
+    'no-confirm': { type: 'boolean' },
+    force: { type: 'boolean' },
+  });
+  const { 'dry-run': dryRun, 'no-confirm': noConfirm, force, model: filterModel } = values;
 
-  const distDir = path.join(process.cwd(), 'dist');
-  if (!fsSync.existsSync(distDir)) {
-    console.error("dist/ directory not found. Run 'npm run build' first.");
-    process.exit(1);
-  }
+  if (!fs.existsSync(paths.dist)) fail("dist/ directory not found. Run 'npm run build' first.");
 
-  // Connect to AnkiConnect
   try {
     await checkConnection();
   } catch (err) {
-    console.error(err.message);
-    process.exit(1);
+    fail(err.message);
   }
 
-  // Read dist/ models
-  let distModels;
-  try {
-    distModels = await readDistModels(distDir, filterModel);
-  } catch (err) {
-    console.error('Failed to read dist/ directory:', err.message);
-    process.exit(1);
-  }
-
+  const ankiModels = await modelNames();
+  const distModels = readDistModels(filterModel);
   if (distModels.length === 0) {
-    if (filterModel) {
-      console.error(`No model directory found for: ${filterModel}`);
-    } else {
-      console.error('No model directories found in dist/');
-    }
-    process.exit(1);
+    fail(filterModel ? `No model directory found in dist/ for: ${filterModel}` : 'No model directories found in dist/');
   }
 
-  // Fetch current Anki state and compute diffs
-  const modelDiffs = [];
+  // ---- Hard validation (nothing is written if any of this fails) ----
+  const errors = [];
+  const current = {};
   for (const { modelName, css, templates } of distModels) {
-    let currentTemplates;
-    let currentStyling;
-    try {
-      currentTemplates = await modelTemplates(modelName);
-      currentStyling = await modelStyling(modelName);
-    } catch (err) {
-      console.error(`Failed to fetch current state for model "${modelName}": ${err.message}`);
-      process.exit(1);
+    if (!ankiModels.includes(modelName)) {
+      errors.push(`Model "${modelName}" does not exist in Anki. Valid models: ${ankiModels.join(', ')}`);
+      continue;
     }
-
-    const currentCss = currentStyling.css || '';
-    const cssDiff = diffStats(currentCss, css);
-
-    const templateDiffs = {};
-    let hasTemplateChanges = false;
-    for (const [templateName, { Front, Back }] of Object.entries(templates)) {
-      const currentTemplate = currentTemplates[templateName] || {};
-      const frontDiff = diffStats(currentTemplate.Front || '', Front);
-      const backDiff = diffStats(currentTemplate.Back || '', Back);
-      templateDiffs[templateName] = { frontDiff, backDiff };
-      if (frontDiff.changed || backDiff.changed) {
-        hasTemplateChanges = true;
+    if (!css.trim()) errors.push(`${modelName}: dist style.css is missing or empty (refusing to send empty CSS)`);
+    const ankiTemplates = await modelTemplates(modelName);
+    current[modelName] = { templates: ankiTemplates, css: (await modelStyling(modelName)).css || '' };
+    const valid = Object.keys(ankiTemplates);
+    if (Object.keys(templates).length === 0) errors.push(`${modelName}: no templates found in dist`);
+    for (const [name, { Front, Back }] of Object.entries(templates)) {
+      if (!valid.includes(name)) {
+        errors.push(`${modelName}: template "${name}" does not exist in Anki. Valid names: ${valid.join(', ')}`);
+        continue;
       }
+      if (!Front.trim()) errors.push(`${modelName}: template "${name}" has an empty Front`);
+      if (!Back.trim()) errors.push(`${modelName}: template "${name}" has an empty Back`);
     }
+  }
+  if (errors.length) fail(`Refusing to deploy:\n  - ${errors.join('\n  - ')}`);
 
-    const hasChanges = cssDiff.changed || hasTemplateChanges;
-    modelDiffs.push({ modelName, css, templates, cssDiff, templateDiffs, hasChanges });
+  // ---- Detect edits made directly in Anki since last deploy ----
+  const state = loadState();
+  let drifted = false;
+  for (const { modelName, templates } of distModels) {
+    const cur = current[modelName];
+    const recorded = state[modelName];
+    if (!recorded) {
+      console.log(`Note: no deploy record for "${modelName}" (first run); skipping Anki-edit check.`);
+      continue;
+    }
+    const diff = differingKeys(recorded, fingerprint(pick(cur.templates, Object.keys(templates)), cur.css));
+    if (diff.length) {
+      drifted = true;
+      console.error(`\nAnki content for "${modelName}" differs from what was last deployed:`);
+      for (const k of diff) console.error(`  - ${k}`);
+    }
+  }
+  if (drifted) {
+    if (!force) {
+      console.error(
+        '\nThese were edited in Anki since the last deploy. Run `npm run anki:pull` to inspect them\n' +
+          '(written to pulled/), then re-run with --force to overwrite.'
+      );
+      if (!dryRun) process.exit(1);
+    } else {
+      console.log('\n--force given: overwriting Anki-side edits.');
+    }
   }
 
-  const changedModels = modelDiffs.filter((m) => m.hasChanges);
-  const unchangedCount = modelDiffs.length - changedModels.length;
+  // ---- Diff summary ----
+  const changed = [];
+  for (const m of distModels) {
+    const cur = current[m.modelName];
+    const cssDiff = diffStats(cur.css, m.css);
+    const tDiffs = {};
+    let any = cssDiff.changed;
+    for (const [name, { Front, Back }] of Object.entries(m.templates)) {
+      const f = diffStats(cur.templates[name].Front || '', Front);
+      const b = diffStats(cur.templates[name].Back || '', Back);
+      tDiffs[name] = { f, b };
+      any = any || f.changed || b.changed;
+    }
+    if (any) changed.push({ ...m, cssDiff, tDiffs });
+  }
 
-  // Print summary
-  console.log(`\n${changedModels.length} model(s) to deploy, ${unchangedCount} unchanged\n`);
-  for (const { modelName, cssDiff, templateDiffs } of changedModels) {
+  console.log(`\n${changed.length} model(s) to deploy, ${distModels.length - changed.length} unchanged\n`);
+  for (const { modelName, cssDiff, tDiffs } of changed) {
     console.log(`  ${modelName}`);
-    if (cssDiff.changed) {
-      console.log(`    CSS: +${cssDiff.added} lines / -${cssDiff.removed} lines`);
-    }
-    for (const [templateName, { frontDiff, backDiff }] of Object.entries(templateDiffs)) {
-      if (frontDiff.changed) {
-        console.log(
-          `    ${templateName} (Front): +${frontDiff.added} lines / -${frontDiff.removed} lines`
-        );
-      }
-      if (backDiff.changed) {
-        console.log(
-          `    ${templateName} (Back): +${backDiff.added} lines / -${backDiff.removed} lines`
-        );
-      }
+    if (cssDiff.changed) console.log(`    CSS: +${cssDiff.added} lines / -${cssDiff.removed} lines`);
+    for (const [name, { f, b }] of Object.entries(tDiffs)) {
+      if (f.changed) console.log(`    ${name} (Front): +${f.added} lines / -${f.removed} lines`);
+      if (b.changed) console.log(`    ${name} (Back): +${b.added} lines / -${b.removed} lines`);
     }
   }
 
-  if (dryRun) {
-    console.log('\nDry run complete. No changes made.');
-    return;
-  }
+  if (dryRun) return console.log('\nDry run complete. No changes made.');
 
-  if (changedModels.length === 0) {
-    console.log('Nothing to deploy.');
-    return;
-  }
-
-  // Confirmation prompt
-  if (!noConfirm) {
-    const confirmed = await promptConfirm(`\nDeploy ${changedModels.length} model(s)? (y/N) `);
-    if (!confirmed) {
-      console.log('Aborted.');
-      return;
+  // Unchanged models already match Anki: record them so future edits are detected.
+  const newState = { ...state };
+  for (const m of distModels) {
+    if (!changed.some((c) => c.modelName === m.modelName)) {
+      newState[m.modelName] = fingerprint(m.templates, m.css);
     }
   }
+  const saveState = () => fs.writeFileSync(paths.state, JSON.stringify(newState, null, 2));
 
-  // Deploy each changed model
-  let deployedCount = 0;
-  for (const { modelName, css, templates } of changedModels) {
+  if (changed.length === 0) {
+    saveState();
+    return console.log('Nothing to deploy.');
+  }
+
+  if (!noConfirm && !(await promptConfirm(`\nDeploy ${changed.length} model(s)? (y/N) `))) {
+    return console.log('Aborted.');
+  }
+
+  // ---- Backup, write, verify ----
+  const backup = await snapshotModels(changed.map((m) => m.modelName));
+  const rollbackCmd = `npm run anki:rollback -- backups/${backup.name}`;
+  console.log(`Backup saved to backups/${backup.name}`);
+
+  let deployed = 0;
+  for (const { modelName, css, templates } of changed) {
     try {
       await updateModelTemplates(modelName, templates);
       await updateModelStyling(modelName, css);
-      console.log(`✓ Deployed ${modelName}`);
-      deployedCount++;
+
+      const after = await modelTemplates(modelName);
+      const afterCss = (await modelStyling(modelName)).css || '';
+      const sent = fingerprint(templates, css);
+      const got = fingerprint(pick(after, Object.keys(templates)), afterCss);
+      const bad = differingKeys(sent, got);
+      if (bad.length) {
+        throw new Error(`verification failed, Anki content differs from what was sent: ${bad.join(', ')}`);
+      }
+      newState[modelName] = got;
+      console.log(`✓ Deployed and verified ${modelName}`);
+      deployed++;
     } catch (err) {
-      console.error(`Failed to deploy ${modelName}: ${err.message}`);
+      saveState();
+      console.error(`\nFailed on ${modelName}: ${err.message}`);
+      console.error(`${deployed} model(s) deployed before the failure. To restore the previous state, run:\n  ${rollbackCmd}`);
       process.exit(1);
     }
   }
 
-  console.log(`\nDone. ${deployedCount} model(s) deployed.`);
+  saveState();
+  console.log(`\nDone. ${deployed} model(s) deployed. Rollback if needed: ${rollbackCmd}`);
 }
 
-deploy();
+deploy().catch((err) => {
+  console.error(`Deploy failed: ${err.message}`);
+  process.exit(1);
+});
