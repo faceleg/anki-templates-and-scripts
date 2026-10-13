@@ -41,7 +41,7 @@ async function processCSSFile(content) {
   for (const match of matches) {
     const [fullMatch, injectPath] = match;
     const injected = await resolveInjectCSS(fullMatch, injectPath.trim());
-    result = result.replace(fullMatch, injected);
+    result = result.replace(fullMatch, () => injected);
   }
   return result;
 }
@@ -57,7 +57,7 @@ async function processHTMLFile(content) {
   for (const match of matches) {
     const [fullMatch, injectPath] = match;
     const injected = await resolveInjectHTML(fullMatch, injectPath.trim());
-    result = result.replace(fullMatch, injected);
+    result = result.replace(fullMatch, () => injected);
   }
   return result;
 }
@@ -80,39 +80,29 @@ async function findHTMLFiles(dir) {
   return files;
 }
 
-/**
- * Find all CSS files at the top level of a model directory.
- * (style.css, quiz.css, etc. — but not files in subdirectories,
- *  as those are only injected, not standalone templates)
- */
-async function findCSSFiles(modelDir) {
-  const entries = await fs.readdir(modelDir, { withFileTypes: true });
-  return entries
-    .filter((e) => e.isFile() && e.name.endsWith(".css"))
-    .map((e) => path.join(modelDir, e.name));
-}
-
 async function buildModel(modelName) {
   const modelDir = path.join(cardTemplatesDir, modelName);
   const outDir = path.join(distDir, modelName);
 
   await fs.mkdir(outDir, { recursive: true });
 
-  // Process CSS files
-  const cssFiles = await findCSSFiles(modelDir);
-  for (const cssFile of cssFiles) {
-    const content = await fs.readFile(cssFile, "utf8");
-    const processed = await processCSSFile(content);
-    const outPath = path.join(outDir, path.basename(cssFile));
-    await fs.writeFile(outPath, processed, "utf8");
-  }
+  // Only style.css is emitted; other CSS (e.g. Grammar's quiz.css) is injected into it.
+  const cssFile = path.join(modelDir, "style.css");
+  const content = await fs.readFile(cssFile, "utf8");
+  await fs.writeFile(path.join(outDir, "style.css"), await processCSSFile(content), "utf8");
 
   // Process HTML files (may be in subdirectories)
   const htmlFiles = await findHTMLFiles(modelDir);
+  const seen = new Set();
   for (const htmlFile of htmlFiles) {
+    const name = path.basename(htmlFile);
+    if (seen.has(name)) {
+      throw new Error(`Duplicate output filename "${name}" in model "${modelName}"`);
+    }
+    seen.add(name);
     const content = await fs.readFile(htmlFile, "utf8");
     const processed = await processHTMLFile(content);
-    const outPath = path.join(outDir, path.basename(htmlFile));
+    const outPath = path.join(outDir, name);
     await fs.writeFile(outPath, processed, "utf8");
   }
 }
@@ -176,7 +166,11 @@ async function main() {
   console.log(`Built ${modelDirs.length} models → dist/`);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
+
+module.exports = { processCSSFile, cardTemplatesDir, distDir };

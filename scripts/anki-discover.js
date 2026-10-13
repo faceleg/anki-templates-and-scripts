@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
-const path = require('path');
 const { checkConnection, modelNames } = require('./lib/ankiconnect');
+const { paths, parseCli } = require('./lib/util');
 
 /**
  * Get all directories in the Card Templates directory
  * @returns {string[]} Array of directory names
  */
 function getRepoModels() {
-  const cardTemplatesDir = path.join(process.cwd(), 'Card Templates');
+  const cardTemplatesDir = paths.cardTemplates;
   try {
     if (!fs.existsSync(cardTemplatesDir)) {
       return [];
@@ -43,6 +43,7 @@ function formatRow(name, inAnki, inRepo, nameWidth) {
  * Main discover function
  */
 async function discover() {
+  parseCli({});
   try {
     // Step 1: Connect to AnkiConnect
     console.log('Connecting to AnkiConnect...\n');
