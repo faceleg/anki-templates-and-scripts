@@ -249,16 +249,9 @@
   font-family: LXGWWenKai, KaiTi;
 }
 
-/* Current rotation font, small label in the corner of the back */
-#font-name {
-  position: absolute;
-  top: 6px;
-  right: 10px;
-  font-size: 11px;
-  font-style: normal;
-  color: var(--text2);
-  opacity: 0.8;
-  pointer-events: none;
+/* Current rotation font: sits in #char_deck above the play button, same style as deck/card */
+#font-name:empty {
+  display: none;
 }
 
 /* Character meaning display for individual characters */
