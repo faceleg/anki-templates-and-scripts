@@ -55,3 +55,15 @@ img {
 .button-wrapper {
   margin-bottom: 20px;
 }
+
+/* Near-synonym contrast note (Contrast field), shown with the meaning */
+.contrast {
+  max-width: 400px;
+  margin: 8px auto;
+  padding: 6px 10px;
+  border-left: 3px solid var(--text2);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  text-align: left;
+  opacity: 0.9;
+}
