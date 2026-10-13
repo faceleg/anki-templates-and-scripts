@@ -15,23 +15,34 @@ npm run lint        # ESLint (HTML files via @html-eslint)
 npm run format      # Prettier (auto-format all files)
 ```
 
-### Build
+### Build & check
 ```bash
-npm run build                # Inject shared modules + run PurgeCSS → dist/
-npm run build:css:mandarin   # PurgeCSS only (strips unused CSS in dist/)
+npm run build   # Inject shared modules + per-model PurgeCSS → dist/
+npm run check   # Rebuild; fail if committed dist/ is stale or tone classes were purged
+npm test        # Deploy/pull/rollback tests against a stub AnkiConnect (no live Anki)
 ```
+
+PurgeCSS only sees template HTML. Classes that live in **note field HTML** (tone
+colours `t0-5`/`tone*`/`char-tone*`, `char_example*`, `pinyin`, `zhuyin`, …) must be
+in the safelist in `scripts/build.js`, or they are silently stripped.
 
 ### AnkiConnect Workflow (requires Anki open with AnkiConnect add-on)
 ```bash
 npm run anki:discover    # Compare Anki note types vs repo
-npm run anki:backup      # Snapshot all templates to backups/<timestamp>/
-npm run anki:pull        # Pull templates from Anki into Card Templates/
-npm run anki:deploy      # Deploy dist/ to Anki (shows diff + asks confirmation)
+npm run anki:backup      # Snapshot all note types to backups/<YYYYMMDD-HHMMSS>/ (gitignored)
+npm run anki:pull        # Pull Anki's templates into pulled/<ts>/ for comparison (never touches source)
+npm run anki:deploy      # Deploy dist/ to Anki (flags: --model=NAME --dry-run --no-confirm --force)
 npm run anki:deploy:dry  # Preview what would be deployed
-npm run anki:rollback    # Restore from backup (usage: node scripts/anki-rollback.js backups/<timestamp>)
+npm run anki:ship        # build + deploy
+npm run anki:rollback -- backups/<ts> [--model=NAME] [--restore-source]
 ```
 
-**Developer workflow:** Edit source → `npm run build` → `npm run anki:deploy`
+**Developer workflow:** Edit source → `npm run check` → `npm run anki:ship` → sync AnkiMobile.
+
+Deploy refuses (before writing anything) on missing/empty CSS, template names unknown to
+Anki, empty Front/Back, or templates edited inside Anki since the last deploy (tracked in
+gitignored `.deploy-state.json`; override with `--force`). It snapshots current Anki state
+to `backups/` first, verifies after writing, and prints the rollback command on failure.
 
 ## Repository Structure
 
@@ -39,20 +50,18 @@ npm run anki:rollback    # Restore from backup (usage: node scripts/anki-rollbac
 shared/
   css/
     base.css          — :root vars, .card light/dark modes
-    fonts.css         — @font-face (KaiTi, Material Icons, handwriting fonts)
-    layout.css        — main, header, fieldset, select, input, responsive
-    components.css    — .icon, .sidebar, .more-info-sidebar, buttons
+    fonts.css         — @font-face (KaiTi, LXGW WenKai, Jason/Muyao handwriting, Material Icons)
+    components.css    — .icon, dictionary-links panel, buttons
     tone-colors.css   — .tone1-.tone5, .t1-.t5, .char-tone1-.char-tone4
-    character.css     — .char-card, HanziWriter divs, #character-target-div
+    character.css     — .char-card, font-rotation classes, HanziWriter divs
     typography.css    — .pinyin, .zhuyin, .meaning, hr, img
-    pinyin-ruby.css   — ruby/rt rules (Grammar + Sentences only)
   js/
-    persistence.js    — anki-persistence library (SimonLammer)
-    preferences.js    — sidebar, setPrefs, initSwitchPrefs (reads window.keyPrefix + window.preferenceDefaults)
+    persistence.js    — anki-persistence (Writing quiz passes its rating front → back)
     audio.js          — AudioManager, playAudio()
-    pinyin.js         — decodePinyin(), TONE_COLORS, recolorCharacters()
+    pinyin.js         — decodePinyin(), TONE_COLORS (night-mode aware) — the only copy
+    strip-lrm.js      — removes U+200E from rendered text nodes (keeps tone spans)
     debug.js          — DEBUG=false, window.onerror, debugLog()
-    font-rotation.js  — assignClassBasedOnTime() for font variety
+    font-rotation.js  — 3-minute font rotation + #font-name label on backs
 
 Card Templates/           — source templates (edit these)
   Basic - Mandarin/
@@ -63,16 +72,21 @@ Card Templates/           — source templates (edit these)
   CGW-ValidExample/
 
 dist/                 — built output (committed to git; do not edit directly)
-backups/              — committed to git; timestamped backup directories
+backups/              — gitignored, local only; Anki snapshots + git commit id
+pulled/               — gitignored; output of anki:pull
 scripts/
-  lib/ankiconnect.js  — AnkiConnect HTTP client
-  anki-backup.js      — backup Anki state + repo snapshot
+  lib/ankiconnect.js  — AnkiConnect HTTP client (ANKICONNECT_URL override)
+  lib/snapshot.js     — shared backup/snapshot logic
+  lib/util.js         — arg parsing (util.parseArgs strict), prompts, paths
+  check.js            — npm run check
+  test/deploy.test.js — npm test
+  anki-backup.js      — backup Anki state
   anki-discover.js    — compare Anki vs repo
   anki-pull.js        — pull templates from Anki
   anki-deploy.js      — deploy dist/ to Anki
   anki-rollback.js    — restore from backup
   build.js            — inject shared modules → dist/
-  normalise-mp3-files.sh
+  normalise-mp3-files.sh — needs `brew install aacgain`
 ```
 
 ## Shared Module @inject Syntax
@@ -87,23 +101,26 @@ Templates use inject comments to reference shared files. The build script resolv
 
 **In HTML templates:**
 ```html
-<script>
-window.keyPrefix = "reading";
-window.preferenceDefaults = { ... };
-</script>
-<!-- @inject: shared/js/persistence.js -->
-<!-- @inject: shared/js/preferences.js -->
+<!-- @inject: shared/js/pinyin.js -->
+<!-- @inject: shared/js/font-rotation.js -->
 ```
 
-The per-template `window.keyPrefix` and `window.preferenceDefaults` config **must appear before** the inject comments — `preferences.js` reads these at runtime.
+## Template Script Rules
 
-## Pinyin Display Approach
+The user reviews only on **AnkiMobile (iOS)**, which may reuse one page across cards, so
+template scripts re-run in the same global scope:
+- Wrap every inline script in an IIFE; no top-level `const`/`let`/`var`. Export only what
+  `onclick` handlers need, explicitly on `window`.
+- Timers must check a session counter kept on `window` (see Writing quiz), not one inside
+  a per-card closure.
+- Hide answers with CSS from first paint; JS only reveals. Never rely on `DOMContentLoaded`
+  or `load` (they don't fire again on a reused page).
+- Pinyin is deliberately hidden on Basic backs (user choice); Simplified only.
 
-Two approaches coexist (intentionally not unified):
-- **Grammar + Sentences**: HTML `<ruby>`/`<rt>` tags styled via `shared/css/pinyin-ruby.css`
-- **Basic - Mandarin + From Subtitles**: div+JS colorization via `shared/js/pinyin.js`
+## Pinyin Display
 
-Unifying these would require changing note field storage format — out of scope.
+Tone colouring goes through `shared/js/pinyin.js` everywhere. Subtitles backs also render
+`<ruby>` pinyin from the note field (styled inline in that model's CSS).
 
 ## Commit Style
 
@@ -142,14 +159,13 @@ Examples:
 ### Bad deploy — Anki cards look wrong
 ```bash
 ls backups/
-node scripts/anki-rollback.js backups/<timestamp>
+npm run anki:rollback -- backups/<YYYYMMDD-HHMMSS>   # only this repo's note types
 # Verify in Anki, fix and redeploy
-npm run build && npm run anki:deploy
+npm run anki:ship
 ```
 
 ### Source files corrupted
 ```bash
-node scripts/anki-rollback.js backups/<timestamp> --restore-source
-git diff
-npm run build && npm run anki:deploy
+npm run anki:rollback -- backups/<ts> --restore-source   # git checkout of the backed-up commit; refuses if dirty
+npm run anki:ship
 ```
