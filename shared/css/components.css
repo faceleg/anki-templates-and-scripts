@@ -28,19 +28,6 @@
   background-color: var(--icon-button-background-focus);
 }
 
-.sidebar {
-  height: 100%;
-  width: 0;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  background-color: var(--surface1);
-  overflow-x: hidden;
-  transition: 0.5s;
-  -webkit-tap-highlight-color: transparent;
-}
-
 .more-info-sidebar {
   height: 100%;
   width: 0;
@@ -52,6 +39,10 @@
   overflow-x: hidden;
   transition: 0.5s;
   -webkit-tap-highlight-color: transparent;
+}
+
+.more-info-sidebar.open {
+  width: 160px;
 }
 
 .more-info-sidebar a {
@@ -67,10 +58,6 @@
 .more-info-sidebar img {
   width: 28px;
   margin-right: 6px;
-}
-
-.more-info-btn {
-  text-align: center;
 }
 
 .brand-title {
@@ -106,15 +93,6 @@
   line-height: 1.8;
 }
 
-.practice-ch {
-  border-radius: 6px;
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.12),
-    0 1px 2px rgba(0, 0, 0, 0.24);
-  transition: all 0.3s ease;
-  padding: 3px;
-}
-
 .header {
   color: var(--header-color);
 }
@@ -141,4 +119,13 @@
   font-size: 30px;
   font-weight: bold;
   color: var(--simplified-color);
+}
+
+.fieldset-item {
+  background: var(--surface3);
+  transition: background 0.2s ease;
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  text-align: left;
 }

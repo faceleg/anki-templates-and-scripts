@@ -161,7 +161,7 @@ function applyColorization() {
   var decodedTones = decodePinyin(pinyinElement.textContent);
   recolorPinyin(pinyinElement, decodedTones);
 
-  ["char_sim", "char_sim_coloured", "char_trad", "chinese"].forEach(function (id) {
+  ["char_sim", "char_sim_coloured", "chinese"].forEach(function (id) {
     var el = document.getElementById(id);
     if (el) recolorCharacters(el, decodedTones);
   });

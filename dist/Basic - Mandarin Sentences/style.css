@@ -141,8 +141,6 @@
   font-family: "AR PL KaitiM GB", "AR PL KaitiM Big5";
 }
 
-/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
-
 /* Material Icon Button */
 
 .tone1,
@@ -332,4 +330,10 @@ hr {
 .char,
 #char_sim {
   font-size: 40px;
+}
+
+/* Simplified only: hide the traditional form in Definitions (.sep + span) */
+.char .sep,
+.char .sep + span {
+  display: none;
 }

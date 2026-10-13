@@ -1,6 +1,5 @@
 /* @inject: shared/css/base.css */
 /* @inject: shared/css/fonts.css */
-/* @inject: shared/css/layout.css */
 /* @inject: shared/css/components.css */
 /* @inject: shared/css/tone-colors.css */
 /* @inject: shared/css/character.css */
@@ -34,11 +33,6 @@
   padding-right: 10px;
   font-size: 16px;
   vertical-align: middle;
-}
-
-#char_pinyin {
-  height: 36px;
-  line-height: 36px;
 }
 
 .char_example,
@@ -107,8 +101,14 @@
   display: block;
 }
 
-#char_zhuyin,
-#char_trad {
+/* Fixed display (Simplified only, no pinyin/zhuyin). #char_pinyin stays in the
+   DOM as the tone source for pinyin.js. In Definitions, .sep + span is the
+   traditional form: <span id="char-sim-id"/><span class="sep">〔</span><span id="char-trad-id"/>… */
+#char_pinyin,
+.pinyin,
+.zhuyin,
+.char .sep,
+.char .sep + span {
   display: none;
 }
 
