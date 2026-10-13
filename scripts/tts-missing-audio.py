@@ -57,7 +57,12 @@ async def main():
             print("  would voice", word, "->", voice)
             continue
         name = f"edgetts-{hashlib.sha1((voice + word).encode()).hexdigest()[:16]}.mp3"
-        ac("storeMediaFile", filename=name, data=base64.b64encode(await speak(word, voice)).decode())
+        try:
+            audio = await speak(word, voice)
+        except RuntimeError as e:  # keep the tag so a re-run retries it
+            print("  skipped:", e)
+            continue
+        ac("storeMediaFile", filename=name, data=base64.b64encode(audio).decode())
         ac("updateNoteFields", note={"id": n["noteId"], "fields": {"Audio": f"[sound:{name}]"}})
         ac("removeTags", notes=[n["noteId"]], tags="needs-audio")
         done += 1
