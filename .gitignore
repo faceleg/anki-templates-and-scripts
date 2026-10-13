@@ -129,3 +129,8 @@ out
 .pnp.*
 .DS_Store
 .worktrees/
+
+# Local-only artefacts
+pulled/
+backups/
+.deploy-state.json

@@ -1,206 +1,131 @@
 #!/usr/bin/env node
 
-const fs = require('fs').promises;
-const fsSync = require('fs');
+// Usage: node scripts/anki-rollback.js <backup-path> [--model=NAME] [--no-confirm] [--restore-source]
+//
+// Restores templates/CSS from a backup into Anki. By default only note types that exist
+// in dist/ (this repo's note types) are restored; --model restores a single one.
+// --restore-source also runs `git checkout <manifest.gitCommit> -- "Card Templates" shared`
+// (refused if those paths have uncommitted changes).
+
+const fs = require('fs');
 const path = require('path');
-const readline = require('readline');
-const { execSync } = require('child_process');
-const { checkConnection, updateModelTemplates, updateModelStyling } = require('./lib/ankiconnect');
+const { execFileSync } = require('child_process');
+const {
+  checkConnection,
+  modelNames,
+  updateModelTemplates,
+  updateModelStyling,
+} = require('./lib/ankiconnect');
+const { ROOT, paths, promptConfirm, parseCli, git } = require('./lib/util');
 
-/**
- * Parse CLI arguments
- * @returns {{ backupPath: string|null, restoreSource: boolean }}
- */
-function parseArgs() {
-  const args = process.argv.slice(2);
-  const restoreSource = args.includes('--restore-source');
-  const positional = args.filter((a) => !a.startsWith('--'));
-  const backupPath = positional[0] || null;
-  return { backupPath, restoreSource };
+const SOURCE_PATHS = ['Card Templates', 'shared'];
+
+function fail(msg) {
+  console.error(msg);
+  process.exit(1);
 }
 
-/**
- * Prompt user for confirmation via stdin
- * @param {string} question
- * @returns {Promise<boolean>}
- */
-function promptConfirm(question) {
-  return new Promise((resolve) => {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-    rl.question(question, (answer) => {
-      rl.close();
-      resolve(answer.trim().toLowerCase() === 'y');
-    });
-  });
-}
-
-/**
- * Check for uncommitted git changes
- * @returns {boolean} True if there are uncommitted changes
- */
-function hasUncommittedChanges() {
-  try {
-    const output = execSync('git status --porcelain', { encoding: 'utf8' });
-    return output.trim().length > 0;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Main rollback function
- */
 async function rollback() {
-  const { backupPath, restoreSource } = parseArgs();
-
-  // Validate backup path argument
-  if (!backupPath) {
-    console.error('Usage: node scripts/anki-rollback.js <backup-path> [--restore-source]');
-    console.error('Example: node scripts/anki-rollback.js backups/20260311-143022');
-    process.exit(1);
+  const { values, positionals } = parseCli(
+    {
+      model: { type: 'string' },
+      'no-confirm': { type: 'boolean' },
+      'restore-source': { type: 'boolean' },
+    },
+    true
+  );
+  if (positionals.length !== 1) {
+    fail(
+      'Usage: node scripts/anki-rollback.js <backup-path> [--model=NAME] [--no-confirm] [--restore-source]\n' +
+        'Example: node scripts/anki-rollback.js backups/20260311-143022'
+    );
   }
 
-  // Resolve backup path (support both absolute and relative)
-  const resolvedBackupPath = path.isAbsolute(backupPath)
-    ? backupPath
-    : path.join(process.cwd(), backupPath);
-
-  // Validate backup path exists
-  if (!fsSync.existsSync(resolvedBackupPath)) {
-    console.error(`Backup path does not exist: ${resolvedBackupPath}`);
-    process.exit(1);
-  }
-
-  // Read manifest
-  const manifestPath = path.join(resolvedBackupPath, 'manifest.json');
+  const backupDir = path.resolve(ROOT, positionals[0]);
   let manifest;
   try {
-    const manifestContent = await fs.readFile(manifestPath, 'utf8');
-    manifest = JSON.parse(manifestContent);
+    manifest = JSON.parse(fs.readFileSync(path.join(backupDir, 'manifest.json'), 'utf8'));
   } catch (err) {
-    console.error(`Failed to read manifest.json: ${err.message}`);
-    process.exit(1);
+    fail(`Failed to read manifest.json in ${backupDir}: ${err.message}`);
   }
 
-  const { timestamp, models, gitCommit } = manifest;
-
-  // Print what will be restored
-  console.log(`\nRestoring backup from ${timestamp}`);
-  console.log(`Models: ${models.join(', ')}`);
-  console.log(`Git commit: ${gitCommit}`);
-  if (restoreSource) {
-    console.log('\nWarning: --restore-source will overwrite source files in working directory.');
-  }
-
-  // Check for uncommitted git changes if restoring source
-  if (restoreSource) {
-    if (hasUncommittedChanges()) {
-      console.log(
-        '\nWarning: You have uncommitted git changes. Proceeding will overwrite working directory files.'
-      );
+  // Which models: dist/ note types (or one via --model), limited to what the backup holds.
+  let targets;
+  if (values.model) {
+    if (!manifest.models.includes(values.model)) {
+      fail(`Model "${values.model}" is not in this backup. Backup has: ${manifest.models.join(', ')}`);
     }
+    targets = [values.model];
+  } else {
+    const distNames = fs.existsSync(paths.dist)
+      ? fs.readdirSync(paths.dist, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name)
+      : [];
+    targets = manifest.models.filter((m) => distNames.includes(m));
+    if (targets.length === 0) fail('No models in this backup match dist/. Use --model=NAME to pick one.');
   }
 
-  // Prompt for confirmation
-  const confirmed = await promptConfirm('\nProceed with rollback? (y/N) ');
-  if (!confirmed) {
-    console.log('Aborted.');
-    return;
-  }
-
-  // Connect to AnkiConnect
+  // ---- Pre-checks (nothing is written until all pass) ----
   try {
     await checkConnection();
   } catch (err) {
-    console.error(err.message);
-    process.exit(1);
+    fail(err.message);
   }
+  const ankiModels = await modelNames();
+  const missing = targets.filter((m) => !ankiModels.includes(m));
+  if (missing.length) fail(`Model(s) not found in Anki: ${missing.join(', ')}. Nothing was written.`);
 
-  // Restore each model
-  for (const modelName of models) {
-    const modelDir = path.join(resolvedBackupPath, modelName);
-
-    // Read templates
-    const templatesPath = path.join(modelDir, 'templates.json');
+  const loaded = targets.map((modelName) => {
+    const dir = path.join(backupDir, modelName);
     let templates;
     try {
-      const templatesContent = await fs.readFile(templatesPath, 'utf8');
-      templates = JSON.parse(templatesContent);
+      templates = JSON.parse(fs.readFileSync(path.join(dir, 'templates.json'), 'utf8'));
     } catch (err) {
-      console.error(`Failed to read templates for "${modelName}": ${err.message}`);
-      process.exit(1);
+      fail(`Failed to read templates.json for "${modelName}": ${err.message}`);
     }
+    const cssPath = path.join(dir, 'style.css');
+    return { modelName, templates, css: fs.existsSync(cssPath) ? fs.readFileSync(cssPath, 'utf8') : null };
+  });
 
-    // Read style.css (optional — might be missing if backup was partial)
-    let css = '';
-    const stylePath = path.join(modelDir, 'style.css');
-    if (fsSync.existsSync(stylePath)) {
-      try {
-        css = await fs.readFile(stylePath, 'utf8');
-      } catch (err) {
-        console.error(`Failed to read style.css for "${modelName}": ${err.message}`);
-        process.exit(1);
-      }
-    } else {
-      console.error(`Warning: No style.css found for "${modelName}" in backup (skipping CSS restore)`);
-    }
+  if (values['restore-source']) {
+    if (!manifest.gitCommit || manifest.gitCommit === 'unknown') fail('Backup has no gitCommit; cannot restore source.');
+    const dirty = git(['status', '--porcelain', '--', ...SOURCE_PATHS]).trim();
+    if (dirty) fail(`Refusing --restore-source: uncommitted changes in ${SOURCE_PATHS.join(', ')}:\n${dirty}`);
+  }
 
-    // Update Anki
+  console.log(`\nRestoring backup ${manifest.timestamp} (git ${manifest.gitCommit})`);
+  console.log(`Models: ${targets.join(', ')}`);
+  if (values['restore-source']) console.log(`Will also: git checkout ${manifest.gitCommit} -- ${SOURCE_PATHS.join(' ')}`);
+
+  if (!values['no-confirm'] && !(await promptConfirm('\nProceed with rollback? (y/N) '))) {
+    return console.log('Aborted.');
+  }
+
+  for (const { modelName, templates, css } of loaded) {
     try {
       await updateModelTemplates(modelName, templates);
-      if (fsSync.existsSync(stylePath)) {
-        await updateModelStyling(modelName, css);
-      }
+      if (css !== null) await updateModelStyling(modelName, css);
+      else console.error(`Warning: no style.css in backup for "${modelName}" (CSS not restored)`);
       console.log(`✓ Restored ${modelName}`);
     } catch (err) {
-      console.error(`Failed to restore "${modelName}": ${err.message}`);
-      process.exit(1);
+      fail(`Failed to restore "${modelName}": ${err.message}`);
     }
   }
 
-  // Restore source files if requested
-  if (restoreSource) {
-    const repoSnapshotDir = path.join(resolvedBackupPath, 'repo-snapshot');
+  if (values['restore-source']) {
+    execFileSync('git', ['checkout', manifest.gitCommit, '--', ...SOURCE_PATHS], { cwd: ROOT, stdio: 'inherit' });
+    console.log('✓ Restored source files from git');
+  }
 
-    // Restore scripts/
-    const backupScriptsDir = path.join(repoSnapshotDir, 'scripts');
-    const targetScriptsDir = path.join(process.cwd(), 'scripts');
-    try {
-      await fs.cp(backupScriptsDir, targetScriptsDir, { recursive: true });
-    } catch (err) {
-      console.error(`Failed to restore scripts/: ${err.message}`);
-      process.exit(1);
-    }
-
-    // Restore Card Templates/
-    const backupCardTemplatesDir = path.join(repoSnapshotDir, 'Card Templates');
-    const targetCardTemplatesDir = path.join(process.cwd(), 'Card Templates');
-    try {
-      await fs.cp(backupCardTemplatesDir, targetCardTemplatesDir, { recursive: true });
-    } catch (err) {
-      console.error(`Failed to restore Card Templates/: ${err.message}`);
-      process.exit(1);
-    }
-
-    // Restore shared/ if it exists in backup
-    const backupSharedDir = path.join(repoSnapshotDir, 'shared');
-    if (fsSync.existsSync(backupSharedDir)) {
-      const targetSharedDir = path.join(process.cwd(), 'shared');
-      try {
-        await fs.cp(backupSharedDir, targetSharedDir, { recursive: true });
-      } catch (err) {
-        console.error(`Failed to restore shared/: ${err.message}`);
-        process.exit(1);
-      }
-    }
-
-    console.log('✓ Restored source files from backup');
+  // Anki no longer matches the last deploy record; drop it so the next deploy isn't a false alarm.
+  try {
+    const state = JSON.parse(fs.readFileSync(paths.state, 'utf8'));
+    for (const m of targets) delete state[m];
+    fs.writeFileSync(paths.state, JSON.stringify(state, null, 2));
+  } catch {
+    // no state file yet
   }
 
   console.log('\nRollback complete.');
 }
 
-rollback();
+rollback().catch((err) => fail(`Rollback failed: ${err.message}`));
