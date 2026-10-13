@@ -356,17 +356,6 @@ hr {
 
 /* Pinyin */
 
-.free_text_wrapper textarea {
-  font-size: 2.2rem;
-  padding: 10px;
-  width: 95%;
-}
-
-/* Force a minimum height for the answer container to prevent misclicking as the UI jumps around */
-#dash {
-  min-height: 56px;
-}
-
 .structure {
   color: var(--structure-color);
 }
@@ -395,6 +384,14 @@ hr {
   color: #263238;
 }
 
+.night_mode .notes {
+  color: var(--text2);
+}
+
+#split_sent {
+  display: none;
+}
+
 .spacer {
   height: 20px;
 }
@@ -410,10 +407,6 @@ hr {
 /*https://codepen.io/danielkvist/pen/xMLKJN*/
 :root {
   --gray: #ddd;
-  --white: #fdfdfd;
-  --blue: hsla(199, 82%, 52%, 1);
-  --blue-bkg: hsla(199, 82%, 70%, 0.35);
-  --blue-font: hsla(199, 82%, 35%, 1);
 }
 
 .btn-q {
@@ -428,77 +421,17 @@ hr {
   color: black;
 }
 
-.text {
-  border: 1px solid green;
-  padding: 10px;
-}
-
-/*https://codepen.io/guerrav/pen/oXZLjd*/
-button.btn-check,
-button.btn-hint,
-button.btn-reset,
-button.btn-play {
-  font-size: 15px;
-  width: 85px;
-  height: 60px!important;
-  margin: 5px;
-}
-
-.btn-check {
-  border: none;
-  color: white;
-  border-radius: 7px;
-  transition: all 0.2s;
-  border-bottom: 4px solid #00796B;
-  background: #009688;
-}
-
-.btn-check:active {
-  transform: scaleX(0.9) translateY(4px);
-}
-
-.btn-check:focus {
-  outline-style: none;
-}
-
-.btn-reset {
-  border-radius: 10px;
-  border: none;
-  color: white;
-  border-radius: 7px;
-  transition: all 0.2s;
-  border-bottom: 4px solid #c62828;
-  background: #e53935;
-}
-
-.btn-reset:active {
-  transform: scaleX(0.9) translateY(4px);
-}
-
-.btn-reset:focus {
-  outline-style: none;
-}
-
-.btn-hint {
-  border-radius: 10px;
-  border: none;
-  color: white;
-  border-radius: 7px;
-  transition: all 0.2s;
-  border-bottom: 4px solid #43A047;
-  background: #4CAF50;
-}
-
-.btn-hint:focus {
-  outline-style: none;
-}
-
-.btn-hint:active {
-  transform: scaleX(0.9) translateY(4px);
+.night_mode .btn-q {
+  background-color: var(--surface3);
+  border-color: var(--surface4);
+  color: var(--text1);
 }
 
 .btn-play {
-  border-radius: 10px;
+  font-size: 15px;
+  width: 85px;
+  height: 60px !important;
+  margin: 5px;
   border: none;
   color: white;
   border-radius: 7px;
@@ -516,7 +449,6 @@ button.btn-play {
 }
 
 @media screen and (max-width: 480px) {
-
   .btn-q {
     font-size: 1.5rem;
   }

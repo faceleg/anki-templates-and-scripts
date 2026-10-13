@@ -34,21 +34,22 @@
     </div>	
 </div>
 
+<script>
+// Strip U+200E (left-to-right mark) from the card's text nodes. Runs on render
+// (DOMContentLoaded never fires again when the page is reused) and only touches
+// text nodes, so nested tone-colour spans survive.
+(function () {
+  var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  var node;
+  while ((node = walker.nextNode())) {
+    if (node.nodeValue.indexOf("‎") !== -1) {
+      node.nodeValue = node.nodeValue.split("‎").join("");
+    }
+  }
+})();
+
+</script>
 <script type="text/javascript">
-
-    document.addEventListener("DOMContentLoaded", function() {
-        // Select the target element
-        var spans = document.querySelectorAll('span');
-
-        // Define the characters to remove
-        var charsToRemove = "\u200E"; // This is the Unicode for the Left-to-Right Mark
-
-        spans.forEach(function(span) {
-            // Replace the characters with an empty string
-            span.textContent = span.textContent.split(charsToRemove).join('');
-        });
-    });
-
     // Show pinyin
     var btnShowPinyin = document.getElementById('btnShowPinyin');
     btnShowPinyin.onclick = function(event) {

@@ -47,21 +47,8 @@
     </div>	
 </div>
 
+<!-- @inject: shared/js/strip-lrm.js -->
 <script type="text/javascript">
-
-    document.addEventListener("DOMContentLoaded", function() {
-        // Select the target element
-        var spans = document.querySelectorAll('span');
-
-        // Define the characters to remove
-        var charsToRemove = "\u200E"; // This is the Unicode for the Left-to-Right Mark
-
-        spans.forEach(function(span) {
-            // Replace the characters with an empty string
-            span.textContent = span.textContent.split(charsToRemove).join('');
-        });
-    });
-
     // Show pinyin
     var btnShowPinyin = document.getElementById('btnShowPinyin');
     btnShowPinyin.onclick = function(event) {

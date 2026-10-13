@@ -134,3 +134,8 @@
   font-size: 12px;
   color: #ea2322;
 }
+
+/* Recall front: one blanked example sentence (the field holds several) */
+.recall-example .char_examples_blank ~ .char_examples_blank {
+  display: none;
+}
